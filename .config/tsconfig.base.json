@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es2015",
+    "strict": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "strictNullChecks": true
+  },
+  "include": ["../src"],
+  "exclude": ["../typings", "../**/*.test.tsx"]
+}

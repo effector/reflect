@@ -1,0 +1,51 @@
+{
+  "name": "effector-reflect",
+  "version": "0.0.1",
+  "repository": "git@github.com:EvgenyiFedotov/effector-reflect.git",
+  "author": "e.fedotov <fedotov1290@gmail.com>",
+  "license": "MIT",
+  "main": "./dist",
+  "typings": "./typings",
+  "files": [
+    "dist",
+    "typings"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "rm -fr ./dist ./typings && tsc -p ./.config/tsconfig.code.json && tsc -p ./.config/tsconfig.typings.json && prettier --write ./typings && yarn uglifyjs ./dist/reflect/index.js -c -m -o ./dist/reflect/index.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.7",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-react": "^7.12.7",
+    "@babel/preset-typescript": "^7.12.7",
+    "@eslint-kit/eslint-config-base": "^2.1.2",
+    "@eslint-kit/eslint-config-node": "^2.0.0",
+    "@eslint-kit/eslint-config-prettier": "^2.0.0",
+    "@eslint-kit/eslint-config-typescript": "^3.1.2",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.2.2",
+    "@types/jest": "^26.0.15",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@typescript-eslint/parser": "^4.8.1",
+    "effector": "^21.7.2",
+    "effector-react": "^21.0.8",
+    "eslint": "^7.14.0",
+    "husky": "^4.3.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.1.2",
+    "uglify-es": "^3.3.9"
+  },
+  "peerDependencies": {
+    "effector": "^21.7.2",
+    "effector-react": "^21.0.8",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
+}
