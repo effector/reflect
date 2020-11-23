@@ -11,7 +11,7 @@
     "typings"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "jest ./src",
     "build": "rm -fr ./dist ./typings && tsc -p ./.config/tsconfig.code.json && tsc -p ./.config/tsconfig.typings.json && prettier --write ./typings && yarn uglifyjs ./dist/reflect/index.js -c -m -o ./dist/reflect/index.js"
   },
   "devDependencies": {
@@ -47,5 +47,11 @@
     "effector-react": "^21.0.8",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn eslint ./src",
+      "pre-push": "yarn test"
+    }
   }
 }
