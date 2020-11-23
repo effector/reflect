@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "jest ./src",
-    "build": "rm -fr ./dist ./typings && tsc -p ./.config/tsconfig.code.json && tsc -p ./.config/tsconfig.typings.json && prettier --write ./typings && yarn uglifyjs ./dist/reflect/index.js -c -m -o ./dist/reflect/index.js"
+    "build": "rm -fr ./dist ./typings && tsc -p ./.config/tsconfig.code.json && tsc -p ./.config/tsconfig.typings.json && prettier --write ./typings && yarn uglifyjs ./dist/reflect/index.js -c -m -o ./dist/reflect/index.js  && yarn uglifyjs ./dist/create-reflect/index.js -c -m -o ./dist/create-reflect/index.js"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
