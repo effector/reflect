@@ -5,5 +5,5 @@ yarn-error.log
 
 dist
 typings
-package
+package*
 effector-reflect-*
