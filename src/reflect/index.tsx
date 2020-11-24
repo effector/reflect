@@ -2,7 +2,7 @@ import React, { FC, ComponentClass } from 'react';
 import { Store, combine } from 'effector';
 import { useStore } from 'effector-react';
 
-type ShapeProps<Props> = {
+export type ShapeProps<Props> = {
   [Key in keyof Props]?:
     | Omit<Store<Props[Key]>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>
     | Props[Key];
