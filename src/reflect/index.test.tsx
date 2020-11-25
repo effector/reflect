@@ -1,4 +1,4 @@
-import React, { FC, InputHTMLAttributes } from 'react';
+import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
 import { createStore, createEvent, restore } from 'effector';
 
 import { render } from '@testing-library/react';
@@ -66,11 +66,15 @@ test('InputBase', async () => {
   const changeName = createEvent<string>();
   const $name = restore(changeName, '');
 
+  const inputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+    return event.currentTarget.value;
+  };
+
   const Name = reflect({
     view: InputBase,
     bind: {
       value: $name,
-      onChange: (event) => changeName(event.currentTarget.value),
+      onChange: changeName.prepend(inputChanged),
     },
   });
 
@@ -80,9 +84,7 @@ test('InputBase', async () => {
     view: InputBase,
     bind: {
       value: $age,
-      onChange: (event) => {
-        changeAge(Number.parseInt(event.currentTarget.value, 10));
-      },
+      onChange: changeAge.prepend(parseInt).prepend(inputChanged),
     },
   });
 
