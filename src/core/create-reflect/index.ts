@@ -1,7 +1,7 @@
 import { FC, ComponentClass } from 'react';
-import { reflect, ShapeProps } from '../reflect';
+import { reflect, BindByProps } from '../reflect';
 
 export function createReflect<Props>(view: FC<Props> | ComponentClass<Props>) {
-  return <Bind extends ShapeProps<Props> = ShapeProps<Props>>(bind: Bind) =>
+  return <Bind extends BindByProps<Props> = BindByProps<Props>>(bind: Bind) =>
     reflect<Props, Bind>({ view, bind });
 }

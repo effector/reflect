@@ -1,8 +1,9 @@
-import React, { FC, ComponentClass } from 'react';
+import { FC, ComponentClass, createElement } from 'react';
 import { Store, combine } from 'effector';
-import { useStore } from 'effector-react';
 
-export type ShapeProps<Props> = {
+import { contextRef } from '../context';
+
+export type BindByProps<Props> = {
   [Key in keyof Props]?:
     | Omit<Store<Props[Key]>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>
     | Props[Key];
@@ -26,18 +27,24 @@ type PropsByBind<
 
 export function reflect<
   Props,
-  Bind extends ShapeProps<Props> = ShapeProps<Props>
->(payload: { view: View<Props>; bind: Bind }) {
-  const View = payload.view;
+  Bind extends BindByProps<Props> = BindByProps<Props>
+>(_payload: { view: View<Props>; bind: Bind }): FC<PropsByBind<Props, Bind>>;
 
+export function reflect<
+  Props,
+  Bind extends BindByProps<Props> = BindByProps<Props>
+>(payload: { view: View<Props>; bind: Bind }) {
   const $bind = combine(payload.bind);
 
-  const Wrapper: FC<PropsByBind<Props, Bind>> = (props) => {
-    const storeProps = useStore($bind);
-    const combineProps = { ...storeProps, ...props } as Props;
+  if (contextRef.context === null) {
+    throw new Error("Context didn't context");
+  }
 
-    return <View {...combineProps} />;
+  const wrapper = (props: Props) => {
+    const storeProps = contextRef.context?.useStore($bind);
+
+    return createElement(payload.view, { ...storeProps, ...props });
   };
 
-  return Wrapper;
+  return wrapper;
 }

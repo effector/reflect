@@ -37,11 +37,16 @@ test('InputCustom', async () => {
   expect($name.getState()).toBe('');
   await userEvent.type(container.getByTestId('name'), 'Bob');
   expect($name.getState()).toBe('Bob');
+
+  const inputName = container.container.firstChild as HTMLInputElement;
+  expect(inputName.value).toBe('Bob');
 });
 
 test('InputCustom [replace value]', async () => {
   const change = createEvent<string>();
   const $name = createStore<string>('');
+
+  $name.on(change, (_, next) => next);
 
   const Name = reflect({
     view: InputCustom,
@@ -52,9 +57,10 @@ test('InputCustom [replace value]', async () => {
 
   expect($name.getState()).toBe('');
   await userEvent.type(container.getByTestId('name'), 'Bob');
+  expect($name.getState()).toBe('Aliseb');
+
   const inputName = container.container.firstChild as HTMLInputElement;
   expect(inputName.value).toBe('Alise');
-  expect($name.getState()).toBe('');
 });
 
 // Example 2 (InputBase)
@@ -102,4 +108,10 @@ test('InputBase', async () => {
   expect($age.getState()).toBe(0);
   await userEvent.type(container.getByTestId('age'), '25');
   expect($age.getState()).toBe(25);
+
+  const inputName = container.getByTestId('name') as HTMLInputElement;
+  expect(inputName.value).toBe('Bob');
+
+  const inputAge = container.getByTestId('age') as HTMLInputElement;
+  expect(inputAge.value).toBe('25');
 });
