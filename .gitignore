@@ -3,7 +3,10 @@ node_modules
 
 yarn-error.log
 
-dist
-typings
+/dist
+/typings
+/browser
+/ssr
+
 package*
 effector-reflect-*
