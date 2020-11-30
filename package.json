@@ -4,15 +4,15 @@
   "repository": "git@github.com:EvgenyiFedotov/effector-reflect.git",
   "author": "e.fedotov <fedotov1290@gmail.com>",
   "license": "MIT",
-  "main": "./dist",
-  "typings": "./typings",
+  "main": "./browser",
   "files": [
     "dist",
-    "typings"
+    "browser",
+    "ssr"
   ],
   "scripts": {
     "test": "jest",
-    "build": "rm -fr ./dist ./typings && tsc -p ./.config/tsconfig.code.json && tsc -p ./.config/tsconfig.typings.json && prettier --write ./typings && yarn uglifyjs ./dist/reflect/index.js -c -m -o ./dist/reflect/index.js  && yarn uglifyjs ./dist/create-reflect/index.js -c -m -o ./dist/create-reflect/index.js"
+    "build": "rm -fr dist browser ssr && yarn rollup --config ./rollup.config.js"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",

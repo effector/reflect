@@ -20,18 +20,23 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://registry.npmjs.org'
 
       - name: install
         run: yarn install
 
       - name: test
-        run: yarn test
+        run: yarn test ./src
         env:
           CI: true
 
       - name: build
         run: yarn build
+
+      - name: test dist
+        run: yarn test ./dist
+        env:
+          CI: true
 
       - name: publish
         run: npm publish
