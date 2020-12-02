@@ -5,6 +5,7 @@ import {
   restore,
   createDomain,
   fork,
+  allSettled,
 } from 'effector';
 import { Provider } from 'effector-react/ssr';
 
@@ -189,9 +190,13 @@ test('with ssr bu for client', async () => {
     </Provider>,
   );
 
+  expect(scope.getState($name)).toBe('');
   expect($name.getState()).toBe('');
   await userEvent.type(container.getByTestId('name'), 'Bob');
   expect($name.getState()).toBe('Bob');
+  expect(scope.getState($name)).toBe('Bob');
+
+  // await allSettled(changeName, { scope, params: 'Bob' });
 
   const inputName = container.getByTestId('name') as HTMLInputElement;
   expect(inputName.value).toBe('Bob');
