@@ -18,22 +18,31 @@ yarn add effector-reflect
 
 ## Motivation
 
-### Old case
+### Common ui
 
-```ts
+```tsx
+// ./ui.ts
 import React, { FC, ChangeEvent, useCallback } from 'react';
-import { createEvent, restore } from 'effector';
-import { useStore } from 'effector-react';
 
-// Base components
 type InputProps = {
   value: string;
   onChange: ChangeEvent<HTMLInputElement>;
 };
 
-const Input: FC<InputProps> = ({ value, onChange }) => {
+export const Input: FC<InputProps> = ({ value, onChange }) => {
   return <input value={value} onChange={onChange} />;
 };
+```
+
+### Old case
+
+```tsx
+// ./old-case.ts
+import React, { FC, ChangeEvent, useCallback } from 'react';
+import { createEvent, restore } from 'effector';
+import { useStore } from 'effector-react';
+
+import { Input } from './ui';
 
 // Model
 const changeName = createEvent<string>();
@@ -53,21 +62,12 @@ export const Name: FC = () => {
 
 ### New case
 
-```ts
-// New case
-import React, { FC, ChangeEvent } from 'react';
+```tsx
+// ./new-case.ts
 import { createEvent, restore } from 'effector';
 import { reflect } from 'effector-reflect';
 
-// Base components
-type InputProps = {
-  value: string;
-  onChange: ChangeEvent<HTMLInputElement>;
-};
-
-const Input: FC<InputProps> = ({ value, onChange }) => {
-  return <input value={value} onChange={onChange} />;
-};
+import { Input } from './ui';
 
 // Model
 const changeName = createEvent<string>();
@@ -84,7 +84,7 @@ export const Name = reflect({
 
 Method for bind stores to a view.
 
-```ts
+```tsx
 // ./user.tsx
 import React, { FC, useCallback, ChangeEvent } from 'react';
 import { createEvent, restore } from 'effector';
@@ -143,7 +143,7 @@ export const User: FC = () => {
 
 Method for creating reflect a view. So you can create a UI kit by views and use a view with a store already.
 
-```ts
+```tsx
 // ./ui.tsx
 import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
 import { createReflect } from 'effector-reflect';
@@ -177,7 +177,7 @@ const Button: FC<ButtonProps> = ({ onClick, children, title }) => {
 export const reflectButton = createReflect(Button);
 ```
 
-```ts
+```tsx
 // ./user.tsx
 import React, { FC } from 'react';
 import { createEvent, restore } from 'effector';
@@ -220,6 +220,80 @@ export const User: FC = () => {
 };
 ```
 
-## Roadmap
+## SSR
 
-- [ ] Add ssr
+For ssr on server-side need one import.
+
+```tsx
+// ./ui.tsx
+import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
+import { createReflect } from 'effector-reflect';
+
+// Input
+type InputProps = {
+  value: string;
+  onChange: ChangeEvent<HTMLInputElement>;
+};
+
+const Input: FC<InputProps> = ({ value, onChange }) => {
+  return <input value={value} onChange={onChange} />;
+};
+```
+
+```tsx
+// ./app.tsx
+import React, { FC } from 'react';
+import { createEvent, restore, Fork, createDomain } from 'effector';
+import { reflect } from 'effector-reflect';
+import { Provider } from 'effector-react/ssr';
+
+import { Input } from './ui';
+
+// Model
+export const app = createDomain();
+
+export const changeName = app.createEvent<string>();
+const $name = restore(changeName, '');
+
+// Component
+const Name = reflect({
+  view: Input,
+  bind: { value: $name, onChange: (event) => changeName(event.target.value) },
+});
+
+export const App: FC<{ data: Fork }> = ({ data }) => {
+  return (
+    <Provider value={data}>
+      <Name />
+    </Provider>
+  );
+};
+```
+
+```tsx
+// ./server.ts
+// imports ...
+import { fork, serialize, allSettled } from 'effector/fork';
+import 'effector-reflect/ssr';
+
+import { App, app, changeName } from './app';
+
+const render = async () => {
+  const scope = fork(app);
+
+  await allSettled(changeName, { scope, params: 'Bob' });
+
+  const data = serialize(scope);
+
+  const content = renderToString(<App data={scope} />);
+
+  return `
+    <body>
+      ${content}
+      <script>
+        window.__initialState__ = ${JSON.stringify(data)};
+      </script>
+    </body>
+  `;
+};
+```
