@@ -9,11 +9,16 @@ interface Context {
 interface ContextRef {
   mode: Mode | null;
   context: Context | null;
+  strict?: boolean;
 }
 
 export const contextRef: ContextRef = { mode: null, context: null };
 
-export const setContext = (payload: { mode: Mode; context: Context }) => {
+export const setContext = (payload: {
+  mode: Mode;
+  context: Context;
+  strict?: boolean;
+}) => {
   const isAddBrowser = contextRef.mode === null && payload.mode === 'browser';
   const isAddSsr =
     (contextRef.mode === null || contextRef.mode === 'browser') &&
@@ -22,10 +27,13 @@ export const setContext = (payload: { mode: Mode; context: Context }) => {
   if (isAddBrowser || isAddSsr) {
     contextRef.mode = payload.mode;
     contextRef.context = payload.context;
+    contextRef.strict = payload.strict ?? false;
     return null;
   }
 
-  throw new Error(
-    'Context insertion error. The context is already configured.',
-  );
+  if (contextRef.strict) {
+    throw new Error(
+      'Context insertion error. The context is already configured.',
+    );
+  }
 };
