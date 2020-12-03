@@ -3,9 +3,9 @@ import { restore, fork, allSettled, createDomain } from 'effector';
 import { Provider } from 'effector-react/ssr';
 
 import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-import { createReflect } from '../browser';
-import './index';
+import { createReflect } from './index';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -128,4 +128,31 @@ test('InputBase', async () => {
 
   const inputAge = container.getByTestId('age') as HTMLInputElement;
   expect(inputAge.value).toBe('25');
+});
+
+test('with ssr for client', async () => {
+  const app = createDomain();
+
+  const changeName = app.createEvent<string>();
+  const $name = restore(changeName, '');
+
+  const Name = inputBase({
+    value: $name,
+    onChange: changeName.prepend((event) => event.currentTarget.value),
+  });
+
+  const scope = fork(app);
+
+  const container = render(
+    <Provider value={scope}>
+      <Name data-testid="name" />
+    </Provider>,
+  );
+
+  expect($name.getState()).toBe('');
+  await userEvent.type(container.getByTestId('name'), 'Bob');
+  expect(scope.getState($name)).toBe('Bob');
+
+  const inputName = container.getByTestId('name') as HTMLInputElement;
+  expect(inputName.value).toBe('Bob');
 });

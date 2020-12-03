@@ -4,8 +4,7 @@ import { Provider } from 'effector-react/ssr';
 
 import { render } from '@testing-library/react';
 
-import { createReflect } from '../../browser';
-import '../../ssr';
+import { createReflect } from '../../ssr';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

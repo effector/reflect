@@ -1,18 +1,10 @@
 import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
-import {
-  createStore,
-  createEvent,
-  restore,
-  createDomain,
-  fork,
-  allSettled,
-} from 'effector';
-import { Provider } from 'effector-react/ssr';
+import { createStore, createEvent, restore } from 'effector';
 
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { reflect } from './index';
+import { reflect } from '../../no-ssr';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -122,82 +114,4 @@ test('InputBase', async () => {
 
   const inputAge = container.getByTestId('age') as HTMLInputElement;
   expect(inputAge.value).toBe('25');
-});
-
-test('component inside', async () => {
-  const changeName = createEvent<string>();
-  const $name = restore(changeName, '');
-
-  const Name = reflect({
-    view: (props: {
-      value: string;
-      onChange: (_event: ChangeEvent<HTMLInputElement>) => void;
-    }) => {
-      return (
-        <input
-          data-testid="name"
-          value={props.value}
-          onChange={props.onChange}
-        />
-      );
-    },
-    bind: {
-      value: $name,
-      onChange: changeName.prepend((event) => event.currentTarget.value),
-    },
-  });
-
-  const container = render(<Name />);
-
-  expect($name.getState()).toBe('');
-  await userEvent.type(container.getByTestId('name'), 'Bob');
-  expect($name.getState()).toBe('Bob');
-
-  const inputName = container.getByTestId('name') as HTMLInputElement;
-  expect(inputName.value).toBe('Bob');
-});
-
-test('with ssr bu for client', async () => {
-  const app = createDomain();
-
-  const changeName = app.createEvent<string>();
-  const $name = restore(changeName, '');
-
-  const Name = reflect({
-    view: (props: {
-      value: string;
-      onChange: (_event: ChangeEvent<HTMLInputElement>) => void;
-    }) => {
-      return (
-        <input
-          data-testid="name"
-          value={props.value}
-          onChange={props.onChange}
-        />
-      );
-    },
-    bind: {
-      value: $name,
-      onChange: changeName.prepend((event) => event.currentTarget.value),
-    },
-  });
-
-  const scope = fork(app);
-
-  const container = render(
-    <Provider value={scope}>
-      <Name />
-    </Provider>,
-  );
-
-  expect(scope.getState($name)).toBe('');
-  expect($name.getState()).toBe('');
-  await userEvent.type(container.getByTestId('name'), 'Bob');
-  expect($name.getState()).toBe('Bob');
-  expect(scope.getState($name)).toBe('Bob');
-
-  // await allSettled(changeName, { scope, params: 'Bob' });
-
-  const inputName = container.getByTestId('name') as HTMLInputElement;
-  expect(inputName.value).toBe('Bob');
 });

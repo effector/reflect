@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "rm -fr dist browser ssr && yarn rollup --config ./rollup.config.js"
+    "build": "rm -fr dist no-ssr ssr && yarn rollup --config ./rollup.config.js"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
@@ -30,8 +30,8 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/parser": "^4.8.1",
-    "effector": "^21.7.2",
-    "effector-react": "^21.0.8",
+    "effector": "^21.7.5",
+    "effector-react": "^21.2.0",
     "eslint": "^7.14.0",
     "fs-extra": "^9.0.1",
     "husky": "^4.3.0",
@@ -47,8 +47,8 @@
     "uglify-es": "^3.3.9"
   },
   "peerDependencies": {
-    "effector": "^21.7.2",
-    "effector-react": "^21.0.8",
+    "effector": "^21.7.5",
+    "effector-react": "^21.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },

@@ -1,3 +1,2 @@
-export { setContext } from './context';
-export { reflect } from './reflect';
-export { createReflect } from './create-reflect';
+export { reflectCreator } from './reflect';
+export { createReflectCreator } from './create-reflect';

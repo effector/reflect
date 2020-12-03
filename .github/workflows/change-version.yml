@@ -34,7 +34,7 @@ jobs:
         run: yarn build
 
       - name: test dist
-        run: yarn test ./dist
+        run: yarn test ./dist-test
         env:
           CI: true
 

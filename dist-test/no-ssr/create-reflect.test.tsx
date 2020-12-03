@@ -1,10 +1,10 @@
-import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
+import React, { FC, InputHTMLAttributes } from 'react';
 import { createStore, createEvent, restore } from 'effector';
 
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { reflect } from '../../browser';
+import { createReflect } from '../../no-ssr';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -23,14 +23,13 @@ const InputCustom: FC<{
   );
 };
 
+const inputCustom = createReflect(InputCustom);
+
 test('InputCustom', async () => {
   const change = createEvent<string>();
   const $name = restore(change, '');
 
-  const Name = reflect({
-    view: InputCustom,
-    bind: { value: $name, onChange: change },
-  });
+  const Name = inputCustom({ value: $name, onChange: change });
 
   const container = render(<Name testId="name" />);
 
@@ -48,10 +47,7 @@ test('InputCustom [replace value]', async () => {
 
   $name.on(change, (_, next) => next);
 
-  const Name = reflect({
-    view: InputCustom,
-    bind: { name: $name, onChange: change },
-  });
+  const Name = inputCustom({ name: $name, onChange: change });
 
   const container = render(<Name testId="name" value="Alise" />);
 
@@ -68,29 +64,23 @@ const InputBase: FC<InputHTMLAttributes<HTMLInputElement>> = (props) => {
   return <input {...props} />;
 };
 
+const inputBase = createReflect(InputBase);
+
 test('InputBase', async () => {
   const changeName = createEvent<string>();
   const $name = restore(changeName, '');
 
-  const inputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-    return event.currentTarget.value;
-  };
-
-  const Name = reflect({
-    view: InputBase,
-    bind: {
-      value: $name,
-      onChange: changeName.prepend(inputChanged),
-    },
+  const Name = inputBase({
+    value: $name,
+    onChange: (event) => changeName(event.currentTarget.value),
   });
 
   const changeAge = createEvent<number>();
   const $age = restore(changeAge, 0);
-  const Age = reflect({
-    view: InputBase,
-    bind: {
-      value: $age,
-      onChange: changeAge.prepend(parseInt).prepend(inputChanged),
+  const Age = inputBase({
+    value: $age,
+    onChange: (event) => {
+      changeAge(Number.parseInt(event.currentTarget.value, 10));
     },
   });
 

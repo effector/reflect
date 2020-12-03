@@ -1,7 +1,8 @@
-import { FC, ComponentClass, createElement } from 'react';
-import { Store, combine } from 'effector';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { contextRef } from '../context';
+import { FC, ComponentClass, createElement } from 'react';
+import { Store, combine, Event, is } from 'effector';
+import { useEvent, useStore } from 'effector-react';
 
 export type BindByProps<Props> = {
   [Key in keyof Props]?:
@@ -9,42 +10,40 @@ export type BindByProps<Props> = {
     | Props[Key];
 };
 
-type View<T> = FC<T> | ComponentClass<T>;
+export type View<T> = FC<T> | ComponentClass<T>;
 
-type PropsOmitBind<Props, Bind> = Omit<Props, keyof Bind>;
+export type PropsByBind<Props, Bind> = Omit<Props, keyof Bind> &
+  Partial<Omit<Props, keyof Omit<Props, keyof Bind>>>;
 
-type PropsPartialOmit<Props, PropsOmit> = Partial<Omit<Props, keyof PropsOmit>>;
+export interface ReflectCreatorContext {
+  useStore: typeof useStore;
+  useEvent: typeof useEvent;
+}
 
-type PropsByBind<
-  Props,
-  Bind,
-  PropsOmit extends PropsOmitBind<Props, Bind> = PropsOmitBind<Props, Bind>,
-  PropsPartion extends PropsPartialOmit<Props, PropsOmit> = PropsPartialOmit<
+export function reflectCreator(context: ReflectCreatorContext) {
+  return function reflect<
     Props,
-    PropsOmit
-  >
-> = PropsOmit & PropsPartion;
+    Bind extends BindByProps<Props> = BindByProps<Props>
+  >(payload: { view: View<Props>; bind: Bind }): FC<PropsByBind<Props, Bind>> {
+    const bind = payload.bind;
+    const events: Record<string, Event<unknown>> = {};
 
-export function reflect<
-  Props,
-  Bind extends BindByProps<Props> = BindByProps<Props>
->(_payload: { view: View<Props>; bind: Bind }): FC<PropsByBind<Props, Bind>>;
+    for (const key in bind) {
+      const value = bind[key];
 
-export function reflect<
-  Props,
-  Bind extends BindByProps<Props> = BindByProps<Props>
->(payload: { view: View<Props>; bind: Bind }) {
-  const $bind = combine(payload.bind);
+      if (is.event(value)) {
+        events[key] = value;
+      }
+    }
 
-  if (contextRef.context === null) {
-    throw new Error("Context didn't context");
-  }
+    const $bind = combine(payload.bind);
 
-  const wrapper = (props: Props) => {
-    const storeProps = contextRef.context?.useStore($bind);
+    return (props) => {
+      const storeProps = context.useStore($bind);
+      const eventsProps = context.useEvent(events);
+      const elementProps = { ...storeProps, ...eventsProps, ...props } as Props;
 
-    return createElement(payload.view, { ...storeProps, ...props });
+      return createElement(payload.view, elementProps);
+    };
   };
-
-  return wrapper;
 }

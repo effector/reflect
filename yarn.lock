@@ -2337,15 +2337,15 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-effector-react@^21.0.8:
-  version "21.0.8"
-  resolved "https://registry.yarnpkg.com/effector-react/-/effector-react-21.0.8.tgz#497b7834e08a52b3f8f84c90d777bba1500cb2e7"
-  integrity sha512-mNJ785p7tT3+crEPvAiKH8YH/XXmBjAfYAcwktEs3awn5rplXMH246tQE6rjzFVnNZEhaROgFZqw51ViyrD2cw==
+effector-react@^21.2.0:
+  version "21.2.0"
+  resolved "https://registry.yarnpkg.com/effector-react/-/effector-react-21.2.0.tgz#c15e2ef59e27b7772704168a59acee0808f3ab41"
+  integrity sha512-lAz8b2F5YgfJKQIegbBT2w8Jqvcs+62QnnYJe4+PqI2s7X3oJvuQ2Zm1obrrsWpoMOqDUdEpaP0KDMq8YRg5ng==
 
-effector@^21.7.2:
-  version "21.7.2"
-  resolved "https://registry.yarnpkg.com/effector/-/effector-21.7.2.tgz#0f20d846cbee5d61411c70162367ad6a41213b9b"
-  integrity sha512-U1hOITOlAkPdCwJlwpm67L+M8XnWboupgz9orYwm/h32qhZOE/+AMp6pjkM6BVexviuJRNAbx2TluuVodagiYA==
+effector@^21.7.5:
+  version "21.7.5"
+  resolved "https://registry.yarnpkg.com/effector/-/effector-21.7.5.tgz#6a8ed81c57e17cc8373ce29645e2715f9693aebd"
+  integrity sha512-sWB9xPJxfTHsPOzjxUIa2rJQ1T33Ya4X2N8RSqm+XMewEt5YmPpo2w82yZF27JxBl0qAQBg1ZI3Tz7u5fE+cwA==
 
 electron-to-chromium@^1.3.591:
   version "1.3.603"

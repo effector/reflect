@@ -297,3 +297,7 @@ const render = async () => {
   `;
 };
 ```
+
+## Roadmap
+
+- [] Auto moving test from ./src to ./dist-test

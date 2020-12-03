@@ -6,7 +6,7 @@ import multiInput from 'rollup-plugin-multi-input';
 const { exportRoot } = require('./lib/rollup-plugin-export-root');
 
 export default {
-  input: ['./src/browser/index.ts', './src/ssr/index.ts'],
+  input: ['./src/no-ssr/index.ts', './src/ssr/index.ts'],
   output: { dir: './dist', format: 'cjs' },
   plugins: [
     typescript({

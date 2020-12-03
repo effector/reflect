@@ -1,10 +1,10 @@
-import React, { FC, InputHTMLAttributes } from 'react';
+import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
 import { createStore, createEvent, restore } from 'effector';
 
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { createReflect } from '../../browser';
+import { reflect } from './index';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -23,13 +23,14 @@ const InputCustom: FC<{
   );
 };
 
-const inputCustom = createReflect(InputCustom);
-
 test('InputCustom', async () => {
   const change = createEvent<string>();
   const $name = restore(change, '');
 
-  const Name = inputCustom({ value: $name, onChange: change });
+  const Name = reflect({
+    view: InputCustom,
+    bind: { value: $name, onChange: change },
+  });
 
   const container = render(<Name testId="name" />);
 
@@ -47,7 +48,10 @@ test('InputCustom [replace value]', async () => {
 
   $name.on(change, (_, next) => next);
 
-  const Name = inputCustom({ name: $name, onChange: change });
+  const Name = reflect({
+    view: InputCustom,
+    bind: { name: $name, onChange: change },
+  });
 
   const container = render(<Name testId="name" value="Alise" />);
 
@@ -64,23 +68,29 @@ const InputBase: FC<InputHTMLAttributes<HTMLInputElement>> = (props) => {
   return <input {...props} />;
 };
 
-const inputBase = createReflect(InputBase);
-
 test('InputBase', async () => {
   const changeName = createEvent<string>();
   const $name = restore(changeName, '');
 
-  const Name = inputBase({
-    value: $name,
-    onChange: (event) => changeName(event.currentTarget.value),
+  const inputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+    return event.currentTarget.value;
+  };
+
+  const Name = reflect({
+    view: InputBase,
+    bind: {
+      value: $name,
+      onChange: changeName.prepend(inputChanged),
+    },
   });
 
   const changeAge = createEvent<number>();
   const $age = restore(changeAge, 0);
-  const Age = inputBase({
-    value: $age,
-    onChange: (event) => {
-      changeAge(Number.parseInt(event.currentTarget.value, 10));
+  const Age = reflect({
+    view: InputBase,
+    bind: {
+      value: $age,
+      onChange: changeAge.prepend(parseInt).prepend(inputChanged),
     },
   });
 
@@ -104,4 +114,37 @@ test('InputBase', async () => {
 
   const inputAge = container.getByTestId('age') as HTMLInputElement;
   expect(inputAge.value).toBe('25');
+});
+
+test('component inside', async () => {
+  const changeName = createEvent<string>();
+  const $name = restore(changeName, '');
+
+  const Name = reflect({
+    view: (props: {
+      value: string;
+      onChange: (_event: ChangeEvent<HTMLInputElement>) => void;
+    }) => {
+      return (
+        <input
+          data-testid="name"
+          value={props.value}
+          onChange={props.onChange}
+        />
+      );
+    },
+    bind: {
+      value: $name,
+      onChange: changeName.prepend((event) => event.currentTarget.value),
+    },
+  });
+
+  const container = render(<Name />);
+
+  expect($name.getState()).toBe('');
+  await userEvent.type(container.getByTestId('name'), 'Bob');
+  expect($name.getState()).toBe('Bob');
+
+  const inputName = container.getByTestId('name') as HTMLInputElement;
+  expect(inputName.value).toBe('Bob');
 });
