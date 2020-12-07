@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "rm -fr dist no-ssr ssr && yarn rollup --config ./rollup.config.js"
+    "build": "rm -fr dist no-ssr ssr && yarn rollup --config ./rollup.config.js",
+    "test-build": "yarn test ./dist-test"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",

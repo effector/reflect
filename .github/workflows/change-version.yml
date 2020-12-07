@@ -33,8 +33,8 @@ jobs:
       - name: build
         run: yarn build
 
-      - name: test dist
-        run: yarn test ./dist-test
+      - name: test build
+        run: yarn test-build
         env:
           CI: true
 
