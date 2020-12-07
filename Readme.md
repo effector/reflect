@@ -222,12 +222,11 @@ export const User: FC = () => {
 
 ## SSR
 
-For ssr on server-side need one import.
+For SSR need to replace imports `effector-reflect` -> `effector-reflect/ssr`.
 
 ```tsx
 // ./ui.tsx
 import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
-import { createReflect } from 'effector-reflect';
 
 // Input
 type InputProps = {
@@ -244,7 +243,7 @@ const Input: FC<InputProps> = ({ value, onChange }) => {
 // ./app.tsx
 import React, { FC } from 'react';
 import { createEvent, restore, Fork, createDomain } from 'effector';
-import { reflect } from 'effector-reflect';
+import { reflect } from 'effector-reflect/ssr';
 import { Provider } from 'effector-react/ssr';
 
 import { Input } from './ui';
@@ -272,9 +271,7 @@ export const App: FC<{ data: Fork }> = ({ data }) => {
 
 ```tsx
 // ./server.ts
-// imports ...
 import { fork, serialize, allSettled } from 'effector/fork';
-import 'effector-reflect/ssr';
 
 import { App, app, changeName } from './app';
 
