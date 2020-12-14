@@ -171,10 +171,56 @@ test('with ssr for client', async () => {
     </Provider>,
   );
 
-  expect($name.getState()).toBe('');
+  expect(scope.getState($name)).toBe('');
   await userEvent.type(container.getByTestId('name'), 'Bob');
   expect(scope.getState($name)).toBe('Bob');
 
   const inputName = container.getByTestId('name') as HTMLInputElement;
   expect(inputName.value).toBe('Bob');
+});
+
+test('two scopes', async () => {
+  const app = createDomain();
+
+  const changeName = app.createEvent<string>();
+  const $name = restore(changeName, '');
+
+  const Name = reflect({
+    view: InputCustom,
+    bind: { value: $name, onChange: changeName },
+  });
+
+  const scope1 = fork(app);
+  const scope2 = fork(app);
+
+  expect(scope2.getState($name)).toBe('');
+  await allSettled(changeName, { scope: scope2, params: 'Alise' });
+  expect(scope2.getState($name)).toBe('Alise');
+
+  expect(scope1.getState($name)).toBe('');
+  await allSettled(changeName, { scope: scope1, params: 'Bob' });
+  expect(scope1.getState($name)).toBe('Bob');
+
+  const container2 = render(
+    <Provider value={scope2}>
+      <Name testId="name2" />
+    </Provider>,
+  );
+  const container1 = render(
+    <Provider value={scope1}>
+      <Name testId="name1" />
+    </Provider>,
+  );
+
+  const inputName1 = container1.getByTestId('name1') as HTMLInputElement;
+  const inputName2 = container2.getByTestId('name2') as HTMLInputElement;
+
+  await allSettled(changeName, { scope: scope2, params: 'Alise' });
+  await allSettled(changeName, { scope: scope1, params: 'Bob' });
+
+  expect(scope1.getState($name)).toBe('Bob');
+  expect(scope2.getState($name)).toBe('Alise');
+
+  expect(inputName1.value).toBe('Bob');
+  expect(inputName2.value).toBe('Alise');
 });
