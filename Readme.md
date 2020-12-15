@@ -223,6 +223,7 @@ export const User: FC = () => {
 ## SSR
 
 For SSR need to replace imports `effector-reflect` -> `effector-reflect/ssr`.
+Also use `event.prepend(params => params)` instead `(params) => event(params)`.
 
 ```tsx
 // ./ui.tsx
@@ -257,7 +258,7 @@ const $name = restore(changeName, '');
 // Component
 const Name = reflect({
   view: Input,
-  bind: { value: $name, onChange: (event) => changeName(event.target.value) },
+  bind: { value: $name, onChange: changeName.prepend(event => event.target.value) },
 });
 
 export const App: FC<{ data: Fork }> = ({ data }) => {
