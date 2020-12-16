@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { FC, ComponentClass, createElement } from 'react';
-import { Store, combine, Event, is } from 'effector';
+import { Store, combine, Event, Effect, is } from 'effector';
 import { useEvent, useStore } from 'effector-react';
 
 export type BindByProps<Props> = {
@@ -24,26 +24,37 @@ export function reflectCreator(context: ReflectCreatorContext) {
   return function reflect<
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
-  >(payload: { view: View<Props>; bind: Bind }): FC<PropsByBind<Props, Bind>> {
-    const bind = payload.bind;
-    const events: Record<string, Event<unknown>> = {};
+  >(config: { view: View<Props>; bind: Bind }): FC<PropsByBind<Props, Bind>> {
+    type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
+    const events: Record<string, GenericEvent> = {};
+    const stores: Record<string, Store<unknown>> = {};
+    const data: Record<string, unknown> = {};
 
-    for (const key in bind) {
-      const value = bind[key];
+    for (const key in config.bind) {
+      const value = config.bind[key];
 
-      if (is.event(value)) {
+      if (is.event(value) || is.effect(value)) {
         events[key] = value;
+      } else if (is.store(value)) {
+        stores[key] = value;
+      } else {
+        data[key] = value;
       }
     }
 
-    const $bind = combine(payload.bind);
+    const $bind = Object.keys(stores).length > 0 ? combine(stores) : null;
 
     return (props) => {
-      const storeProps = context.useStore($bind);
+      const storeProps = $bind ? context.useStore($bind) : ({} as Props);
       const eventsProps = context.useEvent(events);
-      const elementProps = { ...storeProps, ...eventsProps, ...props } as Props;
+      const elementProps = {
+        ...storeProps,
+        ...eventsProps,
+        ...data,
+        ...props,
+      } as Props;
 
-      return createElement(payload.view, elementProps);
+      return createElement(config.view, elementProps);
     };
   };
 }
