@@ -224,3 +224,44 @@ test('two scopes', async () => {
   expect(inputName1.value).toBe('Bob');
   expect(inputName2.value).toBe('Alise');
 });
+
+test('use only event for bind', async () => {
+  const app = createDomain();
+
+  const changeName = app.createEvent<string>();
+  const $name = restore(changeName, '');
+
+  const changeAge = app.createEvent<number>();
+
+  const Name = reflect({
+    view: InputBase,
+    bind: {
+      value: $name,
+      onChange: changeName.prepend((event) => event.currentTarget.value),
+    },
+  });
+
+  const Age = reflect({
+    view: InputBase,
+    bind: {
+      onChange: changeAge.prepend((event) =>
+        Number.parseInt(event.currentTarget.value, 10),
+      ),
+    },
+  });
+
+  const scope = fork(app);
+
+  const container = render(
+    <Provider value={scope}>
+      <Name data-testid="name" />
+      <Age data-testid="age" />
+    </Provider>,
+  );
+
+  const name = container.getByTestId('name') as HTMLInputElement;
+  const age = container.getByTestId('age') as HTMLInputElement;
+
+  expect(name.value).toBe('');
+  expect(age.value).toBe('');
+});
