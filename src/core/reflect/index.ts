@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { FC, ComponentClass, createElement } from 'react';
+import { FC, ComponentClass, createElement, useEffect } from 'react';
 import { Store, combine, Event, Effect, is } from 'effector';
 import { useEvent, useStore } from 'effector-react';
 
@@ -20,11 +18,20 @@ export interface ReflectCreatorContext {
   useEvent: typeof useEvent;
 }
 
+interface ReflectConfig<Props, Bind> {
+  view: View<Props>;
+  bind: Bind;
+  hooks?: {
+    mounted?: (() => void) | Event<void>;
+    unmounted?: (() => void) | Event<void>;
+  };
+}
+
 export function reflectCreator(context: ReflectCreatorContext) {
   return function reflect<
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
-  >(config: { view: View<Props>; bind: Bind }): FC<PropsByBind<Props, Bind>> {
+  >(config: ReflectConfig<Props, Bind>): FC<PropsByBind<Props, Bind>> {
     type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
     const events: Record<string, GenericEvent> = {};
     const stores: Record<string, Store<unknown>> = {};
@@ -44,6 +51,24 @@ export function reflectCreator(context: ReflectCreatorContext) {
 
     const $bind = Object.keys(stores).length > 0 ? combine(stores) : null;
 
+    const hookMounted = config.hooks ? config.hooks.mounted : null;
+    const mounted = hookMounted
+      ? () =>
+          useEffect(() => {
+            hookMounted();
+          }, [])
+      : () => {};
+
+    const hookUnmounted = config.hooks ? config.hooks.unmounted : null;
+    const unmounted = hookUnmounted
+      ? () =>
+          useEffect(() => {
+            return () => {
+              hookUnmounted();
+            };
+          }, [])
+      : () => {};
+
     return (props) => {
       const storeProps = $bind ? context.useStore($bind) : ({} as Props);
       const eventsProps = context.useEvent(events);
@@ -53,6 +78,9 @@ export function reflectCreator(context: ReflectCreatorContext) {
         ...data,
         ...props,
       } as Props;
+
+      mounted();
+      unmounted();
 
       return createElement(config.view, elementProps);
     };
