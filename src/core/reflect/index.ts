@@ -18,7 +18,7 @@ export interface ReflectCreatorContext {
   useEvent: typeof useEvent;
 }
 
-interface ReflectConfig<Props, Bind> {
+export interface ReflectConfig<Props, Bind> {
   view: View<Props>;
   bind: Bind;
   hooks?: {

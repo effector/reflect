@@ -3,13 +3,16 @@ import {
   BindByProps,
   reflectCreator,
   ReflectCreatorContext,
+  ReflectConfig,
 } from '../reflect';
 
 export function createReflectCreator(context: ReflectCreatorContext) {
   const reflect = reflectCreator(context);
 
   return function createReflect<Props>(view: View<Props>) {
-    return <Bind extends BindByProps<Props> = BindByProps<Props>>(bind: Bind) =>
-      reflect<Props, Bind>({ view, bind });
+    return <Bind extends BindByProps<Props> = BindByProps<Props>>(
+      bind: Bind,
+      params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
+    ) => reflect<Props, Bind>({ view, bind, ...params });
   };
 }
