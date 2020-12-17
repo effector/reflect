@@ -1,5 +1,6 @@
 import React, { FC, InputHTMLAttributes } from 'react';
-import { createStore, createEvent, restore } from 'effector';
+import { createStore, createEvent, restore, createEffect } from 'effector';
+import { act } from 'react-dom/test-utils';
 
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -104,4 +105,118 @@ test('InputBase', async () => {
 
   const inputAge = container.getByTestId('age') as HTMLInputElement;
   expect(inputAge.value).toBe('25');
+});
+
+describe('hooks', () => {
+  describe('mounted', () => {
+    test('callback', () => {
+      const changeName = createEvent<string>();
+      const $name = restore(changeName, '');
+
+      const mounted = jest.fn(() => {});
+
+      const Name = inputBase(
+        {
+          value: $name,
+          onChange: changeName.prepend((event) => event.currentTarget.value),
+        },
+        { hooks: { mounted } },
+      );
+
+      render(<Name data-testid="name" />);
+
+      expect(mounted.mock.calls.length).toBe(1);
+    });
+
+    test('event', () => {
+      const changeName = createEvent<string>();
+      const $name = restore(changeName, '');
+      const mounted = createEvent<void>();
+
+      const fn = jest.fn(() => {});
+
+      mounted.watch(fn);
+
+      const Name = inputBase(
+        {
+          value: $name,
+          onChange: changeName.prepend((event) => event.currentTarget.value),
+        },
+        { hooks: { mounted } },
+      );
+
+      render(<Name data-testid="name" />);
+
+      expect(fn.mock.calls.length).toBe(1);
+    });
+  });
+
+  describe('unmounted', () => {
+    const changeVisible = createEffect<boolean, void>({ handler: () => {} });
+    const $visible = restore(
+      changeVisible.finally.map(({ params }) => params),
+      true,
+    );
+
+    const Branch = createReflect<{ visible: boolean }>(
+      ({ visible, children }) => (visible ? <>{children}</> : null),
+    )({
+      visible: $visible,
+    });
+
+    beforeEach(() => {
+      act(() => {
+        changeVisible(true);
+      });
+    });
+
+    test('callback', () => {
+      const changeName = createEvent<string>();
+      const $name = restore(changeName, '');
+
+      const unmounted = jest.fn(() => {});
+
+      const Name = inputBase(
+        {
+          value: $name,
+          onChange: changeName.prepend((event) => event.currentTarget.value),
+        },
+        { hooks: { unmounted } },
+      );
+
+      render(<Name data-testid="name" />, { wrapper: Branch });
+
+      act(() => {
+        changeVisible(false);
+      });
+
+      expect(unmounted.mock.calls.length).toBe(1);
+    });
+
+    test('event', () => {
+      const changeName = createEvent<string>();
+      const $name = restore(changeName, '');
+
+      const unmounted = createEvent<void>();
+      const fn = jest.fn(() => {});
+
+      unmounted.watch(fn);
+
+      const Name = inputBase(
+        {
+          value: $name,
+          onChange: changeName.prepend((event) => event.currentTarget.value),
+        },
+        { hooks: { unmounted } },
+      );
+
+      render(<Name data-testid="name" />, { wrapper: Branch });
+
+      act(() => {
+        changeVisible(false);
+      });
+
+      expect(fn.mock.calls.length).toBe(1);
+    });
+  });
 });
