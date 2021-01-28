@@ -1,6 +1,6 @@
 {
   "name": "@effector/reflect",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "repository": "git@github.com:effector/reflect.git",
   "maintainers": [
     "e.fedotov <fedotov1290@gmail.com>",
