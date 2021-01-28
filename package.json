@@ -11,6 +11,7 @@
     "access": "public"
   },
   "main": "./no-ssr",
+  "types": "./no-ssr/index.d.ts",
   "files": [
     "dist",
     "no-ssr",
