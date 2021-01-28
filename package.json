@@ -1,7 +1,7 @@
 {
   "name": "@effector/reflect",
   "version": "0.3.4",
-  "repository": "git@github.com:sergeysova/effector-reflect.git",
+  "repository": "git@github.com:effector/reflect.git",
   "maintainers": [
     "e.fedotov <fedotov1290@gmail.com>",
     "Sergey Sova <mail@sergeysova.com> (https://sova.dev)"
