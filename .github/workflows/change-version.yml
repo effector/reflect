@@ -39,6 +39,7 @@ jobs:
           CI: true
 
       - name: publish
+        if: 'false'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

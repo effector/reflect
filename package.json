@@ -1,9 +1,15 @@
 {
-  "name": "effector-reflect",
-  "version": "0.3.2",
-  "repository": "git@github.com:EvgenyiFedotov/effector-reflect.git",
-  "author": "e.fedotov <fedotov1290@gmail.com>",
+  "name": "@effector/reflect",
+  "version": "0.3.4",
+  "repository": "git@github.com:sergeysova/effector-reflect.git",
+  "maintainers": [
+    "e.fedotov <fedotov1290@gmail.com>",
+    "Sergey Sova <mail@sergeysova.com> (https://sova.dev)"
+  ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./no-ssr",
   "files": [
     "dist",
@@ -13,7 +19,8 @@
   "scripts": {
     "test": "jest",
     "build": "rm -fr dist no-ssr ssr && yarn rollup --config ./rollup.config.js",
-    "test-build": "yarn test ./dist-test"
+    "test-build": "yarn test ./dist-test",
+    "prepublishOnly": "yarn build"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
@@ -28,8 +35,8 @@
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.2.2",
     "@types/jest": "^26.0.15",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
     "@typescript-eslint/parser": "^4.8.1",
     "effector": "^21.7.5",
     "effector-react": "^21.2.0",
@@ -51,8 +58,7 @@
   "peerDependencies": {
     "effector": "^21.7.5",
     "effector-react": "^21.2.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^16.14.0 || ^17.0.0"
   },
   "husky": {
     "hooks": {

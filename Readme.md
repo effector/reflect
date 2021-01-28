@@ -1,4 +1,4 @@
-# Effector-reflect
+# @effector/reflect
 
 ☄️ Render react-components by effector stores.
 
@@ -7,13 +7,13 @@
 ### Npm
 
 ```sh
-npm install effector-reflect
+npm install @effector/reflect
 ```
 
 ### Yarn
 
 ```sh
-yarn add effector-reflect
+yarn add @effector/reflect
 ```
 
 ## Motivation
@@ -65,7 +65,7 @@ export const Name: FC = () => {
 ```tsx
 // ./new-case.ts
 import { createEvent, restore } from 'effector';
-import { reflect } from 'effector-reflect';
+import { reflect } from '@effector/reflect';
 
 import { Input } from './ui';
 
@@ -88,7 +88,7 @@ Method for bind stores to a view.
 // ./user.tsx
 import React, { FC, useCallback, ChangeEvent } from 'react';
 import { createEvent, restore } from 'effector';
-import { reflect } from 'effector-reflect';
+import { reflect } from '@effector/reflect';
 
 // Base components
 type InputProps = {
@@ -146,7 +146,7 @@ Method for creating reflect a view. So you can create a UI kit by views and use 
 ```tsx
 // ./ui.tsx
 import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
-import { createReflect } from 'effector-reflect';
+import { createReflect } from '@effector/reflect';
 
 // Input
 type InputProps = {
@@ -222,7 +222,7 @@ export const User: FC = () => {
 
 ## SSR
 
-For SSR need to replace imports `effector-reflect` -> `effector-reflect/ssr`.
+For SSR need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
 Also use `event.prepend(params => params)` instead `(params) => event(params)`.
 
 ```tsx
@@ -244,7 +244,7 @@ const Input: FC<InputProps> = ({ value, onChange }) => {
 // ./app.tsx
 import React, { FC } from 'react';
 import { createEvent, restore, Fork, createDomain } from 'effector';
-import { reflect } from 'effector-reflect/ssr';
+import { reflect } from '@effector/reflect/ssr';
 import { Provider } from 'effector-react/ssr';
 
 import { Input } from './ui';
@@ -258,7 +258,10 @@ const $name = restore(changeName, '');
 // Component
 const Name = reflect({
   view: Input,
-  bind: { value: $name, onChange: changeName.prepend(event => event.target.value) },
+  bind: {
+    value: $name,
+    onChange: changeName.prepend((event) => event.target.value),
+  },
 });
 
 export const App: FC<{ data: Fork }> = ({ data }) => {
