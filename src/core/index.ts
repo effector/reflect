@@ -1,2 +1,2 @@
-export { reflectCreator } from './reflect';
-export { reflectFactory } from './create-reflect';
+export { reflectFactory } from './factory';
+export { reflectCreateFactory } from './reflect-create';

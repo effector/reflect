@@ -1,5 +1,5 @@
 import { useStore, useEvent } from 'effector-react/ssr';
-import { reflectFactory, reflectCreator } from '../core';
+import { reflectCreateFactory, reflectFactory } from '../core';
 
-export const reflect = reflectCreator({ useStore, useEvent });
-export const createReflect = reflectFactory({ useStore, useEvent });
+export const reflect = reflectFactory({ useStore, useEvent });
+export const createReflect = reflectCreateFactory({ useStore, useEvent });

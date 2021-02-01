@@ -1,13 +1,13 @@
 import {
   View,
   BindByProps,
-  reflectCreator,
+  reflectFactory,
   ReflectCreatorContext,
   ReflectConfig,
-} from '../reflect';
+} from './factory';
 
-export function reflectFactory(context: ReflectCreatorContext) {
-  const reflect = reflectCreator(context);
+export function reflectCreateFactory(context: ReflectCreatorContext) {
+  const reflect = reflectFactory(context);
 
   return function createReflect<Props>(view: View<Props>) {
     return <Bind extends BindByProps<Props> = BindByProps<Props>>(

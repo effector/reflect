@@ -29,7 +29,7 @@ export interface ReflectConfig<Props, Bind extends BindByProps<Props>> {
   };
 }
 
-export function reflectCreator(context: ReflectCreatorContext) {
+export function reflectFactory(context: ReflectCreatorContext) {
   return function reflect<
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
