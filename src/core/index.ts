@@ -1,2 +1,1 @@
-export { reflectFactory } from './factory';
-export { reflectCreateFactory } from './reflect-create';
+export { reflectFactory, reflectCreateFactory } from './factory';

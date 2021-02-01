@@ -29,6 +29,17 @@ export interface ReflectConfig<Props, Bind extends BindByProps<Props>> {
   };
 }
 
+export function reflectCreateFactory(context: ReflectCreatorContext) {
+  const reflect = reflectFactory(context);
+
+  return function createReflect<Props>(view: View<Props>) {
+    return <Bind extends BindByProps<Props> = BindByProps<Props>>(
+      bind: Bind,
+      params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
+    ) => reflect<Props, Bind>({ view, bind, ...params });
+  };
+}
+
 export function reflectFactory(context: ReflectCreatorContext) {
   return function reflect<
     Props,
