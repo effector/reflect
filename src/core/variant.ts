@@ -11,16 +11,16 @@ import {
   View,
 } from './types';
 
-export function matchFactory(context: ReflectCreatorContext) {
+export function variantFactory(context: ReflectCreatorContext) {
   const reflect = reflectFactory(context);
 
-  return function match<
+  return function variant<
     Props,
     Variant extends string,
     Bind extends BindByProps<Props>
   >(config: {
     source: Store<Variant>;
-    bind: Bind;
+    bind?: Bind;
     cases: Record<Variant, View<Props>>;
     hooks?: Hooks;
     default?: View<Props>;
@@ -32,8 +32,10 @@ export function matchFactory(context: ReflectCreatorContext) {
       return createElement(Component, props);
     }
 
+    const bind = config.bind ?? ({} as Bind);
+
     return reflect({
-      bind: config.bind,
+      bind,
       view: View,
       hooks: config.hooks,
     });

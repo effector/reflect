@@ -4,7 +4,7 @@ import { createStore, createEvent, restore, createEffect } from 'effector';
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { match } from './index';
+import { variant } from './index';
 
 test('matches first', async () => {
   const changeValue = createEvent<string>();
@@ -12,7 +12,7 @@ test('matches first', async () => {
   const $value = restore(changeValue, '');
   const $type = restore(changeType, 'first');
 
-  const Input = match({
+  const Input = variant({
     source: $type,
     bind: { value: $value, onChange: changeValue },
     cases: {
