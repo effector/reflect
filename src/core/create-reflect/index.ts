@@ -6,7 +6,7 @@ import {
   ReflectConfig,
 } from '../reflect';
 
-export function createReflectCreator(context: ReflectCreatorContext) {
+export function reflectFactory(context: ReflectCreatorContext) {
   const reflect = reflectCreator(context);
 
   return function createReflect<Props>(view: View<Props>) {

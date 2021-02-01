@@ -18,12 +18,14 @@ export interface ReflectCreatorContext {
   useEvent: typeof useEvent;
 }
 
+type Hook = (() => any) | Event<void> | Effect<void, any, any>;
+
 export interface ReflectConfig<Props, Bind extends BindByProps<Props>> {
   view: View<Props>;
   bind: Bind;
   hooks?: {
-    mounted?: (() => void) | Event<void>;
-    unmounted?: (() => void) | Event<void>;
+    mounted?: Hook;
+    unmounted?: Hook;
   };
 }
 
@@ -49,40 +51,52 @@ export function reflectCreator(context: ReflectCreatorContext) {
       }
     }
 
-    const $bind = Object.keys(stores).length > 0 ? combine(stores) : null;
+    const $bind = isEmpty(stores) ? null : combine(stores);
 
-    const hookMounted = config.hooks ? config.hooks.mounted : null;
-    const mounted = hookMounted
+    const hookMounted = readHook(config.hooks?.mounted, context);
+    const useMounted = hookMounted
       ? () =>
           useEffect(() => {
             hookMounted();
           }, [])
       : () => {};
 
-    const hookUnmounted = config.hooks ? config.hooks.unmounted : null;
-    const unmounted = hookUnmounted
-      ? () =>
-          useEffect(() => {
-            return () => {
-              hookUnmounted();
-            };
-          }, [])
+    const hookUnmounted = readHook(config.hooks?.unmounted, context);
+    const useUnmounted = hookUnmounted
+      ? () => useEffect(() => () => hookUnmounted(), [])
       : () => {};
 
     return (props) => {
       const storeProps = $bind ? context.useStore($bind) : ({} as Props);
       const eventsProps = context.useEvent(events);
-      const elementProps = {
-        ...storeProps,
-        ...eventsProps,
-        ...data,
-        ...props,
-      } as Props;
+      const elementProps: Props = Object.assign(
+        {},
+        storeProps,
+        eventsProps,
+        data,
+        props,
+      );
 
-      mounted();
-      unmounted();
+      useMounted();
+      useUnmounted();
 
       return createElement(config.view, elementProps);
     };
   };
+}
+
+function readHook(
+  hook: Hook | undefined,
+  context: ReflectCreatorContext,
+): (() => void) | undefined {
+  if (hook) {
+    if (is.event(hook) || is.effect(hook)) {
+      return context.useEvent(hook as Event<void>);
+    }
+    return hook;
+  }
+}
+
+function isEmpty(map: Record<string | number, unknown>): boolean {
+  return Object.keys(map).length === 0;
 }

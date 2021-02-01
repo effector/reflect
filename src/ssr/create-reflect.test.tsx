@@ -2,7 +2,7 @@ import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
 import { restore, fork, allSettled, createDomain } from 'effector';
 import { Provider } from 'effector-react/ssr';
 
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { createReflect } from './index';
