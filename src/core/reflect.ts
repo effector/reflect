@@ -1,32 +1,19 @@
-import { FC, ComponentClass, createElement, useEffect } from 'react';
+import { FC, createElement, useEffect } from 'react';
 import { Store, combine, Event, Effect, is } from 'effector';
-import { useEvent, useStore } from 'effector-react';
 
-export type BindByProps<Props> = {
-  [Key in keyof Props]?:
-    | Omit<Store<Props[Key]>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>
-    | Props[Key];
-};
-
-export type View<T> = FC<T> | ComponentClass<T>;
-
-export type PropsByBind<Props, Bind> = Omit<Props, keyof Bind> &
-  Partial<Omit<Props, keyof Omit<Props, keyof Bind>>>;
-
-export interface ReflectCreatorContext {
-  useStore: typeof useStore;
-  useEvent: typeof useEvent;
-}
-
-type Hook = (() => any) | Event<void> | Effect<void, any, any>;
+import {
+  ReflectCreatorContext,
+  View,
+  BindByProps,
+  PropsByBind,
+  Hooks,
+  Hook,
+} from './types';
 
 export interface ReflectConfig<Props, Bind extends BindByProps<Props>> {
   view: View<Props>;
   bind: Bind;
-  hooks?: {
-    mounted?: Hook;
-    unmounted?: Hook;
-  };
+  hooks?: Hooks;
 }
 
 export function reflectCreateFactory(context: ReflectCreatorContext) {

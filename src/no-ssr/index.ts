@@ -1,5 +1,7 @@
-import { useStore, useEvent } from 'effector-react';
-import { reflectFactory, reflectCreateFactory } from '../core';
+import * as context from 'effector-react';
+import { reflectFactory, reflectCreateFactory, matchFactory } from '../core';
 
-export const reflect = reflectFactory({ useStore, useEvent });
-export const createReflect = reflectCreateFactory({ useStore, useEvent });
+export const reflect = reflectFactory(context);
+export const createReflect = reflectCreateFactory(context);
+
+export const match = matchFactory(context);
