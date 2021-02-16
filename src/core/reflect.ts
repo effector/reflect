@@ -1,4 +1,4 @@
-import { FC, createElement, useEffect } from 'react';
+import { FC, createElement, useEffect, useCallback } from 'react';
 import { Store, combine, Event, Effect, is } from 'effector';
 
 import {
@@ -51,19 +51,6 @@ export function reflectFactory(context: ReflectCreatorContext) {
 
     const $bind = isEmpty(stores) ? null : combine(stores);
 
-    const hookMounted = readHook(config.hooks?.mounted, context);
-    const useMounted = hookMounted
-      ? () =>
-          useEffect(() => {
-            hookMounted();
-          }, [])
-      : () => {};
-
-    const hookUnmounted = readHook(config.hooks?.unmounted, context);
-    const useUnmounted = hookUnmounted
-      ? () => useEffect(() => () => hookUnmounted(), [])
-      : () => {};
-
     return (props) => {
       const storeProps = $bind ? context.useStore($bind) : ({} as Props);
       const eventsProps = context.useEvent(events);
@@ -75,8 +62,15 @@ export function reflectFactory(context: ReflectCreatorContext) {
         props,
       );
 
-      useMounted();
-      useUnmounted();
+      const hookMounted = readHook(config.hooks?.mounted, context);
+      const hookUnmounted = readHook(config.hooks?.unmounted, context);
+
+      useEffect(() => {
+        if (hookMounted) hookMounted();
+        return () => {
+          if (hookUnmounted) hookUnmounted();
+        };
+      }, []);
 
       return createElement(config.view, elementProps);
     };
