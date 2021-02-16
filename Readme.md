@@ -1,24 +1,20 @@
 # @effector/reflect
 
-☄️ Render react-components by effector stores.
+☄️ Attach effector stores to react components without hooks.
 
 ## Install
 
-### Npm
-
 ```sh
 npm install @effector/reflect
-```
-
-### Yarn
-
-```sh
+# or
 yarn add @effector/reflect
 ```
 
 ## Motivation
 
-### Common ui
+### UI library
+
+Let's agree that we have an internal UI library with an input.
 
 ```tsx
 // ./ui.ts
@@ -34,13 +30,14 @@ export const Input: FC<InputProps> = ({ value, onChange }) => {
 };
 ```
 
-### Old case
+### Before
+
+In common case, you need to use `useStore` and `useEvent` (especially for SSR) to use values and call events from React components.
 
 ```tsx
-// ./old-case.ts
 import React, { FC, ChangeEvent, useCallback } from 'react';
 import { createEvent, restore } from 'effector';
-import { useStore } from 'effector-react';
+import { useStore, useEvent } from 'effector-react';
 
 import { Input } from './ui';
 
@@ -51,8 +48,9 @@ const $name = restore(changeName, '');
 // Component
 export const Name: FC = () => {
   const value = useStore($name);
+  const nameChanged = useEvent(changeName);
   const changed = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => changeName(event.target.value),
+    (event: ChangeEvent<HTMLInputElement>) => nameChanged(event.target.value),
     [],
   );
 
@@ -60,10 +58,11 @@ export const Name: FC = () => {
 };
 ```
 
-### New case
+### Now
+
+Now you can create a new component and pass store and event as props without hooks boilerplate.
 
 ```tsx
-// ./new-case.ts
 import { createEvent, restore } from 'effector';
 import { reflect } from '@effector/reflect';
 
@@ -80,13 +79,35 @@ export const Name = reflect({
 });
 ```
 
-## Reflect
+## API
 
-Method for bind stores to a view.
+### Reflect
+
+```tsx
+const Component = reflect({
+  view: SourceComponent,
+  bind: Props,
+  hooks: Hooks,
+});
+```
+
+Static method to create a component bound to effector stores and events as stores.
+
+#### Arguments
+
+1. `view` — A react component that should be used to bind to
+1. `bind` — Object of effector stores, events or any value
+1. `hooks` — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
+
+#### Returns
+
+- A react component with bound values from stores and events.
+
+#### Example
 
 ```tsx
 // ./user.tsx
-import React, { FC, useCallback, ChangeEvent } from 'react';
+import React, { FC, ChangeEvent } from 'react';
 import { createEvent, restore } from 'effector';
 import { reflect } from '@effector/reflect';
 
@@ -139,7 +160,55 @@ export const User: FC = () => {
 };
 ```
 
-## Create reflect
+### Variant
+
+```tsx
+const Components = variant({
+  source: $typeSelector,
+  bind: Props,
+  cases: ComponentVariants,
+  default: DefaultVariant,
+  hooks: Hooks,
+});
+```
+
+Method allows to change component based on value in `$typeSelector`. Optional `bind` allow to pass props bound to stores or events.
+
+#### Arguments
+
+1. `source` — Store of `string` value. Used to select variant of component to render and bound props to.
+1. `bind` — Optional object of stores, events, and static values that would be bound as props.
+1. `cases` — Object of components, key will be used to match
+1. `default` — Optional component, that would be used if no matched in `cases`
+1. `hooks` — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
+
+#### Example
+
+When `Field` is rendered it checks for `$fieldType` value, selects the appropriate component from `cases` and bound props to it.
+
+```tsx
+import React from 'react';
+import { createStore, createEvent } from 'effector';
+import { variant } from '@effector/reflect';
+import { TextInput, Range, DateSelector } from '@org/ui-lib';
+
+const $fieldType = createStore<'date' | 'number' | 'string'>('string');
+
+const valueChanged = createEvent<string>();
+const $value = createStore('');
+
+const Field = variant({
+  source: $fieldType,
+  bind: { onChange: valueChanged, value: $value },
+  cases: {
+    date: DateSelector,
+    number: Range,
+  },
+  default: TextInput,
+});
+```
+
+### Create reflect
 
 Method for creating reflect a view. So you can create a UI kit by views and use a view with a store already.
 
@@ -220,7 +289,7 @@ export const User: FC = () => {
 };
 ```
 
-## SSR
+### SSR
 
 For SSR need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
 Also use `event.prepend(params => params)` instead `(params) => event(params)`.
@@ -298,6 +367,42 @@ const render = async () => {
   `;
 };
 ```
+
+### Hooks
+
+Hooks is an object passed to `variant()` or `match()` with properties `mounted` and `unmounted` all optional.
+
+#### Example
+
+```tsx
+import { createStore, createEvent } from 'effector';
+import { reflect, variant } from '@effector/reflect';
+import { TextInput, Range } from '@org/my-ui';
+
+const $type = createStore<'text' | 'range'>('text');
+const $value = createStore('');
+const valueChange = createEvent<string>();
+const rangeMounted = createEvent();
+const fieldMounted = createEvent();
+
+const RangePrimary = reflect({
+  view: Range,
+  bind: { style: 'primary' },
+  hooks: { mounted: rangeMounted },
+});
+
+const Field = variant({
+  source: $type,
+  bind: { value: $value, onChange: valueChange },
+  cases: {
+    text: TextInput,
+    range: RangePrimary,
+  },
+  hooks: { mounted: fieldMounted },
+});
+```
+
+When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
 
 ## Roadmap
 
