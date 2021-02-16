@@ -11,6 +11,8 @@ import {
   View,
 } from './types';
 
+const Default = () => null;
+
 export function variantFactory(context: ReflectCreatorContext) {
   const reflect = reflectFactory(context);
 
@@ -27,7 +29,7 @@ export function variantFactory(context: ReflectCreatorContext) {
   }): FC<PropsByBind<Props, Bind>> {
     function View(props: Props) {
       const nameOfCase = context.useStore(config.source);
-      const Component = config.cases[nameOfCase] ?? config.default;
+      const Component = config.cases[nameOfCase] ?? config.default ?? Default;
 
       return createElement(Component, props);
     }
