@@ -1,5 +1,6 @@
 import React from 'react';
-import { createEvent, restore } from 'effector';
+import { restore, fork, allSettled, createDomain } from 'effector';
+import { Provider } from 'effector-react/ssr';
 
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,8 +8,9 @@ import userEvent from '@testing-library/user-event';
 import { variant } from './index';
 
 test('matches first', async () => {
-  const changeValue = createEvent<string>();
-  const changeType = createEvent<'first' | 'second' | 'third'>();
+  const app = createDomain();
+  const changeValue = app.createEvent<string>();
+  const changeType = app.createEvent<'first' | 'second' | 'third'>();
   const $value = restore(changeValue, '');
   const $type = restore(changeType, 'first');
 
@@ -22,19 +24,25 @@ test('matches first', async () => {
     },
   });
 
-  const container = render(<Input testId="check" />);
+  const scope = fork(app);
+
+  const container = render(
+    <Provider value={scope}>
+      <Input testId="check" />
+    </Provider>,
+  );
 
   await userEvent.type(container.getByTestId('check'), 'ForExample');
-  expect($value.getState()).toBe('ForExample');
+  expect(scope.getState($value)).toBe('ForExample');
 
   const input = container.container.firstChild as HTMLInputElement;
   expect(input.className).toBe('first');
 
-  act(() => {
-    changeType('second');
+  await act(async () => {
+    await allSettled(changeType, { scope, params: 'second' });
   });
 
-  expect($value.getState()).toBe('ForExample');
+  expect(scope.getState($value)).toBe('ForExample');
   const updatedInput = container.container.firstChild as HTMLInputElement;
   expect(updatedInput.className).toBe('second');
 });
@@ -45,9 +53,10 @@ test.todo('renders default if no match');
 test.todo('works on nested matches');
 
 test('hooks works once on mount', async () => {
-  const changeType = createEvent<'first' | 'second' | 'third'>();
+  const app = createDomain();
+  const changeType = app.createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
-  const mounted = createEvent();
+  const mounted = app.createEvent();
   const fn = jest.fn();
   mounted.watch(fn);
 
@@ -62,24 +71,31 @@ test('hooks works once on mount', async () => {
     },
   });
 
+  const scope = fork(app);
+
   expect(fn).not.toBeCalled();
 
-  render(<Input testId="check" />);
+  render(
+    <Provider value={scope}>
+      <Input testId="check" />
+    </Provider>,
+  );
   expect(fn).toBeCalledTimes(1);
 
-  act(() => {
-    changeType('second');
+  await act(async () => {
+    await allSettled(changeType, { scope, params: 'second' });
   });
   expect(fn).toBeCalledTimes(1);
 });
 
 test('hooks works once on unmount', async () => {
-  const changeType = createEvent<'first' | 'second' | 'third'>();
+  const app = createDomain();
+  const changeType = app.createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
-  const unmounted = createEvent();
+  const unmounted = app.createEvent();
   const fn = jest.fn();
   unmounted.watch(fn);
-  const setVisible = createEvent<boolean>();
+  const setVisible = app.createEvent<boolean>();
   const $visible = restore(setVisible, true);
 
   const Input = variant({
@@ -100,29 +116,36 @@ test('hooks works once on unmount', async () => {
     },
   });
 
+  const scope = fork(app);
+
   expect(fn).not.toBeCalled();
 
-  render(<Component />);
+  render(
+    <Provider value={scope}>
+      <Component />
+    </Provider>,
+  );
   expect(fn).not.toBeCalled();
 
-  act(() => {
-    setVisible(false);
+  await act(async () => {
+    await allSettled(setVisible, { scope, params: false });
   });
   expect(fn).toBeCalledTimes(1);
 });
 
 test('hooks works on remount', async () => {
-  const changeType = createEvent<'first' | 'second' | 'third'>();
+  const app = createDomain();
+  const changeType = app.createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
 
-  const unmounted = createEvent();
+  const unmounted = app.createEvent();
   const onUnmount = jest.fn();
   unmounted.watch(onUnmount);
-  const mounted = createEvent();
+  const mounted = app.createEvent();
   const onMount = jest.fn();
   mounted.watch(onMount);
 
-  const setVisible = createEvent<boolean>();
+  const setVisible = app.createEvent<boolean>();
   const $visible = restore(setVisible, true);
 
   const Input = variant({
@@ -146,17 +169,23 @@ test('hooks works on remount', async () => {
   expect(onMount).not.toBeCalled();
   expect(onUnmount).not.toBeCalled();
 
-  render(<Component />);
+  const scope = fork(app);
+
+  render(
+    <Provider value={scope}>
+      <Component />
+    </Provider>,
+  );
   expect(onMount).toBeCalledTimes(1);
   expect(onUnmount).not.toBeCalled();
 
-  act(() => {
-    setVisible(false);
+  await act(async () => {
+    await allSettled(setVisible, { scope, params: false });
   });
   expect(onUnmount).toBeCalledTimes(1);
 
-  act(() => {
-    setVisible(true);
+  await act(async () => {
+    await allSettled(setVisible, { scope, params: true });
   });
   expect(onMount).toBeCalledTimes(2);
   expect(onUnmount).toBeCalledTimes(1);
