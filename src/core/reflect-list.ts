@@ -11,13 +11,12 @@ type ReflectListConfig<Props, Item, Bind> = {
   source: Store<Item[]>;
   bind: Bind;
   getKey?: (item: Item, index: number) => Key;
-  mapItem: Record<
-    Exclude<keyof Props, keyof Bind>,
-    (
+  mapItem: {
+    [P in keyof PropsByBind<Props, Bind>]: (
       item: Item,
       index: number,
-    ) => PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>]
-  >;
+    ) => PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>];
+  };
 };
 
 export function reflectListFactory(context: ReflectCreatorContext) {
@@ -27,7 +26,9 @@ export function reflectListFactory(context: ReflectCreatorContext) {
     Item,
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
-  >(config: ReflectListConfig<Props, Item, Bind>): () => ReactElement {
+  >(
+    config: ReflectListConfig<Props, Item, Bind>,
+  ): () => ReactElement<Record<string, never>> {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind,
@@ -35,7 +36,7 @@ export function reflectListFactory(context: ReflectCreatorContext) {
 
     return () =>
       useList(config.source, {
-        fn: (value: Item, index: number) => {
+        fn: (value, index) => {
           const props = useMemo(() => {
             const nextProps: any = {};
 
