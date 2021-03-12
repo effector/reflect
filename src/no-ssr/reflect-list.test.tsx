@@ -13,7 +13,7 @@ const ListItem: FC<{ title: string; color?: string }> = (props) => {
   return <li style={{ color: props.color }}>{props.title}</li>;
 };
 
-test('relfect-list: basic list', async () => {
+test('relfect-list: renders list from store', async () => {
   const $todos = createStore<{ title: string; body: string }[]>([
     { title: 'Abc', body: 'Text' },
     { title: 'Dbe', body: 'Text 2' },
@@ -37,6 +37,6 @@ test('relfect-list: basic list', async () => {
   );
 
   const list = container.getAllByRole('listitem');
-  
+
   expect(list.length).toEqual($todos.getState().length);
 });
