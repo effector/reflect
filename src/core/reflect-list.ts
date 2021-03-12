@@ -1,4 +1,4 @@
-import { ReactElement, FC, Key, useMemo, createElement } from 'react';
+import { FC, Key, useMemo, createElement } from 'react';
 import { Store } from 'effector';
 import { useList } from 'effector-react';
 
