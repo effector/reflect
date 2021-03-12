@@ -26,9 +26,7 @@ export function reflectListFactory(context: ReflectCreatorContext) {
     Item,
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
-  >(
-    config: ReflectListConfig<Props, Item, Bind>,
-  ): FC {
+  >(config: ReflectListConfig<Props, Item, Bind>): FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind,
