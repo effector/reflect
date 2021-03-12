@@ -38,7 +38,11 @@ export function reflectListFactory(context: ReflectCreatorContext) {
       useList(config.source, {
         fn: (value, index) => {
           const props = useMemo(() => {
-            const nextProps: any = {};
+            const nextProps: any = {
+              // TODO: remove that in favor of `getKey` in useList config
+              // when next effector-react version is released
+              key: config.getKey ? config.getKey(value, index) : index,
+            };
 
             for (const prop in config.mapItem) {
               if ({}.hasOwnProperty.call(config.mapItem, prop)) {
