@@ -36,13 +36,7 @@ test('relfect-list: renders list from store', async () => {
     </List>,
   );
 
-  const list = container.getAllByRole('listitem');
-
-  const listHtml = container.container.innerHTML;
-
-  expect(list.length).toEqual($todos.getState().length);
-
-  expect(listHtml).toMatchInlineSnapshot(
+  expect(container.container.innerHTML).toMatchInlineSnapshot(
     '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
   );
 });
