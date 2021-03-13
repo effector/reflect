@@ -21,10 +21,17 @@ test('relfect-list: renders list from store', async () => {
     { title: 'Do homework', body: 'Text 3' },
   ]);
 
+  const mounted = createEvent<void>();
+
+  const fn = jest.fn(() => {});
+
+  mounted.watch(fn);
+
   const Items = reflectList({
     source: $todos,
     view: ListItem,
     bind: {},
+    hooks: { mounted },
     mapItem: {
       title: (todo) => todo.title,
     },
@@ -35,6 +42,8 @@ test('relfect-list: renders list from store', async () => {
       <Items />
     </List>,
   );
+
+  expect(fn.mock.calls.length).toBe(3);
 
   expect(container.container.innerHTML).toMatchInlineSnapshot(
     '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
