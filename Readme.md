@@ -226,14 +226,53 @@ const Items = reflectList({
   },
   getKey: (user: Item, index: number) => `${user.id}${user.name}` // optional, will use index by default
 });
+```
+
+Method creates component, which renders `view` component for every item from array in `source` store, item's content will be mapped to View props by `mapItem` rules
+
+#### Arguments
+
+1. `source` — Store of `Item[]` value. 
+1. `view` — A react component, will be used to render list items
+1. `mapItems` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to each rendered list item view.
+1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
+1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
+
+#### Example
+
+```tsx
+const $users = createStore([
+  {id: 1, name: 'Yung'},
+  {id: 2, name: 'Lean'},
+  {id: 3, name: 'Kyoto'},
+  {id: 4, name: 'Sesh'},
+]);
+
+const Item = ({ id, name, color }) => {
+  return (
+    <li style={{ color }}>
+      {id} - {name}
+    </li>
+  );
+};
+
+const Items = reflectList({
+  view: Item,
+  source: $users,
+  bind: {
+    color: $color
+  },
+  mapItem: {
+    id: (user) => user.id,
+    name: (user) => user.name
+  },
+  getKey: (user) => `${user.id}${user.name}`
+});
 
 <List>
   <Items />
 </List>
 ```
-
-Method creates component, which renders `view` component for every item from array in `source` store, item's content will be mapped to View props by `mapItem` rules
-
 
 ### Create reflect
 
