@@ -236,6 +236,7 @@ Method creates component, which renders list of `view` components based on items
 1. `mapItem` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to props of each rendered list item.
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
+1. `getKey` - Optional function `(item: Item, index: number) => React.Key` to set key for every item in the list to help React with effecient rerenders. If not provided, index is used
 
 
 #### Returns
