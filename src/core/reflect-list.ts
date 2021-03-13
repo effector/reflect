@@ -1,10 +1,15 @@
 import { FC, Key, useMemo, createElement } from 'react';
-import { Store } from 'effector';
-import { useList } from 'effector-react';
+import { Store, Event, is } from 'effector';
 
 import { reflectFactory } from './reflect';
 
-import { BindByProps, PropsByBind, ReflectCreatorContext, View } from './types';
+import {
+  BindByProps,
+  PropsByBind,
+  ReflectCreatorContext,
+  View,
+  GenericEvent,
+} from './types';
 
 type ReflectListConfig<Props, Item, Bind> = {
   view: View<Props>;
@@ -15,7 +20,9 @@ type ReflectListConfig<Props, Item, Bind> = {
     [P in keyof PropsByBind<Props, Bind>]: (
       item: Item,
       index: number,
-    ) => PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>];
+    ) =>
+      | PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>]
+      | GenericEvent;
   };
 };
 
@@ -33,7 +40,7 @@ export function reflectListFactory(context: ReflectCreatorContext) {
     });
 
     return () =>
-      useList(config.source, {
+      context.useList(config.source, {
         fn: (value, index) => {
           const props = useMemo(() => {
             const nextProps: any = {
@@ -46,8 +53,12 @@ export function reflectListFactory(context: ReflectCreatorContext) {
               if ({}.hasOwnProperty.call(config.mapItem, prop)) {
                 // for some reason TS can't properly infer `prop` type here
                 const fn = config.mapItem[prop as keyof typeof config.mapItem];
+                const propValue = fn(value, index);
 
-                nextProps[prop] = fn(value, index);
+                nextProps[prop] =
+                  is.event(propValue) || is.effect(propValue)
+                    ? context.useEvent<unknown>(propValue as Event<unknown>)
+                    : propValue;
               }
             }
 
