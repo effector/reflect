@@ -1,5 +1,5 @@
 import { FC, Key, useMemo, createElement } from 'react';
-import { Store, Event, is } from 'effector';
+import { Store } from 'effector';
 
 import { reflectFactory } from './reflect';
 
@@ -8,7 +8,6 @@ import {
   PropsByBind,
   ReflectCreatorContext,
   View,
-  GenericEvent,
 } from './types';
 
 type ReflectListConfig<Props, Item, Bind> = {
@@ -20,9 +19,7 @@ type ReflectListConfig<Props, Item, Bind> = {
     [P in keyof PropsByBind<Props, Bind>]: (
       item: Item,
       index: number,
-    ) =>
-      | PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>]
-      | GenericEvent;
+    ) => PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>];
   };
 };
 
@@ -42,8 +39,8 @@ export function reflectListFactory(context: ReflectCreatorContext) {
     return () =>
       context.useList(config.source, {
         fn: (value, index) => {
-          const props = useMemo(() => {
-            const nextProps: any = {
+          const finalProps = useMemo(() => {
+            const props: any = {
               // TODO: remove that in favor of `getKey` in useList config
               // when next effector-react version is released
               key: config.getKey ? config.getKey(value, index) : index,
@@ -55,17 +52,14 @@ export function reflectListFactory(context: ReflectCreatorContext) {
                 const fn = config.mapItem[prop as keyof typeof config.mapItem];
                 const propValue = fn(value, index);
 
-                nextProps[prop] =
-                  is.event(propValue) || is.effect(propValue)
-                    ? context.useEvent<unknown>(propValue as Event<unknown>)
-                    : propValue;
+                props[prop] = propValue;
               }
             }
 
-            return nextProps;
+            return props;
           }, [value, index]);
 
-          return createElement(ItemView, props);
+          return createElement(ItemView, finalProps);
         },
       });
   };
