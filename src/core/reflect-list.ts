@@ -8,12 +8,14 @@ import {
   PropsByBind,
   ReflectCreatorContext,
   View,
+  Hooks,
 } from './types';
 
 type ReflectListConfig<Props, Item, Bind> = {
   view: View<Props>;
   source: Store<Item[]>;
   bind: Bind;
+  hooks?: Hooks;
   getKey?: (item: Item, index: number) => Key;
   mapItem: {
     [P in keyof PropsByBind<Props, Bind>]: (
@@ -34,6 +36,7 @@ export function reflectListFactory(context: ReflectCreatorContext) {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind,
+      hooks: config.hooks,
     });
 
     return () =>
