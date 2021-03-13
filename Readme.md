@@ -211,8 +211,8 @@ const Field = variant({
 ### ReflectList
 
 ```tsx
-const Items = reflectList({
-  view: React.FC,
+const Items: React.FC = reflectList({
+  view: React.FC<Props>,
   source: Store<Item[]>,
   bind: { 
     // regular reflect's bind, for list item view
@@ -221,10 +221,9 @@ const Items = reflectList({
     // regular reflect's hooks, for list item view
   },
   mapItem: {
-    id: (item: Item, index: number) => item.id, // maps array store item to View props
-    name: (item: Item, index: number) => item.name
+    propName: (item: Item, index: number) => propValue, // maps array store item to View props
   },
-  getKey: (user: Item, index: number) => `${user.id}${user.name}` // optional, will use index by default
+  getKey: (item: Item, index: number) => React.Key // optional, will use index by default
 });
 ```
 
@@ -238,9 +237,20 @@ Method creates component, which renders `view` component for every item from arr
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
 
+
+#### Returns
+
+- A react component that renders a list of `view` components based on items of array in `source` store. Every `view` component props are bound to array item contents by the rules in `mapItem`, and to stores and events in `bind`, like with regular `reflect`
+
 #### Example
 
 ```tsx
+import React from 'react';
+import { createStore, createEvent } from 'effector';
+import { reflectList } from '@effector/reflect';
+
+const $color = createStore('red');
+
 const $users = createStore([
   {id: 1, name: 'Yung'},
   {id: 2, name: 'Lean'},
