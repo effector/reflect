@@ -233,7 +233,7 @@ Method creates component, which renders list of `view` components based on items
 
 1. `source` — Store of `Item[]` value. 
 1. `view` — A react component, will be used to render list items
-1. `mapItem` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to each rendered list item view.
+1. `mapItem` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to props of each rendered list item.
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
 
