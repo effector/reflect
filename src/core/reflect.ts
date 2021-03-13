@@ -8,7 +8,6 @@ import {
   PropsByBind,
   Hooks,
   Hook,
-  GenericEvent,
 } from './types';
 
 export interface ReflectConfig<Props, Bind extends BindByProps<Props>> {
@@ -33,6 +32,7 @@ export function reflectFactory(context: ReflectCreatorContext) {
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
   >(config: ReflectConfig<Props, Bind>): FC<PropsByBind<Props, Bind>> {
+    type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
     const events: Record<string, GenericEvent> = {};
     const stores: Record<string, Store<unknown>> = {};
     const data: Record<string, unknown> = {};

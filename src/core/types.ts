@@ -25,5 +25,3 @@ export interface Hooks {
   mounted?: Hook;
   unmounted?: Hook;
 }
-
-export type GenericEvent<T = unknown> = Event<T> | Effect<T, unknown, unknown>;
