@@ -174,32 +174,6 @@ const Components = variant({
 
 Method allows to change component based on value in `$typeSelector`. Optional `bind` allow to pass props bound to stores or events.
 
-### ReflectList
-
-Method creates component, which renders `view` component for every item from array in `source` store, item's content will be mapped to View props by `mapItem` rules
-
-```tsx
-const Items = reflectList({
-  view: React.FC,
-  source: Store<Item[]>,
-  bind: { 
-    // regular reflect's bind, for list item view
-  },
-  hooks: {
-    // regular reflect's hooks, for list item view
-  },
-  mapItem: {
-    id: (item: Item, index: number) => item.id, // maps array store item to View props
-    name: (item: Item, index: number) => item.name
-  },
-  getKey: (user: Item, index: number) => `${user.id}${user.name}` // optional, will use index by default
-});
-
-<List>
-  <Items />
-</List>
-```
-
 #### Arguments
 
 1. `source` — Store of `string` value. Used to select variant of component to render and bound props to.
@@ -233,6 +207,33 @@ const Field = variant({
   default: TextInput,
 });
 ```
+
+### ReflectList
+
+```tsx
+const Items = reflectList({
+  view: React.FC,
+  source: Store<Item[]>,
+  bind: { 
+    // regular reflect's bind, for list item view
+  },
+  hooks: {
+    // regular reflect's hooks, for list item view
+  },
+  mapItem: {
+    id: (item: Item, index: number) => item.id, // maps array store item to View props
+    name: (item: Item, index: number) => item.name
+  },
+  getKey: (user: Item, index: number) => `${user.id}${user.name}` // optional, will use index by default
+});
+
+<List>
+  <Items />
+</List>
+```
+
+Method creates component, which renders `view` component for every item from array in `source` store, item's content will be mapped to View props by `mapItem` rules
+
 
 ### Create reflect
 
