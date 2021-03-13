@@ -12,11 +12,13 @@ const List: FC = (props) => {
 
 const ListItem: FC<{
   title: string;
+  prefix?: string;
   color?: string;
   onClick?: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
 }> = (props) => {
   return (
     <li onClick={props.onClick} style={{ color: props.color }}>
+      {props.prefix || ''}
       {props.title}
     </li>
   );
@@ -34,7 +36,9 @@ test('relfect-list: renders list from store', async () => {
   const Items = reflectList({
     source: $todos,
     view: ListItem,
-    bind: {},
+    bind: {
+      prefix: 'Title: ',
+    },
     mapItem: {
       title: (todo) => todo.title,
     },
@@ -57,7 +61,7 @@ test('relfect-list: renders list from store', async () => {
   expect(list.length).toEqual($todos.getState().length);
 
   expect(listHtml).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
+    '"<ul><li>Title: Buy milk</li><li>Title: Clean room</li><li>Title: Do homework</li></ul>"',
   );
 });
 
@@ -118,5 +122,61 @@ test('reflect-list: rerenders on list changes', async () => {
 
   expect(container.container.innerHTML).toMatchInlineSnapshot(
     '"<ul><li>Buy milk</li><li>Do homework</li><li>Write tests</li></ul>"',
+  );
+});
+
+test('reflect-list: does not breaks reflect`s bind', async () => {
+  const app = createDomain();
+
+  const $todos = app.createStore<{ title: string; body: string }[]>([
+    { title: 'Buy milk', body: 'Text' },
+    { title: 'Clean room', body: 'Text 2' },
+    { title: 'Do homework', body: 'Text 3' },
+  ]);
+
+  const $prefix = app.createStore<string>('');
+  const prefix = app.createEvent<string>();
+
+  $prefix.on(prefix, (_, next) => next);
+
+  const Items = reflectList({
+    source: $todos,
+    view: ListItem,
+    bind: {
+      prefix: $prefix,
+    },
+    mapItem: {
+      title: (todo) => todo.title,
+    },
+  });
+
+  const scope = fork(app);
+
+  const container = render(
+    <Provider value={scope}>
+      <List>
+        <Items />
+      </List>
+    </Provider>,
+  );
+
+  expect(container.container.innerHTML).toMatchInlineSnapshot(
+    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
+  );
+
+  await act(async () => {
+    await allSettled(prefix, { scope, params: 'Task: ' });
+  });
+
+  expect(container.container.innerHTML).toMatchInlineSnapshot(
+    '"<ul><li>Task: Buy milk</li><li>Task: Clean room</li><li>Task: Do homework</li></ul>"',
+  );
+
+  await act(async () => {
+    await allSettled(prefix, { scope, params: '' });
+  });
+
+  expect(container.container.innerHTML).toMatchInlineSnapshot(
+    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
   );
 });
