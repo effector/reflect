@@ -21,7 +21,7 @@ type ReflectListConfig<Props, Item, Bind> = {
     [P in keyof PropsByBind<Props, Bind>]: (
       item: Item,
       index: number,
-    ) => PropsByBind<Props, Bind>[keyof PropsByBind<Props, Bind>];
+    ) => PropsByBind<Props, Bind>[P];
   };
 };
 
