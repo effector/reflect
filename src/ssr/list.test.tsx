@@ -10,17 +10,11 @@ const List: FC = (props) => {
   return <ul>{props.children}</ul>;
 };
 
-const ListItem: FC<{
-  title: string;
-  prefix?: string;
-  color?: string;
-  onClick?: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
-}> = (props) => {
+const ListItem: FC<{ title: string; prefix?: string }> = (props) => {
   return (
-    <li onClick={props.onClick} style={{ color: props.color }}>
-      {props.prefix || ''}
-      {props.title}
-    </li>
+    <li data-testid={props.title} data-prefix={props.prefix || ''}>{`${
+      props.prefix || ''
+    }${props.title}`}</li>
   );
 };
 
@@ -61,11 +55,11 @@ test('relfect-list: renders list from store', async () => {
     </Provider>,
   );
 
-  expect(fn.mock.calls.length).toBe(3);
+  expect(fn.mock.calls.length).toBe(scope.getState($todos).length);
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Title: Buy milk</li><li>Title: Clean room</li><li>Title: Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual(scope.getState($todos).map((todo) => todo.title));
 });
 
 test('reflect-list: rerenders on list changes', async () => {
@@ -104,9 +98,9 @@ test('reflect-list: rerenders on list changes', async () => {
     </Provider>,
   );
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual(scope.getState($todos).map((todo) => todo.title));
 
   await act(async () => {
     await allSettled(addTodo, {
@@ -115,17 +109,17 @@ test('reflect-list: rerenders on list changes', async () => {
     });
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li><li>Write tests</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual(scope.getState($todos).map((todo) => todo.title));
 
   await act(async () => {
     await allSettled(removeTodo, { scope, params: 'Clean room' });
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Do homework</li><li>Write tests</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual(scope.getState($todos).map((todo) => todo.title));
 });
 
 test('reflect-list: does not breaks reflect`s bind', async () => {
@@ -163,23 +157,23 @@ test('reflect-list: does not breaks reflect`s bind', async () => {
     </Provider>,
   );
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual(scope.getState($todos).map(() => scope.getState($prefix)));
 
   await act(async () => {
     await allSettled(prefix, { scope, params: 'Task: ' });
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Task: Buy milk</li><li>Task: Clean room</li><li>Task: Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual(scope.getState($todos).map(() => scope.getState($prefix)));
 
   await act(async () => {
     await allSettled(prefix, { scope, params: '' });
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual(scope.getState($todos).map(() => scope.getState($prefix)));
 });
