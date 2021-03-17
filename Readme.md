@@ -227,15 +227,16 @@ const Items: React.FC = list({
 });
 ```
 
-Method creates component, which renders `view` component for every item from array in `source` store, item's content will be mapped to View props by `mapItem` rules
+Method creates component, which renders list of `view` components based on items in array in `source` store, each item content's will be mapped to View props by `mapItem` rules. On changes to `source` store, rendered list will be updated too
 
 #### Arguments
 
 1. `source` — Store of `Item[]` value. 
 1. `view` — A react component, will be used to render list items
-1. `mapItems` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to each rendered list item view.
+1. `mapItem` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to props of each rendered list item.
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
+1. `getKey` - Optional function `(item: Item, index: number) => React.Key` to set key for every item in the list to help React with effecient rerenders. If not provided, index is used
 
 
 #### Returns
