@@ -208,10 +208,10 @@ const Field = variant({
 });
 ```
 
-### ReflectList
+### List
 
 ```tsx
-const Items: React.FC = reflectList({
+const Items: React.FC = list({
   view: React.FC<Props>,
   source: Store<Item[]>,
   bind: { 
@@ -247,7 +247,7 @@ Method creates component, which renders `view` component for every item from arr
 ```tsx
 import React from 'react';
 import { createStore, createEvent } from 'effector';
-import { reflectList } from '@effector/reflect';
+import { list } from '@effector/reflect';
 
 const $color = createStore('red');
 
@@ -266,7 +266,7 @@ const Item = ({ id, name, color }) => {
   );
 };
 
-const Items = reflectList({
+const Items = list({
   view: Item,
   source: $users,
   bind: {
