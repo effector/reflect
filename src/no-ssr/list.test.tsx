@@ -25,17 +25,10 @@ test('relfect-list: renders list from store', async () => {
     { title: 'Do homework', body: 'Text 3' },
   ]);
 
-  const mounted = createEvent<void>();
-
-  const fn = jest.fn(() => {});
-
-  mounted.watch(fn);
-
   const Items = list({
     source: $todos,
     view: ListItem,
     bind: {},
-    hooks: { mounted },
     mapItem: {
       title: (todo) => todo.title,
     },
@@ -51,9 +44,49 @@ test('relfect-list: renders list from store', async () => {
     .getAllByRole('listitem')
     .map((item) => item.dataset.testid);
 
+  expect(renderedIds).toEqual($todos.getState().map((todo) => todo.title));
+});
+
+test('relfect-list: reflect hooks called once for every item', async () => {
+  const $todos = createStore<{ title: string; body: string }[]>([
+    { title: 'Buy milk', body: 'Text' },
+    { title: 'Clean room', body: 'Text 2' },
+    { title: 'Do homework', body: 'Text 3' },
+  ]);
+
+  const mounted = createEvent<void>();
+
+  const fn = jest.fn(() => {});
+
+  mounted.watch(fn);
+
+  const unmounted = createEvent<void>();
+
+  const unfn = jest.fn(() => {});
+
+  mounted.watch(unfn);
+
+  const Items = list({
+    source: $todos,
+    view: ListItem,
+    bind: {},
+    hooks: { mounted, unmounted },
+    mapItem: {
+      title: (todo) => todo.title,
+    },
+  });
+
+  const container = render(
+    <List>
+      <Items />
+    </List>,
+  );
+
   expect(fn.mock.calls.length).toBe($todos.getState().length);
 
-  expect(renderedIds).toEqual($todos.getState().map((todo) => todo.title));
+  container.unmount();
+
+  expect(unfn.mock.calls.length).toBe($todos.getState().length);
 });
 
 test('reflect-list: rerenders on list changes', async () => {
@@ -107,7 +140,7 @@ test('reflect-list: rerenders on list changes', async () => {
   ).toEqual($todos.getState().map((todo) => todo.title));
 });
 
-test('reflect-list: does not breaks reflect`s bind', async () => {
+test('reflect-list: reflect binds props to every item in the list', async () => {
   const $todos = createStore<{ title: string; body: string }[]>([
     { title: 'Buy milk', body: 'Text' },
     { title: 'Clean room', body: 'Text 2' },

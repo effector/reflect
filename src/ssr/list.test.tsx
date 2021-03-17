@@ -27,19 +27,56 @@ test('relfect-list: renders list from store', async () => {
     { title: 'Do homework', body: 'Text 3' },
   ]);
 
+  const Items = list({
+    source: $todos,
+    view: ListItem,
+    bind: {},
+    mapItem: {
+      title: (todo) => todo.title,
+    },
+  });
+
+  const scope = fork(app);
+
+  const container = render(
+    <Provider value={scope}>
+      <List>
+        <Items />
+      </List>
+    </Provider>,
+  );
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual(scope.getState($todos).map((todo) => todo.title));
+});
+
+test('relfect-list: reflect hooks called once for every item', async () => {
+  const app = createDomain();
+
+  const $todos = app.createStore<{ title: string; body: string }[]>([
+    { title: 'Buy milk', body: 'Text' },
+    { title: 'Clean room', body: 'Text 2' },
+    { title: 'Do homework', body: 'Text 3' },
+  ]);
+
   const mounted = app.createEvent<void>();
 
   const fn = jest.fn(() => {});
 
   mounted.watch(fn);
 
+  const unmounted = app.createEvent<void>();
+
+  const unfn = jest.fn(() => {});
+
+  unmounted.watch(unfn);
+
   const Items = list({
     source: $todos,
     view: ListItem,
-    bind: {
-      prefix: 'Title: ',
-    },
-    hooks: { mounted },
+    bind: {},
+    hooks: { mounted, unmounted },
     mapItem: {
       title: (todo) => todo.title,
     },
@@ -57,9 +94,9 @@ test('relfect-list: renders list from store', async () => {
 
   expect(fn.mock.calls.length).toBe(scope.getState($todos).length);
 
-  expect(
-    container.getAllByRole('listitem').map((item) => item.dataset.testid),
-  ).toEqual(scope.getState($todos).map((todo) => todo.title));
+  container.unmount();
+
+  expect(unfn.mock.calls.length).toBe(scope.getState($todos).length);
 });
 
 test('reflect-list: rerenders on list changes', async () => {
@@ -122,7 +159,7 @@ test('reflect-list: rerenders on list changes', async () => {
   ).toEqual(scope.getState($todos).map((todo) => todo.title));
 });
 
-test('reflect-list: does not breaks reflect`s bind', async () => {
+test('reflect-list: reflect binds props to every item in the list', async () => {
   const app = createDomain();
 
   const $todos = app.createStore<{ title: string; body: string }[]>([
