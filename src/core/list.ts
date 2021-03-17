@@ -25,10 +25,10 @@ type ReflectListConfig<Props, Item, Bind> = {
   };
 };
 
-export function reflectListFactory(context: ReflectCreatorContext) {
+export function listFactory(context: ReflectCreatorContext) {
   const reflect = reflectFactory(context);
 
-  return function reflectList<
+  return function list<
     Item,
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>

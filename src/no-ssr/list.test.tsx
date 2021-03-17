@@ -4,7 +4,7 @@ import { createStore, createEvent } from 'effector';
 import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 
-import { reflectList } from './index';
+import { list } from './index';
 
 const List: FC = (props) => {
   return <ul>{props.children}</ul>;
@@ -27,7 +27,7 @@ test('relfect-list: renders list from store', async () => {
 
   mounted.watch(fn);
 
-  const Items = reflectList({
+  const Items = list({
     source: $todos,
     view: ListItem,
     bind: {},
@@ -65,7 +65,7 @@ test('reflect-list: rerenders on list changes', async () => {
       todos.filter((todo) => todo.title !== toRemove),
     );
 
-  const Items = reflectList({
+  const Items = list({
     source: $todos,
     view: ListItem,
     bind: {},
@@ -113,7 +113,7 @@ test('reflect-list: does not breaks reflect`s bind', async () => {
 
   $prefix.on(prefix, (_, next) => next);
 
-  const Items = reflectList({
+  const Items = list({
     source: $todos,
     view: ListItem,
     bind: {
