@@ -11,7 +11,11 @@ const List: FC = (props) => {
 };
 
 const ListItem: FC<{ title: string; prefix?: string }> = (props) => {
-  return <li>{`${props.prefix || ''}${props.title}`}</li>;
+  return (
+    <li data-testid={props.title} data-prefix={props.prefix || ''}>{`${
+      props.prefix || ''
+    }${props.title}`}</li>
+  );
 };
 
 test('relfect-list: renders list from store', async () => {
@@ -43,11 +47,13 @@ test('relfect-list: renders list from store', async () => {
     </List>,
   );
 
-  expect(fn.mock.calls.length).toBe(3);
+  const renderedIds = container
+    .getAllByRole('listitem')
+    .map((item) => item.dataset.testid);
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(fn.mock.calls.length).toBe($todos.getState().length);
+
+  expect(renderedIds).toEqual($todos.getState().map((todo) => todo.title));
 });
 
 test('reflect-list: rerenders on list changes', async () => {
@@ -80,25 +86,25 @@ test('reflect-list: rerenders on list changes', async () => {
     </List>,
   );
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
 
   act(() => {
     addTodo({ title: 'Write tests', body: 'Text 4' });
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li><li>Write tests</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
 
   act(() => {
     removeTodo('Clean room');
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Do homework</li><li>Write tests</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
 });
 
 test('reflect-list: does not breaks reflect`s bind', async () => {
@@ -130,23 +136,23 @@ test('reflect-list: does not breaks reflect`s bind', async () => {
     </List>,
   );
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual($todos.getState().map(() => $prefix.getState()));
 
   act(() => {
     prefix('Task: ');
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Task: Buy milk</li><li>Task: Clean room</li><li>Task: Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual($todos.getState().map(() => $prefix.getState()));
 
   act(() => {
     prefix('');
   });
 
-  expect(container.container.innerHTML).toMatchInlineSnapshot(
-    '"<ul><li>Buy milk</li><li>Clean room</li><li>Do homework</li></ul>"',
-  );
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual($todos.getState().map(() => $prefix.getState()));
 });
