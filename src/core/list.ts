@@ -11,7 +11,7 @@ import {
   Hooks,
 } from './types';
 
-interface ReflectListConfig<Props, Item, Bind> {
+type ReflectListConfig<Props, Item, Bind> = {
   view: View<Props>;
   source: Store<Item[]>;
   bind: Bind;
