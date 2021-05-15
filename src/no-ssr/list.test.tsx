@@ -1,5 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 import { createStore, createEvent } from 'effector';
+import { useStore } from 'effector-react';
 
 import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
@@ -188,4 +189,99 @@ test('reflect-list: reflect binds props to every item in the list', async () => 
   expect(
     container.getAllByRole('listitem').map((item) => item.dataset.prefix),
   ).toEqual($todos.getState().map(() => $prefix.getState()));
+});
+
+interface MemberProps {
+  id: number;
+  name: string;
+}
+
+const Member: FC<MemberProps> = (props) => {
+  const { name, id } = props;
+
+  return <li data-testid={id}>{name}</li>;
+};
+
+test('reflect-list: getKey option', async () => {
+  const fn = jest.fn();
+  const fn2 = jest.fn();
+  const renameUser = createEvent<{ id: number; name: string }>();
+  const removeUser = createEvent<number>();
+  const sortById = createEvent();
+  const $members = createStore([
+    { name: 'alice', id: 1 },
+    { name: 'bob', id: 3 },
+    { name: 'carol', id: 2 },
+  ])
+    .on(renameUser, (list, { id, name }) =>
+      list.map((e) => (e.id === id ? { id, name } : e)),
+    )
+    .on(removeUser, (list, id) => list.filter((e) => e.id !== id))
+    .on(sortById, (list) => [...list].sort((a, b) => a.id - b.id));
+
+  // plain
+  const PlainMember = memo((props: MemberProps) => {
+    fn2(props);
+    return <Member id={props.id} name={props.name} />;
+  });
+
+  const PlainMemberList = () => {
+    return (
+      <ul data-list="plain">
+        {useStore($members).map((props) => (
+          <PlainMember key={props.id} id={props.id} name={props.name} />
+        ))}
+      </ul>
+    );
+  };
+
+  // reflect
+  const ReflectMember: FC<MemberProps> = (props) => {
+    fn(props);
+    return <Member id={props.id} name={props.name} />;
+  };
+  const ReflectList: FC = (props) => (
+    <ul data-list="reflect">{props.children}</ul>
+  );
+  const Members = list({
+    source: $members,
+    view: ReflectMember,
+    bind: {},
+    mapItem: {
+      id: (member) => member.id,
+      name: (member) => member.name,
+    },
+    getKey: (item) => item.id,
+  });
+
+  const App = () => (
+    <>
+      <PlainMemberList />
+      <ReflectList>
+        <Members />
+      </ReflectList>
+    </>
+  );
+
+  const container = render(<App />);
+
+  // first check
+
+  act(() => {
+    sortById();
+  });
+
+  // second check
+
+  act(() => {
+    renameUser({ id: 2, name: 'charlie' });
+  });
+
+  // third check
+
+  act(() => {
+    removeUser(2);
+  });
+
+  // last check
 });
