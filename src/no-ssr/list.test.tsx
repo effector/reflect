@@ -227,7 +227,7 @@ test('reflect-list: getKey option', async () => {
 
   const PlainMemberList = () => {
     return (
-      <ul data-list="plain">
+      <ul data-testid="plain">
         {useStore($members).map((props) => (
           <PlainMember key={props.id} id={props.id} name={props.name} />
         ))}
@@ -241,7 +241,7 @@ test('reflect-list: getKey option', async () => {
     return <Member id={props.id} name={props.name} />;
   };
   const ReflectList: FC = (props) => (
-    <ul data-list="reflect">{props.children}</ul>
+    <ul data-testid="reflect">{props.children}</ul>
   );
   const Members = list({
     source: $members,
@@ -266,22 +266,78 @@ test('reflect-list: getKey option', async () => {
   const container = render(<App />);
 
   // first check
+  expect(
+    Array.from(
+      container.getByTestId('plain').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+  expect(
+    Array.from(
+      container.getByTestId('reflect').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+
+  expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
+    fn2.mock.calls.map(([arg]) => arg),
+  );
 
   act(() => {
     sortById();
   });
 
   // second check
+  expect(
+    Array.from(
+      container.getByTestId('plain').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+  expect(
+    Array.from(
+      container.getByTestId('reflect').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+
+  expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
+    fn2.mock.calls.map(([arg]) => arg),
+  );
 
   act(() => {
     renameUser({ id: 2, name: 'charlie' });
   });
 
   // third check
+  expect(
+    Array.from(
+      container.getByTestId('plain').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+  expect(
+    Array.from(
+      container.getByTestId('reflect').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+
+  expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
+    fn2.mock.calls.map(([arg]) => arg),
+  );
 
   act(() => {
     removeUser(2);
   });
 
   // last check
+  expect(
+    Array.from(
+      container.getByTestId('plain').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+  expect(
+    Array.from(
+      container.getByTestId('reflect').querySelectorAll('li'),
+    ).map((item) => Number(item.dataset.testid)),
+  ).toEqual($members.getState().map((member) => member.id));
+
+  expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
+    fn2.mock.calls.map(([arg]) => arg),
+  );
 });
