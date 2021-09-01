@@ -40,8 +40,8 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/parser": "^4.8.1",
-    "effector": "^21.8.3",
-    "effector-react": "^21.3.0",
+    "effector": "^22.0.6",
+    "effector-react": "^22.0.4",
     "eslint": "^7.14.0",
     "fs-extra": "^9.0.1",
     "husky": "^4.3.0",
@@ -58,8 +58,8 @@
     "uglify-es": "^3.3.9"
   },
   "peerDependencies": {
-    "effector": "^21.8.0",
-    "effector-react": "^21.3.0",
+    "effector": "^22.0.0",
+    "effector-react": "^22.0.0",
     "react": "^16.14.0 || ^17.0.0"
   },
   "husky": {
