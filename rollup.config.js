@@ -8,11 +8,7 @@ const { exportRoot } = require('./lib/rollup-plugin-export-root');
 const babelConfig = require('./babel.config.json');
 
 export default {
-  input: [
-    './src/no-ssr/index.ts',
-    './src/ssr/index.ts',
-    './src/babel-preset.js',
-  ],
+  input: ['./src/no-ssr/index.ts', './src/ssr/index.ts'],
   output: { dir: './dist', format: 'cjs' },
   watch: false,
   plugins: [

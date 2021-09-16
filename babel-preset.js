@@ -8,6 +8,13 @@ module.exports = (_api, _, _dirname) => {
           noDefaults: true,
         },
       ],
+      [
+        'effector/babel-plugin',
+        {
+          factories: ['@effector/reflect/ssr'],
+          noDefaults: true,
+        },
+      ],
     ],
   };
 };
