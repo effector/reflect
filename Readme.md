@@ -482,7 +482,8 @@ const Field = variant({
 When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
 
 ## Usage with SSR and tests
-To use reflected components with [SSR and effector](https://effector.dev/docs/api/effector-react/useEvent) or testing via [Fork API](https://effector.dev/docs/api/effector/fork) you will need to mark reflect as a [fabric import via effector's babel-plugin](https://effector.dev/docs/api/effector/babel-plugin#factories)
+To use reflected components with [SSR and effector](https://effector.dev/docs/api/effector-react/useEvent) or testing via [Fork API](https://effector.dev/docs/api/effector/fork) you will need to mark both `@effector/reflect` and `@effector/reflect/ssr` as a [fabric import via effector's babel-plugin](https://effector.dev/docs/api/effector/babel-plugin#factories)
+
 To make this easier `@effector/reflect` exports babel-preset just for that:
 ```js
 // in your babel config
