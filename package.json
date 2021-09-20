@@ -59,8 +59,8 @@
     "uglify-es": "^3.3.9"
   },
   "peerDependencies": {
-    "effector": "^22.0.0",
-    "effector-react": "^22.0.0",
+    "effector": "^21.8.0",
+    "effector-react": "^21.3.0",
     "react": "^16.14.0 || ^17.0.0"
   },
   "husky": {
