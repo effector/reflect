@@ -4,16 +4,10 @@ module.exports = (_api, _, _dirname) => {
       [
         'effector/babel-plugin',
         {
-          factories: ['@effector/reflect'],
+          factories: ['@effector/reflect', '@effector/reflect/ssr'],
           noDefaults: true,
         },
-      ],
-      [
-        'effector/babel-plugin',
-        {
-          factories: ['@effector/reflect/ssr'],
-          noDefaults: true,
-        },
+        'effector-reflect',
       ],
     ],
   };
