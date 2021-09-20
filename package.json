@@ -16,8 +16,7 @@
   "files": [
     "dist",
     "no-ssr",
-    "ssr",
-    "babel-preset.js"
+    "ssr"
   ],
   "scripts": {
     "test": "jest",
