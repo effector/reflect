@@ -366,10 +366,11 @@ export const User: FC = () => {
 };
 ```
 
-### SSR
+### SSR and tests via Fork API
 
-For SSR need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
-Also use `event.prepend(params => params)` instead `(params) => event(params)`.
+For [SSR](https://effector.dev/docs/api/effector-react/useEvent) you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
+
+Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
 
 ```tsx
 // ./ui.tsx
@@ -421,7 +422,7 @@ export const App: FC<{ data: Fork }> = ({ data }) => {
 
 ```tsx
 // ./server.ts
-import { fork, serialize, allSettled } from 'effector/fork';
+import { fork, serialize, allSettled } from 'effector';
 
 import { App, app, changeName } from './app';
 
@@ -443,6 +444,24 @@ const render = async () => {
     </body>
   `;
 };
+```
+
+Also, to use reflected components with [SSR and effector](https://effector.dev/docs/api/effector-react/useEvent) or testing via [effector's Fork API](https://effector.dev/docs/api/effector/fork) you will need to mark `@effector/reflect` and `@effector/reflect/ssr` as a [fabric import via effector/babel-plugin](https://effector.dev/docs/api/effector/babel-plugin#factories)
+
+
+```js
+// in your .babelrc
+{
+  "plugins": [
+    [
+      "effector/babel-plugin",
+      {
+        "factories": ["@effector/reflect", "@effector/reflect/ssr"]
+      }
+    ]
+  ]
+}
+
 ```
 
 ### Hooks
