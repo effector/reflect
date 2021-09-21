@@ -1,6 +1,6 @@
 {
   "name": "@effector/reflect",
-  "version": "0.6.0",
+  "version": "0.0.0-real-version-will-be-set-on-ci",
   "repository": "git@github.com:effector/reflect.git",
   "description": "☄️ Attach effector stores to react components without hooks",
   "maintainers": [
