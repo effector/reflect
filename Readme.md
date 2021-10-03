@@ -507,7 +507,7 @@ When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
 ## Release process
 
 1. Check out the [draft release](https://github.com/effector/reflect/releases).
-1. All PRs should have correct labels. You can [review available labels here](https://github.com/effector/reflect/blob/master/.github/release-drafter.yml).
-1. Update labels for PRs and [manually run release drafter action](https://github.com/effector/reflect/actions/workflows/release-drafter.yml) to regenerate the draft release.
-1. Review new version and press "Publish"
-1. If needed check "Create discussion for this release"
+1. All PRs should have correct labels and useful titles. You can [review available labels here](https://github.com/effector/reflect/blob/master/.github/release-drafter.yml).
+1. Update labels for PRs and titles, next [manually run the release drafter action](https://github.com/effector/reflect/actions/workflows/release-drafter.yml) to regenerate the draft release.
+1. Review the new version and press "Publish"
+1. If required check "Create discussion for this release"
