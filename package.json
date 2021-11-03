@@ -15,9 +15,7 @@
   "module": "./dist/esm/index.js",
   "types": "./dist/cjs/no-ssr/index.d.ts",
   "files": [
-    "dist",
-    "no-ssr",
-    "ssr"
+    "dist"
   ],
   "scripts": {
     "test": "jest",
