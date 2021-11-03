@@ -11,8 +11,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./no-ssr",
-  "types": "./no-ssr/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": ".dist/cjs/no-ssr/index.d.ts",
   "files": [
     "dist",
     "no-ssr",
@@ -49,7 +50,7 @@
     "prettier": "^2.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "rollup": "^2.34.0",
+    "rollup": "^2.59.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-multi-input": "^1.1.1",
     "rollup-plugin-typescript2": "^0.29.0",
@@ -67,5 +68,10 @@
       "pre-commit": "yarn eslint ./src",
       "pre-push": "yarn test ./src"
     }
+  },
+  "dependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
