@@ -5,7 +5,7 @@ import { Provider } from 'effector-react/ssr';
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { createReflect } from './index';
+import { createReflect } from '../ssr';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

@@ -5,7 +5,7 @@ import { useStore } from 'effector-react';
 import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 
-import { list } from './index';
+import { list } from '../index';
 
 const List: FC = (props) => {
   return <ul>{props.children}</ul>;

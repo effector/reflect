@@ -1,7 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 
 import typescript from 'rollup-plugin-typescript2';
-import multiInput from 'rollup-plugin-multi-input';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
@@ -11,7 +10,10 @@ const babelConfig = require('./babel.config.json');
 
 const plugins = [
   typescript({
-    tsconfigDefaults: { compilerOptions: { declaration: true } },
+    useTsconfigDeclarationDir: true,
+    tsconfigDefaults: {
+      compilerOptions: { declaration: true, declarationDir: './dist' },
+    },
   }),
   babel({
     exclude: 'node_modules/**',
@@ -25,12 +27,11 @@ const plugins = [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  multiInput(),
-  terser(),
+  // terser(),
 ];
 
 const noSsr = './src/index.ts';
-const ssr = './src/ssr/index.ts';
+const ssr = './src/ssr.ts';
 const input = [noSsr, ssr];
 const external = ['effector', 'effector-react', 'react', 'effector-react/ssr'];
 

@@ -4,7 +4,7 @@ import { createEvent, restore } from 'effector';
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { variant } from './index';
+import { variant } from '../index';
 
 test('matches first', async () => {
   const changeValue = createEvent<string>();

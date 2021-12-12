@@ -1,5 +1,10 @@
-import * as context from 'effector-react';
-import { reflectFactory, listFactory, reflectCreateFactory, variantFactory } from '../core';
+import * as context from 'effector-react/ssr';
+import {
+  variantFactory,
+  reflectCreateFactory,
+  reflectFactory,
+  listFactory,
+} from './core';
 
 export const reflect = reflectFactory(context);
 export const createReflect = reflectCreateFactory(context);

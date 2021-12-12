@@ -11,11 +11,24 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/cjs/no-ssr/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    },
+    "./ssr": {
+      "import":  "./dist/ssr.mjs",
+      "require": "./dist/ssr.js",
+      "default":  "./dist/ssr.mjs"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "typings": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "Readme.md"
   ],
   "scripts": {
     "test": "jest",
