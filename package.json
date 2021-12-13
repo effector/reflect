@@ -14,22 +14,21 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./index.mjs",
-      "umd": "./index.umd.js",
-      "require": "./index.js",
-      "default": "./index.mjs"
+      "import": "./reflect.mjs",
+      "require": "./reflect.cjs.js",
+      "default": "./reflect.mjs"
     },
+    "./reflect.mjs": "./reflect.mjs",
+    "./ssr.mjs": "./ssr.mjs",
     "./ssr": {
       "import": "./ssr.mjs",
-      "umd": "./ssr.umd.js",
       "require": "./ssr.js",
       "default": "./ssr.mjs"
     }
   },
-  "main": "./index.js",
-  "module": "./index.mjs",
-  "typings": "./index.d.ts",
-  "umd:main": "./index.umd.js",
+  "main": "reflect.cjs.js",
+  "module": "reflect.mjs",
+  "typings": "index.d.ts",
   "files": [
     "Readme.md",
     "index.d.ts",
@@ -46,8 +45,8 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "yarn clear-build && microbundle build src/index.ts src/ssr.ts",
-    "clear-build": "rm -f index.* && rm -f ssr.*",
+    "build": "yarn clear-build && yarn rollup --config ./rollup.config.js",
+    "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -rf dist && rm -rf core",
     "test-build": "yarn test ./dist-test",
     "prepublishOnly": "yarn build"
   },
@@ -67,6 +66,7 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/parser": "^4.8.1",
+    "babel-plugin-module-resolver": "^4.1.0",
     "effector": "^22.0.6",
     "effector-react": "^22.0.4",
     "eslint": "^7.14.0",

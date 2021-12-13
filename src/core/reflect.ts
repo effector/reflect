@@ -1,4 +1,4 @@
-import { FC, createElement, useEffect, useCallback } from 'react';
+import React from 'react';
 import { Store, combine, Event, Effect, is } from 'effector';
 
 import {
@@ -31,7 +31,7 @@ export function reflectFactory(context: ReflectCreatorContext) {
   return function reflect<
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
-  >(config: ReflectConfig<Props, Bind>): FC<PropsByBind<Props, Bind>> {
+  >(config: ReflectConfig<Props, Bind>): React.FC<PropsByBind<Props, Bind>> {
     type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
     const events: Record<string, GenericEvent> = {};
     const stores: Record<string, Store<unknown>> = {};
@@ -65,14 +65,14 @@ export function reflectFactory(context: ReflectCreatorContext) {
       const hookMounted = readHook(config.hooks?.mounted, context);
       const hookUnmounted = readHook(config.hooks?.unmounted, context);
 
-      useEffect(() => {
+      React.useEffect(() => {
         if (hookMounted) hookMounted();
         return () => {
           if (hookUnmounted) hookUnmounted();
         };
       }, []);
 
-      return createElement(config.view, elementProps);
+      return React.createElement(config.view, elementProps);
     };
   };
 }

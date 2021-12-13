@@ -1,4 +1,4 @@
-import { FC, Key, useMemo, createElement } from 'react';
+import React from 'react';
 import { Store } from 'effector';
 
 import { reflectFactory } from './reflect';
@@ -16,7 +16,7 @@ type ReflectListConfig<Props, Item, Bind> = {
   source: Store<Item[]>;
   bind: Bind;
   hooks?: Hooks;
-  getKey?: (item: Item) => Key;
+  getKey?: (item: Item) => React.Key;
   mapItem: {
     [P in keyof PropsByBind<Props, Bind>]: (
       item: Item,
@@ -32,7 +32,7 @@ export function listFactory(context: ReflectCreatorContext) {
     Item,
     Props,
     Bind extends BindByProps<Props> = BindByProps<Props>
-  >(config: ReflectListConfig<Props, Item, Bind>): FC {
+  >(config: ReflectListConfig<Props, Item, Bind>): React.FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind,
@@ -42,7 +42,7 @@ export function listFactory(context: ReflectCreatorContext) {
     const listConfig = {
       getKey: config.getKey,
       fn: (value: Item, index: number) => {
-        const finalProps = useMemo(() => {
+        const finalProps = React.useMemo(() => {
           const props: any = {};
 
           for (const prop in config.mapItem) {
@@ -58,7 +58,7 @@ export function listFactory(context: ReflectCreatorContext) {
           return props;
         }, [value, index]);
 
-        return createElement(ItemView, finalProps);
+        return React.createElement(ItemView, finalProps);
       },
     };
 

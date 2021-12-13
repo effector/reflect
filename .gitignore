@@ -16,3 +16,4 @@ effector-reflect-*
 core/
 index.*
 ssr.*
+reflect.*
