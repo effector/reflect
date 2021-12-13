@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { createReflect } from '../../index';
+import { createReflect } from '../../reflect.cjs';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
