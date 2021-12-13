@@ -15,11 +15,13 @@
   "exports": {
     ".": {
       "import": "./index.mjs",
+      "umd": "./index.umd.js",
       "require": "./index.js",
       "default": "./index.mjs"
     },
     "./ssr": {
       "import": "./ssr.mjs",
+      "umd": "./ssr.umd.js",
       "require": "./ssr.js",
       "default": "./ssr.mjs"
     }
@@ -27,6 +29,7 @@
   "main": "./index.js",
   "module": "./index.mjs",
   "typings": "./index.d.ts",
+  "umd:main": "./index.umd.js",
   "files": [
     "Readme.md",
     "index.d.ts",
