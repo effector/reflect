@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { createReflect } from '../../dist/esm';
+import { createReflect } from '../../index';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

@@ -11,28 +11,39 @@
   "publishConfig": {
     "access": "public"
   },
+  "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.mjs"
+      "import": "./index.mjs",
+      "require": "./index.js",
+      "default": "./index.mjs"
     },
     "./ssr": {
-      "import":  "./dist/ssr.mjs",
-      "require": "./dist/ssr.js",
-      "default":  "./dist/ssr.mjs"
+      "import": "./ssr.mjs",
+      "require": "./ssr.js",
+      "default": "./ssr.mjs"
     }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "typings": "./dist/index.d.ts",
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "typings": "./index.d.ts",
   "files": [
-    "dist",
-    "Readme.md"
+    "Readme.md",
+    "index.d.ts",
+    "index.js",
+    "index.mjs",
+    "index.mjs.map",
+    "index.umd.js",
+    "index.umd.js.map",
+    "ssr.d.ts",
+    "ssr.js",
+    "ssr.js.map",
+    "ssr.umd.js",
+    "ssr.umd.js.map"
   ],
   "scripts": {
     "test": "jest",
-    "build": "rm -fr dist no-ssr ssr && yarn rollup --config ./rollup.config.js",
+    "build": "microbundle build src/index.ts src/ssr.ts",
     "test-build": "yarn test ./dist-test",
     "prepublishOnly": "yarn build"
   },
@@ -58,6 +69,7 @@
     "fs-extra": "^9.0.1",
     "husky": "^4.3.0",
     "jest": "^26.6.3",
+    "microbundle": "^0.14.2",
     "prettier": "^2.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

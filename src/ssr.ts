@@ -1,4 +1,4 @@
-import * as context from 'effector-react/ssr';
+import * as effectorReactSSR from 'effector-react/ssr';
 import {
   variantFactory,
   reflectCreateFactory,
@@ -6,9 +6,9 @@ import {
   listFactory,
 } from './core';
 
-export const reflect = reflectFactory(context);
-export const createReflect = reflectCreateFactory(context);
+export const reflect = reflectFactory(effectorReactSSR);
+export const createReflect = reflectCreateFactory(effectorReactSSR);
 
-export const variant = variantFactory(context);
+export const variant = variantFactory(effectorReactSSR);
 
-export const list = listFactory(context);
+export const list = listFactory(effectorReactSSR);

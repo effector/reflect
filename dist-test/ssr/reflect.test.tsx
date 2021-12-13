@@ -5,7 +5,7 @@ import { Provider } from 'effector-react/ssr';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { reflect } from '../../dist/esm/ssr';
+import { reflect } from '../../ssr';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
