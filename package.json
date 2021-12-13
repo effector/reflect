@@ -46,7 +46,8 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "microbundle build src/index.ts src/ssr.ts",
+    "build": "yarn clear-build && microbundle build src/index.ts src/ssr.ts",
+    "clear-build": "rm -f index.* && rm -f ssr.*",
     "test-build": "yarn test ./dist-test",
     "prepublishOnly": "yarn build"
   },
