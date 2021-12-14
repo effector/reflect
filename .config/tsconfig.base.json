@@ -8,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "strictNullChecks": true,
+    "strictNullChecks": true
   },
   "include": ["../src"],
   "exclude": ["../typings", "../**/*.test.tsx"]
