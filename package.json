@@ -33,16 +33,15 @@
     "Readme.md",
     "core",
     "index.d.ts",
-    "index.js",
-    "index.mjs",
-    "index.mjs.map",
-    "index.umd.js",
-    "index.umd.js.map",
     "ssr.d.ts",
+    "reflect.cjs.js",
+    "reflect.cjs.js.map",
+    "reflect.mjs",
+    "reflect.mjs.map",
     "ssr.js",
     "ssr.js.map",
-    "ssr.umd.js",
-    "ssr.umd.js.map"
+    "ssr.mjs",
+    "ssr.mjs.map"
   ],
   "scripts": {
     "test": "jest",
