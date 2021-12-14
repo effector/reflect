@@ -41,7 +41,7 @@ const plugins = (isEsm) => [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  // terser(),
+  terser(),
 ];
 
 const noSsr = './src/index.ts';
