@@ -60,6 +60,8 @@
     "@eslint-kit/eslint-config-node": "^2.0.0",
     "@eslint-kit/eslint-config-prettier": "^2.0.0",
     "@eslint-kit/eslint-config-typescript": "^3.1.2",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.1",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.2.2",
     "@types/jest": "^26.0.15",
@@ -79,6 +81,7 @@
     "rollup": "^2.59.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-multi-input": "^1.1.1",
+    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.29.0",
     "ts-jest": "^26.4.4",
     "typescript": "^4.1.2",
@@ -95,9 +98,5 @@
       "pre-push": "yarn test ./src"
     }
   },
-  "dependencies": {
-    "@rollup/plugin-commonjs": "^21.0.1",
-    "@rollup/plugin-node-resolve": "^13.0.6",
-    "rollup-plugin-terser": "^7.0.2"
-  }
+  "dependencies": {}
 }
