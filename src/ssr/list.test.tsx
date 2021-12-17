@@ -4,7 +4,7 @@ import { Provider, useStore } from 'effector-react/ssr';
 
 import { render, act } from '@testing-library/react';
 
-import { list } from './index';
+import { list } from '../ssr';
 
 const List: FC = (props) => {
   return <ul>{props.children}</ul>;

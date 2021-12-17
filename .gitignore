@@ -4,6 +4,7 @@ node_modules
 yarn-error.log
 
 /dist
+/ssr/dist
 /typings
 /browser
 /no-ssr
@@ -12,3 +13,7 @@ yarn-error.log
 package*
 effector-reflect-*
 .idea
+core/
+index.*
+ssr.*
+reflect.*

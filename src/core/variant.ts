@@ -1,4 +1,4 @@
-import { FC, createElement } from 'react';
+import React from 'react';
 import { Store } from 'effector';
 
 import { reflectFactory } from './reflect';
@@ -26,12 +26,12 @@ export function variantFactory(context: ReflectCreatorContext) {
     cases: Record<Variant, View<Props>>;
     hooks?: Hooks;
     default?: View<Props>;
-  }): FC<PropsByBind<Props, Bind>> {
+  }): React.FC<PropsByBind<Props, Bind>> {
     function View(props: Props) {
       const nameOfCase = context.useStore(config.source);
       const Component = config.cases[nameOfCase] ?? config.default ?? Default;
 
-      return createElement(Component, props);
+      return React.createElement(Component, props);
     }
 
     const bind = config.bind ?? ({} as Bind);

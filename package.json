@@ -11,16 +11,42 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./no-ssr",
-  "types": "./no-ssr/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./reflect.mjs",
+      "require": "./reflect.cjs.js",
+      "default": "./reflect.mjs"
+    },
+    "./reflect.mjs": "./reflect.mjs",
+    "./ssr.mjs": "./ssr.mjs",
+    "./ssr": {
+      "import": "./ssr.mjs",
+      "require": "./ssr.js",
+      "default": "./ssr.mjs"
+    }
+  },
+  "main": "reflect.cjs.js",
+  "module": "reflect.mjs",
+  "typings": "index.d.ts",
   "files": [
-    "dist",
-    "no-ssr",
-    "ssr"
+    "Readme.md",
+    "core",
+    "index.d.ts",
+    "ssr.d.ts",
+    "reflect.cjs.js",
+    "reflect.cjs.js.map",
+    "reflect.mjs",
+    "reflect.mjs.map",
+    "ssr.js",
+    "ssr.js.map",
+    "ssr.mjs",
+    "ssr.mjs.map"
   ],
   "scripts": {
     "test": "jest",
-    "build": "rm -fr dist no-ssr ssr && yarn rollup --config ./rollup.config.js",
+    "build": "yarn clear-build && yarn rollup --config ./rollup.config.js && cp index.d.ts reflect.d.ts",
+    "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -rf dist && rm -rf core",
     "test-build": "yarn test ./dist-test",
     "prepublishOnly": "yarn build"
   },
@@ -34,12 +60,15 @@
     "@eslint-kit/eslint-config-node": "^2.0.0",
     "@eslint-kit/eslint-config-prettier": "^2.0.0",
     "@eslint-kit/eslint-config-typescript": "^3.1.2",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.1",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.2.2",
     "@types/jest": "^26.0.15",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/parser": "^4.8.1",
+    "babel-plugin-module-resolver": "^4.1.0",
     "effector": "^22.0.6",
     "effector-react": "^22.0.4",
     "eslint": "^7.14.0",
@@ -49,9 +78,10 @@
     "prettier": "^2.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "rollup": "^2.34.0",
+    "rollup": "^2.59.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-multi-input": "^1.1.1",
+    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.29.0",
     "ts-jest": "^26.4.4",
     "typescript": "^4.1.2",
@@ -67,5 +97,6 @@
       "pre-commit": "yarn eslint ./src",
       "pre-push": "yarn test ./src"
     }
-  }
+  },
+  "dependencies": {}
 }
