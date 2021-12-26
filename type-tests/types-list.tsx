@@ -101,6 +101,27 @@ import { list } from '../src';
   expectType<React.FC>(List);
 }
 
+// list allows optional mapItem
+{
+  const Item: React.FC<{
+    id: number;
+    value: string;
+    common: string;
+  }> = () => null;
+  const $common = createStore<string>('common prop');
+  const $items = createStore<{ id: number; value: string }[]>([]);
+
+  const List = list({
+    source: $items,
+    bind: {
+      common: $common,
+    },
+    view: Item,
+  });
+
+  expectType<React.FC>(List);
+}
+
 // list allows not to set both `bind` and `mapItem` if source type matches with props
 {
   const Item: React.FC<{

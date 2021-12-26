@@ -188,6 +188,66 @@ test('reflect-list: bind and mapItem optional, if source type matches view props
   ).toEqual($todos.getState().map((todo) => todo.title));
 });
 
+test('reflect-list: mapItem optional, if not needed', async () => {
+  const addTodo = createEvent<{ title: string; body: string }>();
+  const removeTodo = createEvent<string>();
+  const $todos = createStore<{ title: string; body: string }[]>([
+    { title: 'Buy milk', body: 'Text' },
+    { title: 'Clean room', body: 'Text 2' },
+    { title: 'Do homework', body: 'Text 3' },
+  ]);
+  const $prefix = createStore('Pre:');
+
+  $todos
+    .on(addTodo, (todos, next) => todos.concat(next))
+    .on(removeTodo, (todos, toRemove) =>
+      todos.filter((todo) => todo.title !== toRemove),
+    );
+
+  const Items = list({
+    source: $todos,
+    bind: {
+      prefix: $prefix,
+    },
+    view: ListItem,
+  });
+
+  const container = render(
+    <List>
+      <Items />
+    </List>,
+  );
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual($todos.getState().map(() => $prefix.getState()));
+
+  act(() => {
+    addTodo({ title: 'Write tests', body: 'Text 4' });
+  });
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual($todos.getState().map(() => $prefix.getState()));
+
+  act(() => {
+    removeTodo('Clean room');
+  });
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.prefix),
+  ).toEqual($todos.getState().map(() => $prefix.getState()));
+});
+
 test('reflect-list: bind is optional if not needed', async () => {
   const addTodo = createEvent<{ title: string; body: string }>();
   const removeTodo = createEvent<string>();
