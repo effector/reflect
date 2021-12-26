@@ -78,3 +78,20 @@ import { list } from '../src';
 
   expectType<React.FC>(List);
 }
+
+// list allows not to set both `bind` and `mapItem` if source type matches props
+{
+  const Item: React.FC<{
+    id: number;
+    value: string;
+  }> = () => null;
+  const $items = createStore<{ id: number; value: string }[]>([]);
+
+  // does not work yet
+  const List = list({
+    source: $items,
+    view: Item,
+  });
+
+  expectType<React.FC>(List);
+}
