@@ -79,7 +79,29 @@ import { list } from '../src';
   expectType<React.FC>(List);
 }
 
-// list allows not to set both `bind` and `mapItem` if source type matches props
+// list allows optional bind
+{
+  const Item: React.FC<{
+    id: number;
+    value: string;
+    onChange: (update: [id: string, newValue: string]) => void;
+  }> = () => null;
+  const $items = createStore<{ id: number; value: string }[]>([]);
+
+  const List = list({
+    source: $items,
+    view: Item,
+    mapItem: {
+      id: (item) => item.id,
+      value: (item) => item.value,
+      onChange: (_item) => (_params) => {},
+    },
+  });
+
+  expectType<React.FC>(List);
+}
+
+// list allows not to set both `bind` and `mapItem` if source type matches with props
 {
   const Item: React.FC<{
     id: number;
@@ -87,7 +109,23 @@ import { list } from '../src';
   }> = () => null;
   const $items = createStore<{ id: number; value: string }[]>([]);
 
-  // does not work yet
+  const List = list({
+    source: $items,
+    view: Item,
+  });
+
+  expectType<React.FC>(List);
+}
+
+// list doesn't allow not to set both `bind` and `mapItem` if source type doesn't matches with props
+{
+  const Item: React.FC<{
+    id: number;
+    value: string;
+  }> = () => null;
+  const $items = createStore<{ biba: string; boba: string }[]>([]);
+
+  // @ts-expect-error
   const List = list({
     source: $items,
     view: Item,

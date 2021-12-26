@@ -188,6 +188,56 @@ test('reflect-list: bind and mapItem optional, if source type matches view props
   ).toEqual($todos.getState().map((todo) => todo.title));
 });
 
+test('reflect-list: bind is optional if not needed', async () => {
+  const addTodo = createEvent<{ title: string; body: string }>();
+  const removeTodo = createEvent<string>();
+  const $todos = createStore<{ title: string; body: string }[]>([
+    { title: 'Buy milk', body: 'Text' },
+    { title: 'Clean room', body: 'Text 2' },
+    { title: 'Do homework', body: 'Text 3' },
+  ]);
+
+  $todos
+    .on(addTodo, (todos, next) => todos.concat(next))
+    .on(removeTodo, (todos, toRemove) =>
+      todos.filter((todo) => todo.title !== toRemove),
+    );
+
+  const Items = list({
+    source: $todos,
+    view: ListItem,
+    mapItem: {
+      title: (item) => item.title,
+    },
+  });
+
+  const container = render(
+    <List>
+      <Items />
+    </List>,
+  );
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
+
+  act(() => {
+    addTodo({ title: 'Write tests', body: 'Text 4' });
+  });
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
+
+  act(() => {
+    removeTodo('Clean room');
+  });
+
+  expect(
+    container.getAllByRole('listitem').map((item) => item.dataset.testid),
+  ).toEqual($todos.getState().map((todo) => todo.title));
+});
+
 test('reflect-list: reflect binds props to every item in the list', async () => {
   const $todos = createStore<{ title: string; body: string }[]>([
     { title: 'Buy milk', body: 'Text' },
