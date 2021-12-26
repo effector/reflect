@@ -44,7 +44,9 @@
     "ssr.mjs.map"
   ],
   "scripts": {
-    "test": "jest",
+    "test:code": "jest ./src",
+    "test:types": "tsc -p ./type-tests",
+    "test": "yarn test:code && yarn test:types",
     "build": "yarn clear-build && yarn rollup --config ./rollup.config.js && cp index.d.ts reflect.d.ts",
     "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -rf dist && rm -rf core",
     "test-build": "yarn test ./dist-test",
@@ -84,6 +86,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.29.0",
     "ts-jest": "^26.4.4",
+    "tsd": "^0.19.0",
     "typescript": "^4.1.2",
     "uglify-es": "^3.3.9"
   },
@@ -95,7 +98,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "yarn eslint ./src",
-      "pre-push": "yarn test ./src"
+      "pre-push": "yarn test:code ./src"
     }
   },
   "dependencies": {}
