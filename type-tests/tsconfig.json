@@ -12,6 +12,7 @@
       "noImplicitThis": true,
       "noUnusedLocals": false,
       "strict": true,
+      "jsx": "react",
       "strictNullChecks": true,
       "suppressImplicitAnyIndexErrors": true
     }
