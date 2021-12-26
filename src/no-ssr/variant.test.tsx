@@ -39,9 +39,41 @@ test('matches first', async () => {
   expect(updatedInput.className).toBe('second');
 });
 
+test('allows partial cases, renders default for unmatched', async () => {
+  const changeValue = createEvent<string>();
+  const changeType = createEvent<'first' | 'second' | 'third'>();
+  const $value = restore(changeValue, '');
+  const $type = restore(changeType, 'first');
+
+  const Input = variant({
+    source: $type,
+    bind: { value: $value, onChange: changeValue },
+    cases: {
+      second: InputCustom2,
+      third: InputCustom3,
+    },
+    default: InputCustom,
+  });
+
+  const container = render(<Input testId="check" />);
+
+  await userEvent.type(container.getByTestId('check'), 'ForExample');
+  expect($value.getState()).toBe('ForExample');
+
+  const input = container.container.firstChild as HTMLInputElement;
+  expect(input.className).toBe('first');
+
+  act(() => {
+    changeType('second');
+  });
+
+  expect($value.getState()).toBe('ForExample');
+  const updatedInput = container.container.firstChild as HTMLInputElement;
+  expect(updatedInput.className).toBe('second');
+});
+
 test.todo('rerenders only once after change source');
 test.todo('rerenders only once on type');
-test.todo('renders default if no match');
 test.todo('works on nested matches');
 
 test('hooks works once on mount', async () => {
