@@ -47,9 +47,9 @@
     "test:code": "jest ./src",
     "test:types": "tsc -p ./type-tests",
     "test": "yarn test:code && yarn test:types",
+    "test-build": "yarn jest ./dist-test",
     "build": "yarn clear-build && yarn rollup --config ./rollup.config.js && cp index.d.ts reflect.d.ts",
     "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -rf dist && rm -rf core",
-    "test-build": "yarn test ./dist-test",
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
