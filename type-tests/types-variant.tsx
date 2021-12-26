@@ -64,6 +64,28 @@ import { variant } from '../src';
   expectType<React.FC>(VariableInput);
 }
 
+// variant warns, if no cases provided
+{
+  type PageProps = {
+    context: {
+      route: string;
+    };
+  };
+  const NotFoundPage: React.FC<PageProps> = () => null;
+  const $page = createStore<'home' | 'faq' | 'profile' | 'products'>('home');
+  const $pageContext = $page.map((route) => ({ route }));
+
+  const CurrentPage = variant({
+    source: $page,
+    bind: { context: $pageContext },
+    // @ts-expect-error
+    cases: {},
+    default: NotFoundPage,
+  });
+
+  expectType<React.FC>(CurrentPage);
+}
+
 // variant allows to set every possble case
 // for e.g. if we want to cover only specific ones and render default for the rest
 {
@@ -82,9 +104,36 @@ import { variant } from '../src';
   const CurrentPage = variant({
     source: $page,
     bind: { context: $pageContext },
-    // does not work yet
     cases: {
       home: HomePage,
+      faq: FaqPage,
+    },
+    default: NotFoundPage,
+  });
+
+  expectType<React.FC>(CurrentPage);
+}
+
+// variant warns about wrong cases
+{
+  type PageProps = {
+    context: {
+      route: string;
+    };
+  };
+
+  const HomePage: React.FC<PageProps> = () => null;
+  const FaqPage: React.FC<PageProps> = () => null;
+  const NotFoundPage: React.FC<PageProps> = () => null;
+  const $page = createStore<'home' | 'profile' | 'products'>('home');
+  const $pageContext = $page.map((route) => ({ route }));
+
+  const CurrentPage = variant({
+    source: $page,
+    bind: { context: $pageContext },
+    cases: {
+      home: HomePage,
+      // @ts-expect-error
       faq: FaqPage,
     },
     default: NotFoundPage,

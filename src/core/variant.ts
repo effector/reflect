@@ -9,6 +9,7 @@ import {
   PropsByBind,
   ReflectCreatorContext,
   View,
+  AtLeastOne,
 } from './types';
 
 const Default = () => null;
@@ -23,7 +24,7 @@ export function variantFactory(context: ReflectCreatorContext) {
   >(config: {
     source: Store<Variant>;
     bind?: Bind;
-    cases: Record<Variant, View<Props>>;
+    cases: AtLeastOne<Record<Variant, View<Props>>>;
     hooks?: Hooks;
     default?: View<Props>;
   }): React.FC<PropsByBind<Props, Bind>> {
