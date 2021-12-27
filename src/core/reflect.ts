@@ -80,7 +80,7 @@ export function reflectFactory(context: ReflectCreatorContext) {
 function readHook(
   hook: Hook | undefined,
   context: ReflectCreatorContext,
-): (() => void) | undefined {
+): (() => void) | void {
   if (hook) {
     if (is.event(hook) || is.effect(hook)) {
       return context.useEvent(hook as Event<void>);

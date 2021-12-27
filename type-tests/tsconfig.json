@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "allowJs": true,
+      "allowSyntheticDefaultImports": true,
+      "allowUnreachableCode": false,
+      "module": "esnext",
+      "moduleResolution": "Node",
+      "noEmit": true,
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitAny": true,
+      "noImplicitReturns": true,
+      "noImplicitThis": true,
+      "noUnusedLocals": false,
+      "strict": true,
+      "jsx": "react",
+      "strictNullChecks": true,
+      "suppressImplicitAnyIndexErrors": true
+    }
+}
