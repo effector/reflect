@@ -1,10 +1,9 @@
 import { FC, ComponentClass } from 'react';
 import { Store, Event, Effect } from 'effector';
-import { useEvent, useList, useStore } from 'effector-react';
+import { useUnit, useList } from 'effector-react';
 
 export interface ReflectCreatorContext {
-  useStore: typeof useStore;
-  useEvent: typeof useEvent;
+  useUnit: typeof useUnit;
   useList: typeof useList;
 }
 

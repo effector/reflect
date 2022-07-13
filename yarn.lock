@@ -2442,10 +2442,12 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-effector-react@^22.0.4:
-  version "22.0.4"
-  resolved "https://registry.yarnpkg.com/effector-react/-/effector-react-22.0.4.tgz#4dcefdbf1167a0ad9a23fbabeec03a66a0f746de"
-  integrity sha512-4bWdcUXZlET5uKF/+9HNeB+s7tAPrD6V7RWbTJXeDCVSwF6gXgDQMjmla7DtHsbpZxB6hSsH98JfqFq7yXbXdw==
+effector-react@22.1.0:
+  version "22.1.0"
+  resolved "https://registry.yarnpkg.com/effector-react/-/effector-react-22.1.0.tgz#698239341193b6fc92b51c5effb9b7110df6ac06"
+  integrity sha512-Wm/4tbIVOld0nqaglH+VxlYaxvqmkoKmynNCiEmQ/ekqx2ChieGOcNHMJrOETKZEa4pB9TQf3a9qDnQG5jXPAA==
+  dependencies:
+    use-sync-external-store "^1.0.0"
 
 effector@^22.0.6:
   version "22.0.6"
@@ -6105,6 +6107,11 @@ urix@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
+
+use-sync-external-store@^1.0.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 use@^3.1.0:
   version "3.1.1"
