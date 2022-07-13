@@ -16,4 +16,7 @@ effector-reflect-*
 core/
 index.*
 ssr.*
+scope.*js
+scope.*map
+scope.d.ts
 reflect.*
