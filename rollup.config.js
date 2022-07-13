@@ -41,11 +41,12 @@ const plugins = (isEsm) => [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  terser(),
+  // terser(),
 ];
 
 const noSsr = './src/index.ts';
 const ssr = './src/ssr.ts';
+const scope = './src/scope.ts';
 const external = [
   'effector',
   'effector/effector.mjs',
@@ -53,6 +54,7 @@ const external = [
   'effector-react/effector-react.mjs',
   'react',
   'effector-react/ssr',
+  'effector-react/scope',
 ];
 
 export default [
@@ -79,6 +81,17 @@ export default [
     },
   },
   {
+    input: scope,
+    external,
+    plugins: plugins(true),
+    output: {
+      file: './scope.mjs',
+      format: 'es',
+      sourcemap: true,
+      externalLiveBindings: false,
+    },
+  },
+  {
     input: noSsr,
     external,
     plugins: plugins(),
@@ -97,6 +110,19 @@ export default [
     plugins: plugins(),
     output: {
       file: './ssr.js',
+      format: 'cjs',
+      freeze: false,
+      exports: 'named',
+      sourcemap: true,
+      externalLiveBindings: false,
+    },
+  },
+  {
+    input: scope,
+    external,
+    plugins: plugins(),
+    output: {
+      file: './scope.js',
       format: 'cjs',
       freeze: false,
       exports: 'named',

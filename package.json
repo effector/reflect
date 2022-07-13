@@ -24,6 +24,12 @@
       "import": "./ssr.mjs",
       "require": "./ssr.js",
       "default": "./ssr.mjs"
+    },
+    "./scope.mjs": "./scope.mjs",
+    "./scope": {
+      "import": "./scope.mjs",
+      "require": "./scope.js",
+      "default": "./scope.mjs"
     }
   },
   "main": "reflect.cjs.js",
@@ -34,6 +40,7 @@
     "core",
     "index.d.ts",
     "ssr.d.ts",
+    "scope.d.ts",
     "reflect.cjs.js",
     "reflect.cjs.js.map",
     "reflect.mjs",
@@ -41,7 +48,11 @@
     "ssr.js",
     "ssr.js.map",
     "ssr.mjs",
-    "ssr.mjs.map"
+    "ssr.mjs.map",
+    "scope.js",
+    "scope.js.map",
+    "scope.mjs",
+    "scope.mjs.map"
   ],
   "scripts": {
     "test:code": "jest ./src",
@@ -50,7 +61,7 @@
     "test:code:build": "jest ./dist-test",
     "test-build": "yarn test:code:build",
     "build": "yarn clear-build && yarn rollup --config ./rollup.config.js && cp index.d.ts reflect.d.ts",
-    "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -rf dist && rm -rf core",
+    "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -f scope.* && rm -rf dist && rm -rf core",
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
@@ -73,7 +84,7 @@
     "@typescript-eslint/parser": "^4.8.1",
     "babel-plugin-module-resolver": "^4.1.0",
     "effector": "^22.0.6",
-    "effector-react": "^22.0.4",
+    "effector-react": "^22.1.0",
     "eslint": "^7.14.0",
     "fs-extra": "^9.0.1",
     "husky": "^4.3.0",
@@ -92,9 +103,9 @@
     "uglify-es": "^3.3.9"
   },
   "peerDependencies": {
-    "effector": "^21.8.0 || ^22.0.0",
-    "effector-react": "^21.3.0 || ^22.0.0",
-    "react": "^16.14.0 || ^17.0.0"
+    "effector": "^22.0.0",
+    "effector-react": "^22.1.0",
+    "react": ">=16.8.0 <19.0.0"
   },
   "husky": {
     "hooks": {

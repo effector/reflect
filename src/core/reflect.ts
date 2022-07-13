@@ -49,11 +49,11 @@ export function reflectFactory(context: ReflectCreatorContext) {
       }
     }
 
-    const $bind = isEmpty(stores) ? null : combine(stores);
+    const $bind = isEmpty(stores) ? null : stores;
 
     return (props) => {
-      const storeProps = $bind ? context.useStore($bind) : ({} as Props);
-      const eventsProps = context.useEvent(events);
+      const storeProps = $bind ? context.useUnit($bind) : ({} as Props);
+      const eventsProps = context.useUnit(events);
       const elementProps: Props = Object.assign(
         {},
         storeProps,
@@ -83,7 +83,7 @@ function readHook(
 ): (() => void) | void {
   if (hook) {
     if (is.event(hook) || is.effect(hook)) {
-      return context.useEvent(hook as Event<void>);
+      return context.useUnit(hook as Event<void>);
     }
     return hook;
   }

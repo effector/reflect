@@ -29,7 +29,7 @@ export function variantFactory(context: ReflectCreatorContext) {
     default?: View<Props>;
   }): React.FC<PropsByBind<Props, Bind>> {
     function View(props: Props) {
-      const nameOfCase = context.useStore(config.source);
+      const nameOfCase = context.useUnit(config.source);
       const Component = config.cases[nameOfCase] ?? config.default ?? Default;
 
       return React.createElement(Component, props);
