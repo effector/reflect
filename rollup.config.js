@@ -41,7 +41,7 @@ const plugins = (isEsm) => [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  terser(),
+  // terser(),
 ];
 
 const noSsr = './src/index.ts';
@@ -54,6 +54,7 @@ const external = [
   'effector-react/effector-react.mjs',
   'react',
   'effector-react/ssr',
+  'effector-react/scope',
 ];
 
 export default [
