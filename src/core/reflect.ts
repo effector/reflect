@@ -33,6 +33,7 @@ export function reflectFactory(context: ReflectCreatorContext) {
     Bind extends BindableProps<Props> = BindableProps<Props>
   >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
     type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
+
     const events: Record<string, GenericEvent> = {};
     const stores: Record<string, Store<unknown>> = {};
     const data: Record<string, unknown> = {};
@@ -49,11 +50,10 @@ export function reflectFactory(context: ReflectCreatorContext) {
       }
     }
 
-    const $bind = isEmpty(stores) ? null : stores;
-
     return (props) => {
-      const storeProps = $bind ? context.useUnit($bind) : ({} as Props);
+      const storeProps = context.useUnit(stores)
       const eventsProps = context.useUnit(events);
+
       const elementProps: Props = Object.assign(
         {},
         storeProps,
@@ -87,8 +87,4 @@ function readHook(
     }
     return hook;
   }
-}
-
-function isEmpty(map: Record<string | number, unknown>): boolean {
-  return Object.keys(map).length === 0;
 }
