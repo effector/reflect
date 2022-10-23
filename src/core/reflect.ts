@@ -31,24 +31,10 @@ export function reflectFactory(context: Ctx) {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>
-  >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
-    type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
-
-    const events: Record<string, GenericEvent> = {};
-    const stores: Record<string, Store<unknown>> = {};
-    const data: Record<string, unknown> = {};
-
-    for (const key in config.bind) {
-      const value = config.bind[key];
-
-      if (is.event(value) || is.effect(value)) {
-        events[key] = value;
-      } else if (is.store(value)) {
-        stores[key] = value;
-      } else {
-        data[key] = value;
-      }
-    }
+  >(
+    config: ReflectConfig<Props, Bind>,
+  ): React.FC<PartialBoundProps<Props, Bind>> {
+    const { stores, events, data } = sortProps(config);
 
     return (props) => {
       const storeProps = context.useUnit(stores);
@@ -78,7 +64,32 @@ export function reflectFactory(context: Ctx) {
   };
 }
 
-function wrapToHook(hook: Hook | void, context: Ctx ) {
+function sortProps<
+  Props,
+  Bind extends BindableProps<Props> = BindableProps<Props>
+>(config: ReflectConfig<Props, Bind>) {
+  type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
+
+  const events: Record<string, GenericEvent> = {};
+  const stores: Record<string, Store<unknown>> = {};
+  const data: Record<string, unknown> = {};
+
+  for (const key in config.bind) {
+    const value = config.bind[key];
+
+    if (is.event(value) || is.effect(value)) {
+      events[key] = value;
+    } else if (is.store(value)) {
+      stores[key] = value;
+    } else {
+      data[key] = value;
+    }
+  }
+
+  return { events, stores, data };
+}
+
+function wrapToHook(hook: Hook | void, context: Ctx) {
   if (hookDefined(hook)) {
     return context.useUnit(hook as Event<void>);
   }
