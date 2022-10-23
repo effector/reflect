@@ -6,7 +6,7 @@ import { reflectFactory } from './reflect';
 import {
   BindableProps,
   PartialBoundProps,
-  ReflectCreatorContext,
+  Ctx,
   View,
   Hooks,
 } from './types';
@@ -50,7 +50,7 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
           };
         };
 
-export function listFactory(context: ReflectCreatorContext) {
+export function listFactory(context: Ctx) {
   const reflect = reflectFactory(context);
 
   return function list<

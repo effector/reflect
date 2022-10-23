@@ -2,7 +2,7 @@ import { FC, ComponentClass } from 'react';
 import { Store, Event, Effect } from 'effector';
 import { useUnit, useList } from 'effector-react';
 
-export interface ReflectCreatorContext {
+export interface Ctx {
   useUnit: typeof useUnit;
   useList: typeof useList;
 }
