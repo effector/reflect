@@ -4,8 +4,8 @@ import { Store } from 'effector';
 import { reflectFactory } from './reflect';
 
 import {
-  BindByProps,
-  PropsByBind,
+  BindableProps,
+  PartialBoundProps,
   ReflectCreatorContext,
   View,
   Hooks,
@@ -19,10 +19,10 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
       hooks?: Hooks;
       getKey?: (item: Item) => React.Key;
       mapItem?: {
-        [P in keyof PropsByBind<Props, Bind>]: (
+        [P in keyof PartialBoundProps<Props, Bind>]: (
           item: Item,
           index: number,
-        ) => PropsByBind<Props, Bind>[P];
+        ) => PartialBoundProps<Props, Bind>[P];
       };
     }
   :
@@ -43,10 +43,10 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
           hooks?: Hooks;
           getKey?: (item: Item) => React.Key;
           mapItem?: {
-            [P in keyof PropsByBind<Props, Bind>]: (
+            [P in keyof PartialBoundProps<Props, Bind>]: (
               item: Item,
               index: number,
-            ) => PropsByBind<Props, Bind>[P];
+            ) => PartialBoundProps<Props, Bind>[P];
           };
         };
 
@@ -56,7 +56,7 @@ export function listFactory(context: ReflectCreatorContext) {
   return function list<
     Item,
     Props,
-    Bind extends BindByProps<Props> = BindByProps<Props>
+    Bind extends BindableProps<Props> = BindableProps<Props>
   >(config: ReflectListConfig<Props, Item, Bind>): React.FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,

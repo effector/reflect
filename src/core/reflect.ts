@@ -1,16 +1,16 @@
 import React from 'react';
-import { Store, combine, Event, Effect, is } from 'effector';
+import { Store, Event, Effect, is } from 'effector';
 
 import {
   ReflectCreatorContext,
   View,
-  BindByProps,
-  PropsByBind,
+  BindableProps,
+  PartialBoundProps,
   Hooks,
   Hook,
 } from './types';
 
-export interface ReflectConfig<Props, Bind extends BindByProps<Props>> {
+export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   view: View<Props>;
   bind: Bind;
   hooks?: Hooks;
@@ -20,7 +20,7 @@ export function reflectCreateFactory(context: ReflectCreatorContext) {
   const reflect = reflectFactory(context);
 
   return function createReflect<Props>(view: View<Props>) {
-    return <Bind extends BindByProps<Props> = BindByProps<Props>>(
+    return <Bind extends BindableProps<Props> = BindableProps<Props>>(
       bind: Bind,
       params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
     ) => reflect<Props, Bind>({ view, bind, ...params });
@@ -30,8 +30,8 @@ export function reflectCreateFactory(context: ReflectCreatorContext) {
 export function reflectFactory(context: ReflectCreatorContext) {
   return function reflect<
     Props,
-    Bind extends BindByProps<Props> = BindByProps<Props>
-  >(config: ReflectConfig<Props, Bind>): React.FC<PropsByBind<Props, Bind>> {
+    Bind extends BindableProps<Props> = BindableProps<Props>
+  >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
     type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
     const events: Record<string, GenericEvent> = {};
     const stores: Record<string, Store<unknown>> = {};

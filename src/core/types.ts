@@ -7,16 +7,20 @@ export interface ReflectCreatorContext {
   useList: typeof useList;
 }
 
-export type BindByProps<Props> = {
+type Storify<Prop> = Omit<Store<Prop>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>;
+
+export type BindableProps<Props> = {
   [Key in keyof Props]?:
-    | Omit<Store<Props[Key]>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>
+    | Storify<Props[Key]>
     | Props[Key];
 };
 
 export type View<T> = FC<T> | ComponentClass<T>;
 
-export type PropsByBind<Props, Bind> = Omit<Props, keyof Bind> &
-  Partial<Omit<Props, keyof Omit<Props, keyof Bind>>>;
+type UnboundProps<Props, Bind> = Omit<Props, keyof Bind>;
+type BoundProps<Props, Bind> = Omit<Props, keyof UnboundProps<Props, Bind>>;
+
+export type PartialBoundProps<Props, Bind> = UnboundProps<Props, Bind> & Partial<BoundProps<Props, Bind>>;
 
 export type Hook = (() => any) | Event<void> | Effect<void, any, any>;
 
