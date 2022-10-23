@@ -51,7 +51,7 @@ export function reflectFactory(context: ReflectCreatorContext) {
     }
 
     return (props) => {
-      const storeProps = context.useUnit(stores)
+      const storeProps = context.useUnit(stores);
       const eventsProps = context.useUnit(events);
 
       const elementProps: Props = Object.assign(
@@ -62,13 +62,14 @@ export function reflectFactory(context: ReflectCreatorContext) {
         props,
       );
 
-      const hookMounted = readHook(config.hooks?.mounted, context);
-      const hookUnmounted = readHook(config.hooks?.unmounted, context);
+      const mounted = wrapToHook(config.hooks?.mounted, context);
+      const unmounted = wrapToHook(config.hooks?.unmounted, context);
 
       React.useEffect(() => {
-        if (hookMounted) hookMounted();
+        if (mounted) mounted();
+
         return () => {
-          if (hookUnmounted) hookUnmounted();
+          if (unmounted) unmounted();
         };
       }, []);
 
@@ -77,14 +78,14 @@ export function reflectFactory(context: ReflectCreatorContext) {
   };
 }
 
-function readHook(
-  hook: Hook | undefined,
-  context: ReflectCreatorContext,
-): (() => void) | void {
-  if (hook) {
-    if (is.event(hook) || is.effect(hook)) {
-      return context.useUnit(hook as Event<void>);
-    }
-    return hook;
+function wrapToHook(hook: Hook | void, context: ReflectCreatorContext ) {
+  if (hookDefined(hook)) {
+    return context.useUnit(hook as Event<void>);
   }
+
+  return hook;
+}
+
+function hookDefined(hook: Hook | void): hook is Hook {
+  return Boolean(hook && (is.event(hook) || is.effect(hook)));
 }
