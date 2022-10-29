@@ -2,7 +2,7 @@ import React from 'react';
 import { Store, Event, Effect, is } from 'effector';
 
 import {
-  Ctx,
+  Context,
   View,
   BindableProps,
   PartialBoundProps,
@@ -16,7 +16,7 @@ export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   hooks?: Hooks;
 }
 
-export function reflectCreateFactory(context: Ctx) {
+export function reflectCreateFactory(context: Context) {
   const reflect = reflectFactory(context);
 
   return function createReflect<Props>(view: View<Props>) {
@@ -27,7 +27,7 @@ export function reflectCreateFactory(context: Ctx) {
   };
 }
 
-export function reflectFactory(context: Ctx) {
+export function reflectFactory(context: Context) {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>
@@ -89,7 +89,7 @@ function sortProps<
   return { events, stores, data };
 }
 
-function wrapToHook(hook: Hook | void, context: Ctx) {
+function wrapToHook(hook: Hook | void, context: Context) {
   if (hookDefined(hook)) {
     return context.useUnit(hook as Event<void>);
   }

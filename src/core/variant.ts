@@ -7,14 +7,14 @@ import {
   BindableProps,
   Hooks,
   PartialBoundProps,
-  Ctx,
+  Context,
   View,
   AtLeastOne,
 } from './types';
 
 const Default = () => null;
 
-export function variantFactory(context: Ctx) {
+export function variantFactory(context: Context) {
   const reflect = reflectFactory(context);
 
   return function variant<
