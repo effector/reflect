@@ -103,3 +103,21 @@ import { reflect } from '../src';
   expectType<React.FC>(App);
   expectType<React.FC>(AppFixed);
 }
+
+// reflect should allow to pass Event<void> as click event handler
+{
+  const Button: React.FC<{
+    onClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>>;
+  }> = () => null;
+
+  const reactOnClick = createEvent();
+
+  const ReflectedButton = reflect({
+    view: Button,
+    bind: {
+      onClick: reactOnClick,
+    },
+  });
+
+  expectType<React.FC>(ReflectedButton);
+}

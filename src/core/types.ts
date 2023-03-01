@@ -13,7 +13,9 @@ type Storify<Prop> = Omit<
 >;
 
 export type BindableProps<Props> = {
-  [Key in keyof Props]?: Storify<Props[Key]> | Props[Key];
+  [Key in keyof Props]?: Props[Key] extends (_payload: any) => void
+    ? Storify<Props[Key]> | Props[Key] | Event<void>
+    : Storify<Props[Key]> | Props[Key];
 };
 
 export type View<T> = FC<T> | ComponentClass<T>;
