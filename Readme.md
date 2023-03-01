@@ -498,17 +498,23 @@ const Input: FC<InputProps> = ({ value, onChange }) => {
 ```tsx
 // ./app.tsx
 import React, { FC } from 'react';
-import { createEvent, restore, Fork, createDomain } from 'effector';
-import { reflect } from '@effector/reflect/ssr';
-import { Provider } from 'effector-react/ssr';
+import { createEvent, restore, sample, Scope } from 'effector';
+import { reflect } from '@effector/reflect';
+import { Provider } from 'effector-react';
 
 import { Input } from './ui';
 
 // Model
-export const app = createDomain();
+export const appStarted = createEvent<{name: string}>()
 
-export const changeName = app.createEvent<string>();
+const changeName = createEvent<string>();
 const $name = restore(changeName, '');
+
+sample({
+  clock: appStarted,
+  fn: ctx => ctx.name,
+  target: changeName,
+})
 
 // Component
 const Name = reflect({
@@ -519,9 +525,9 @@ const Name = reflect({
   },
 });
 
-export const App: FC<{ data: Fork }> = ({ data }) => {
+export const App: FC<{ scope: Scope }> = ({ scope }) => {
   return (
-    <Provider value={data}>
+    <Provider value={scope}>
       <Name />
     </Provider>
   );
@@ -529,19 +535,23 @@ export const App: FC<{ data: Fork }> = ({ data }) => {
 ```
 
 ```tsx
-// ./server.ts
+// ./server.tsx
 import { fork, serialize, allSettled } from 'effector';
 
-import { App, app, changeName } from './app';
+import { App, appStarted } from './app';
 
-const render = async () => {
-  const scope = fork(app);
+const render = async (reqCtx) => {
+  const serverScope = fork();
 
-  await allSettled(changeName, { scope, params: 'Bob' });
+  await allSettled(appStarted, {
+    scope: serverScope,
+    params: {
+      name: reqCtx.cookies.name,
+    }
+  });
 
+  const content = renderToString(<App scope={serverScope} />);
   const data = serialize(scope);
-
-  const content = renderToString(<App data={scope} />);
 
   return `
     <body>
@@ -552,6 +562,20 @@ const render = async () => {
     </body>
   `;
 };
+```
+
+```tsx
+// client.tsx
+import { fork } from 'effector';
+import { hydrateRoot } from 'react-dom/client'
+
+import { App, appStarted } from './app';
+
+const clientScope = fork({
+  values: window.__initialState__
+})
+
+hydrateRoot(document.body, <App scope={clientScope} />)
 ```
 
 ## Release process
