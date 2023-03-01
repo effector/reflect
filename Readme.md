@@ -202,6 +202,7 @@ const Name = reflect({
   view: Input,
   bind: {
     value: $name,
+    placeholder: "Name",
     onChange: changeName.prepend(inputChanged),
   },
 });
@@ -210,6 +211,7 @@ const Age = reflect({
   view: Input,
   bind: {
     value: $age,
+    placeholder: "Age",
     onChange: changeAge.prepend(parseInt).prepend(inputChanged),
   },
 });
@@ -217,8 +219,8 @@ const Age = reflect({
 export const User: FC = () => {
   return (
     <div>
-      <Name placeholder="Name" />
-      <Age placeholder="Age" />
+      <Name />
+      <Age />
     </div>
   );
 };
