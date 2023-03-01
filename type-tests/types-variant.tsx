@@ -156,26 +156,18 @@ import { variant } from '../src';
   const FallbackPage: React.FC<PageProps> = () => null;
   const $enabled = createStore(true);
 
-  const CurrentPage1 = variant({
-    if: $enabled,
-    then: HomePage,
-    else: null,
-    bind: { context: $ctx },
-  });
-  expectType<React.FC>(CurrentPage1);
-
-  const CurrentPage2 = variant({
+  const CurrentPageThenElse = variant({
     if: $enabled,
     then: HomePage,
     else: FallbackPage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPage2);
+  expectType<React.FC>(CurrentPageThenElse);
 
-  const CurrentPage3 = variant({
+  const CurrentPageOnlyThen = variant({
     if: $enabled,
     then: HomePage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPage3);
+  expectType<React.FC>(CurrentPageOnlyThen);
 }

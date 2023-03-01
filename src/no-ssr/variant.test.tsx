@@ -256,7 +256,7 @@ describe('overload for Store<boolean>', () => {
     const Component = variant({
       if: $visible,
       then: Button,
-      else: null,
+      else: () => <div data-testid="else" />,
     });
 
     const container = render(<Component testId="then" />);
