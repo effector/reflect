@@ -417,7 +417,7 @@ const Age = reflectInput({
 });
 
 const Submit = reflectButton({
-  onClick: () => submit(),
+  onClick: submit,
 });
 
 export const User: FC = () => {
@@ -471,13 +471,10 @@ When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
 
 ### SSR and tests via Fork API
 
-#### Note
 
 Since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release, you can just use `@effector/reflect` main imports.
 
 Just add `Provider` from `effector-react` to your app root, and you are good to go.
-
-#### How-to
 
 For [SSR](https://effector.dev/docs/api/effector-react/useEvent) and `effector-react` before `2.5.0` release you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
 
