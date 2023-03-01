@@ -12,72 +12,139 @@ yarn add @effector/reflect
 
 ## Motivation
 
-### UI library
+What's the point of reflect?
 
-Let's agree that we have an internal UI library with an input.
+It's the API design, that, using classic HOC pattern, makes you write your React components with Effector in effective and composable way.
+
+### The usual way
+
+Let's take a look at typical example of hooks usage:
 
 ```tsx
-// ./ui.ts
-import React, { FC, ChangeEvent, useCallback } from 'react';
+import { Input, Button, FormContainer, ErrorMessage } from "ui-lib"
+import { useUnit } from "effector-react"
 
-type InputProps = {
-  value: string;
-  onChange: ChangeEvent<HTMLInputElement>;
-};
+import * as model from "./form-model"
 
-export const Input: FC<InputProps> = ({ value, onChange }) => {
-  return <input value={value} onChange={onChange} />;
-};
+export function UserForm() {
+  const {
+    formValid,
+    name,
+    nameChanged,
+    lastName,
+    lastNameChanged,
+    formSubmitted,
+    error,
+  } = useUnit({
+    formValid: model.$formValid,
+    name: model.$name,
+    nameChanged: model.nameChanged,
+    lastName: model.lastNameChanged,
+    formSubmitted: model.formSubmitted,
+    error: model.$error,
+  })
+
+  return (
+    <FormContainer>
+      <Input value={name} onChange={nameChanged} />
+      <Input value={lastName} onChange={lastNameChanged} />
+      {error && (<ErrorMessage text={error} />)}
+      <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
+    </FormContainer>
+  )
+}
+```
+Here we have a fairly typical structure: user form is represented by one big component tree, which takes all of it's subsriptions at the top-level and then data is provided down the tree via props.
+
+As you can see, downside of such approach is that any update of `$formValid` or `$name` will trigger the full rerender of this component's tree, even though each of these stores only needed here for one specific input or submit button down below.
+This means that React will have to perform more diffing work to produce the update to the DOM.
+
+This could be fixed by moving subscriptions further down the component's tree by creating separate components like this
+
+```tsx
+function UserFormSubmitButton() {
+  const {
+    formValid,
+    formSubmitted,
+  } = useUnit({
+    formValid: model.$formValid,
+    formSubmitted: model.formSubmitted
+  })
+
+  return <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
+}
 ```
 
-### Before
+However, very often it is not really convenient to create a separate component with separate subscription, as it produces more code, which is a bit harder to read and change.
+Because this is basically a mapping from store values to props - it is easier to do it only once at the top.
 
-In common case, you need to use `useStore` and `useEvent` (especially for SSR) to use values and call events from React components.
+Also, most of the time this is not really a huge problem as React's diffing is fast enough.
+But larger the app gets, more small performance hits like this will appear in the code, more of them will combine into bigger performance issues.
 
-```tsx
-import React, { FC, ChangeEvent, useCallback } from 'react';
-import { createEvent, restore } from 'effector';
-import { useStore, useEvent } from 'effector-react';
+### Reflect's way
 
-import { Input } from './ui';
-
-// Model
-const changeName = createEvent<string>();
-const $name = restore(changeName, '');
-
-// Component
-export const Name: FC = () => {
-  const value = useStore($name);
-  const nameChanged = useEvent(changeName);
-  const changed = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => nameChanged(event.target.value),
-    [],
-  );
-
-  return <Input value={value} onChange={changed} />;
-};
-```
-
-### Now
-
-Now you can create a new component and pass store and event as props without hooks boilerplate.
+That's where reflect comes to the rescue:
 
 ```tsx
-import { createEvent, restore } from 'effector';
-import { reflect } from '@effector/reflect';
+import { reflect, variant } from "@effector/reflect"
 
-import { Input } from './ui';
+export function UserForm() {
+  return (
+    <FormContainer>
+      <Name />
+      <LastName />
+      <Error />
+      <SubmitButton />
+    </FormContainer>
+  )
+}
 
-// Model
-const changeName = createEvent<string>();
-const $name = restore(changeName, '');
-
-// Component
-export const Name = reflect({
+const Name = reflect({
   view: Input,
-  bind: { value: $name, onChange: (event) => changeName(event.target.value) },
-});
+  bind: {
+    value: model.$name,
+    onChange: model.nameChanged
+  }
+})
+
+const LastName = reflect({
+  view: Input,
+  bind: {
+    value: model.$lastName,
+    onChange: model.lastNameChanged
+  }
+})
+
+const Error = variant({
+  if: model.$error,
+  then: reflect({
+    view: ErrorMessage,
+    bind: {
+      text: model.$error,
+    }
+  })
+})
+
+const SubmitButton = reflect({
+  view: Button,
+  bind: {
+    type: "submit", // plain values are allowed too!
+    disabled: model.$formValid.map(valid => !valid),
+    onClick: model.formSubmitted
+  }
+})
 ```
+
+Here we have splitted this component in many separate pieces, which were created in a convenient way with reflect operators, as this is a very simple description like `view + view props -> values`, which is easier to read and change.
+
+Also these components are combined in a single __pure__ `UserForm` component which only handles components structure and does not have any subscriptions to external sources.
+
+This way we are achieved kind of __"fine-grained"__ subscriptions - each component is listening only to relevant stores and each update will trigger rerender only to small separate parts of components tree.
+
+React handles such updates much better, than updating a one big and deep tree, as it requires it to check and compare a lot more things, than actually needed in this case.
+You can learn more about React's rendering behavior from [this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
+
+With reflect our `$formValid` update will only trigger `SubmitButton` rerender and there will be **literally zero** React's work for all other parts of our `<UserForm />`
 
 ## API
 
