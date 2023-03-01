@@ -133,11 +133,11 @@ const SubmitButton = reflect({
 })
 ```
 
-Here we've separated this component into separate parts, which were created in a convenient way using `reflect` operators, which is a very simple description of the `props -> values` mapping, which is easier to read and modify.
+Here we've separated this component into small parts, which were created in a convenient way using `reflect` operators, which is a very simple description of the `props -> values` mapping, which is easier to read and modify.
 
 Also, these components are combined into one pure `UserForm` component, which handles only the component structure and has no subscriptions to external sources.
 
-In this way, we have achieved a kind of _"fine-grained"_ subscription - each component listens only to the relevant stores, and each update will cause only small individual parts of the component tree to be rendered.
+In this way, we have achieved a kind of _"fine-grained"_ subscriptions - each component listens only to the relevant stores, and each update will cause only small individual parts of the component tree to be rendered.
 
 React handles such updates much better than updating one big tree, because it requires it to check and compare many more things than is necessary in this case. You can learn more about React's rendering behavior [from this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
 
