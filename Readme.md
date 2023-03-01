@@ -14,7 +14,7 @@ yarn add @effector/reflect
 
 What's the point of reflect?
 
-It's the API design, that, using classic HOC pattern, makes you write your React components with Effector in effective and composable way.
+It's the API design that, using the classic HOC pattern, allows you to write React components with Effector in an efficient and composable way.
 
 ### The usual way
 
@@ -54,12 +54,12 @@ export function UserForm() {
   )
 }
 ```
-Here we have a fairly typical structure: user form is represented by one big component tree, which takes all of it's subsriptions at the top-level and then data is provided down the tree via props.
 
-As you can see, downside of such approach is that any update of `$formValid` or `$name` will trigger the full rerender of this component's tree, even though each of these stores only needed here for one specific input or submit button down below.
-This means that React will have to perform more diffing work to produce the update to the DOM.
+Here we have a fairly typical structure: the user form is represented by one big component tree, which takes all its subscriptions at the top level, and then the data is provided down the tree via props.
 
-This could be fixed by moving subscriptions further down the component's tree by creating separate components like this
+As you can see, the disadvantage of this approach is that any update to `$formValid` or `$name` will cause a full rendering of that component tree, even though each of those stores is only needed for one specific input or submit button at the bottom. This means that React will have to do more work on diffing to create the update in the DOM.
+
+This can be fixed by moving the subscriptions further down the component tree by creating separate components, as done here
 
 ```tsx
 function UserFormSubmitButton() {
@@ -75,11 +75,9 @@ function UserFormSubmitButton() {
 }
 ```
 
-However, very often it is not really convenient to create a separate component with separate subscription, as it produces more code, which is a bit harder to read and change.
-Because this is basically a mapping from store values to props - it is easier to do it only once at the top.
+However, it's very often not very convenient to create a separate component with a separate subscription, because it produces more code that's a little harder to read and modify. Since it's essentially mapping store values to props - it's easier to do it just once at the very top.
 
-Also, most of the time this is not really a huge problem as React's diffing is fast enough.
-But larger the app gets, more small performance hits like this will appear in the code, more of them will combine into bigger performance issues.
+Also, in most cases it's not a big problem, since React is pretty fast at diffing. But as the application gets bigger, there are more and more of these small performance problems in the code, and more and more of them combine into bigger performance issues.
 
 ### Reflect's way
 
@@ -135,16 +133,15 @@ const SubmitButton = reflect({
 })
 ```
 
-Here we have splitted this component in many separate pieces, which were created in a convenient way with reflect operators, as this is a very simple description like `view + view props -> values`, which is easier to read and change.
+Here we've separated this component into separate parts, which were created in a convenient way using `reflect` operators. Because it's a very simple description of the `view + view props -> values` type, which is easier to read and modify.
 
-Also these components are combined in a single __pure__ `UserForm` component which only handles components structure and does not have any subscriptions to external sources.
+Also, these components are combined into one pure `UserForm` component, which handles only the component structure and has no subscriptions to external sources.
 
-This way we are achieved kind of __"fine-grained"__ subscriptions - each component is listening only to relevant stores and each update will trigger rerender only to small separate parts of components tree.
+In this way, we have achieved a kind of _"fine-grained"_ subscription - each component listens only to the relevant repositories, and each update will cause only small individual parts of the component tree to be rendered.
 
-React handles such updates much better, than updating a one big and deep tree, as it requires it to check and compare a lot more things, than actually needed in this case.
-You can learn more about React's rendering behavior from [this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
+React handles such updates much better than updating one big tree, because it requires it to check and compare many more things than is necessary in this case. You can learn more about React's rendering behavior [from this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
 
-With reflect our `$formValid` update will only trigger `SubmitButton` rerender and there will be **literally zero** React's work for all other parts of our `<UserForm />`
+With `@effector/reflect`, our `$formValid` update will only cause the SubmitButton to be re-rendered, and for all other parts of our <UserForm /> there will literally be **zero** React work.
 
 ## API
 
