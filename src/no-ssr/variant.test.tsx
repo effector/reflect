@@ -1,5 +1,5 @@
 import React from 'react';
-import { createEvent, restore } from 'effector';
+import { createEvent, createStore, restore } from 'effector';
 
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -244,3 +244,35 @@ function InputCustom3(props: {
     />
   );
 }
+
+describe('overload for Store<boolean>', () => {
+  function Button(props: { testId: string }) {
+    return <button data-testid={props.testId}>Button</button>;
+  }
+
+  test('render "then" on true', () => {
+    const $visible = createStore(true);
+
+    const Component = variant({
+      if: $visible,
+      then: Button,
+      else: null,
+    });
+
+    const container = render(<Component testId="then" />);
+    expect(container.getByTestId('then')).not.toBeNull();
+  });
+
+  test('render "else" on false', () => {
+    const $visible = createStore(false);
+
+    const Component = variant({
+      if: $visible,
+      then: Button,
+      else: () => <div data-testid="else" />,
+    });
+
+    const container = render(<Component testId="then" />);
+    expect(container.getByTestId('else')).not.toBeNull();
+  });
+});
