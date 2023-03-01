@@ -368,6 +368,8 @@ export const User: FC = () => {
 
 ### SSR and tests via Fork API
 
+> Note: since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release. Just add `Provider` from `effector-react` to your app root, and you are good to go.
+
 For [SSR](https://effector.dev/docs/api/effector-react/useEvent) you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
 
 Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
@@ -445,6 +447,8 @@ const render = async () => {
   `;
 };
 ```
+
+> Note: since [effector 22.5.1](https://github.com/effector/effector/releases/tag/effector%4022.5.1) it is no longer necessary to add `@effector/reflect` and `@effector/reflect/ssr` to `factories` array in `effector/babel-plugin` config. It is done by default.
 
 Also, to use reflected components with [SSR and effector](https://effector.dev/docs/api/effector-react/useEvent) or testing via [effector's Fork API](https://effector.dev/docs/api/effector/fork) you will need to mark `@effector/reflect` and `@effector/reflect/ssr` as a [fabric import via effector/babel-plugin](https://effector.dev/docs/api/effector/babel-plugin#factories)
 
