@@ -430,11 +430,54 @@ export const User: FC = () => {
 };
 ```
 
+### Hooks
+
+Hooks is an object passed to `variant()` or `match()` with properties `mounted` and `unmounted` all optional.
+
+#### Example
+
+```tsx
+import { createStore, createEvent } from 'effector';
+import { reflect, variant } from '@effector/reflect';
+import { TextInput, Range } from '@org/my-ui';
+
+const $type = createStore<'text' | 'range'>('text');
+const $value = createStore('');
+const valueChange = createEvent<string>();
+const rangeMounted = createEvent();
+const fieldMounted = createEvent();
+
+const RangePrimary = reflect({
+  view: Range,
+  bind: { style: 'primary' },
+  hooks: { mounted: rangeMounted },
+});
+
+const Field = variant({
+  source: $type,
+  bind: { value: $value, onChange: valueChange },
+  cases: {
+    text: TextInput,
+    range: RangePrimary,
+  },
+  hooks: { mounted: fieldMounted },
+});
+```
+
+When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
+
+
 ### SSR and tests via Fork API
 
-> Note: since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release. Just add `Provider` from `effector-react` to your app root, and you are good to go.
+#### Note
 
-For [SSR](https://effector.dev/docs/api/effector-react/useEvent) you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
+Since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release, you can just use `@effector/reflect` main imports.
+
+Just add `Provider` from `effector-react` to your app root, and you are good to go.
+
+#### How-to
+
+For [SSR](https://effector.dev/docs/api/effector-react/useEvent) and `effector-react` before `2.5.0` release you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
 
 Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
 
@@ -511,66 +554,6 @@ const render = async () => {
   `;
 };
 ```
-
-> Note: since [effector 22.5.1](https://github.com/effector/effector/releases/tag/effector%4022.5.1) it is no longer necessary to add `@effector/reflect` and `@effector/reflect/ssr` to `factories` array in `effector/babel-plugin` config. It is done by default.
-
-Also, to use reflected components with [SSR and effector](https://effector.dev/docs/api/effector-react/useEvent) or testing via [effector's Fork API](https://effector.dev/docs/api/effector/fork) you will need to mark `@effector/reflect` and `@effector/reflect/ssr` as a [fabric import via effector/babel-plugin](https://effector.dev/docs/api/effector/babel-plugin#factories)
-
-
-```js
-// in your .babelrc
-{
-  "plugins": [
-    [
-      "effector/babel-plugin",
-      {
-        "factories": ["@effector/reflect", "@effector/reflect/ssr"]
-      }
-    ]
-  ]
-}
-
-```
-
-### Hooks
-
-Hooks is an object passed to `variant()` or `match()` with properties `mounted` and `unmounted` all optional.
-
-#### Example
-
-```tsx
-import { createStore, createEvent } from 'effector';
-import { reflect, variant } from '@effector/reflect';
-import { TextInput, Range } from '@org/my-ui';
-
-const $type = createStore<'text' | 'range'>('text');
-const $value = createStore('');
-const valueChange = createEvent<string>();
-const rangeMounted = createEvent();
-const fieldMounted = createEvent();
-
-const RangePrimary = reflect({
-  view: Range,
-  bind: { style: 'primary' },
-  hooks: { mounted: rangeMounted },
-});
-
-const Field = variant({
-  source: $type,
-  bind: { value: $value, onChange: valueChange },
-  cases: {
-    text: TextInput,
-    range: RangePrimary,
-  },
-  hooks: { mounted: fieldMounted },
-});
-```
-
-When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
-
-## Roadmap
-
-- [] Auto moving test from ./src to ./dist-test
 
 ## Release process
 
