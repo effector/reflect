@@ -133,7 +133,7 @@ const SubmitButton = reflect({
 })
 ```
 
-Here we've separated this component into separate parts, which were created in a convenient way using `reflect` operators. Because it's a very simple description of the `view + view props -> values` type, which is easier to read and modify.
+Here we've separated this component into separate parts, which were created in a convenient way using `reflect` operators, which is a very simple description of the `props -> values` mapping, which is easier to read and modify.
 
 Also, these components are combined into one pure `UserForm` component, which handles only the component structure and has no subscriptions to external sources.
 
