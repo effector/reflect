@@ -21,13 +21,23 @@ export function variantFactory(context: Context) {
     Props,
     Variant extends string,
     Bind extends BindableProps<Props>
-  >(config: {
-    source: Store<Variant>;
-    bind?: Bind;
-    cases: AtLeastOne<Record<Variant, View<Props>>>;
-    hooks?: Hooks;
-    default?: View<Props>;
-  }): React.FC<PartialBoundProps<Props, Bind>> {
+  >(
+    config:
+      | {
+          source: Store<Variant>;
+          bind?: Bind;
+          cases: AtLeastOne<Record<Variant, View<Props>>>;
+          hooks?: Hooks;
+          default?: View<Props>;
+        }
+      | {
+          source: Store<boolean>;
+          bind?: Bind;
+          view: View<Props>;
+          hooks?: Hooks;
+          default: View<Props> | null;
+        },
+  ): React.FC<PartialBoundProps<Props, Bind>> {
     function View(props: Props) {
       const nameOfCase = context.useUnit(config.source);
       const Component = config.cases[nameOfCase] ?? config.default ?? Default;
