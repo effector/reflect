@@ -157,18 +157,18 @@ import { variant } from '../src';
   const $enabled = createStore(true);
 
   const CurrentPage1 = variant({
-    source: $enabled,
+    if: $enabled,
+    then: HomePage,
+    else: null,
     bind: { context: $ctx },
-    view: HomePage,
-    default: null,
   });
   expectType<React.FC>(CurrentPage1);
 
   const CurrentPage2 = variant({
-    source: $enabled,
+    if: $enabled,
+    then: HomePage,
+    else: FallbackPage,
     bind: { context: $ctx },
-    view: HomePage,
-    default: FallbackPage,
   });
   expectType<React.FC>(CurrentPage2);
 }

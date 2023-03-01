@@ -31,11 +31,11 @@ export function variantFactory(context: Context) {
           default?: View<Props>;
         }
       | {
-          source: Store<boolean>;
-          bind?: Bind;
-          view: View<Props>;
+          if: Store<boolean>;
+          then: View<Props>;
+          else: View<Props> | null;
           hooks?: Hooks;
-          default: View<Props> | null;
+          bind?: Bind;
         },
   ): React.FC<PartialBoundProps<Props, Bind>> {
     function View(props: Props) {
