@@ -171,4 +171,11 @@ import { variant } from '../src';
     bind: { context: $ctx },
   });
   expectType<React.FC>(CurrentPage2);
+
+  const CurrentPage3 = variant({
+    if: $enabled,
+    then: HomePage,
+    bind: { context: $ctx },
+  });
+  expectType<React.FC>(CurrentPage3);
 }

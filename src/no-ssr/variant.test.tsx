@@ -275,4 +275,16 @@ describe('overload for Store<boolean>', () => {
     const container = render(<Component testId="then" />);
     expect(container.getByTestId('else')).not.toBeNull();
   });
+
+  test('render "null" as default "else"', () => {
+    const $visible = createStore(false);
+
+    const Component = variant({
+      if: $visible,
+      then: Button,
+    });
+
+    const container = render(<Component testId="then" />);
+    expect(() => container.getByTestId('then')).toThrowError();
+  });
 });

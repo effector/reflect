@@ -33,7 +33,7 @@ export function variantFactory(context: Context) {
       | {
           if: Store<boolean>;
           then: View<Props>;
-          else: View<Props> | null;
+          else?: View<Props> | null;
           hooks?: Hooks;
           bind?: Bind;
         },
