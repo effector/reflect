@@ -1,15 +1,14 @@
-import React from 'react';
 import { Store } from 'effector';
+import React from 'react';
 
 import { reflectFactory } from './reflect';
-
 import {
+  AtLeastOne,
   BindableProps,
+  Context,
   Hooks,
   PartialBoundProps,
-  Context,
   View,
-  AtLeastOne,
 } from './types';
 
 const Default = () => null;
@@ -20,7 +19,7 @@ export function variantFactory(context: Context) {
   return function variant<
     Props,
     Variant extends string,
-    Bind extends BindableProps<Props>
+    Bind extends BindableProps<Props>,
   >(
     config:
       | {
@@ -44,14 +43,12 @@ export function variantFactory(context: Context) {
 
     // Shortcut for Store<boolean>
     if ('if' in config) {
-      $case = config.if.map(
-        (value): Variant => (value ? 'then' : 'else') as Variant,
-      );
+      $case = config.if.map((value): Variant => (value ? 'then' : 'else') as Variant);
 
-      cases = ({
+      cases = {
         then: config.then,
         else: config.else,
-      } as unknown) as AtLeastOne<Record<Variant, View<Props>>>;
+      } as unknown as AtLeastOne<Record<Variant, View<Props>>>;
       def = Default;
     }
     // Full form for Store<string>

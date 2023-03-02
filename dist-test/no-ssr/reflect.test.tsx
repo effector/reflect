@@ -1,11 +1,9 @@
-import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
-import { createStore, createEvent, restore, createEffect } from 'effector';
-import { act } from 'react-dom/test-utils';
-
+import { reflect } from '../../reflect.cjs';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-import { reflect } from '../../reflect.cjs';
+import { createEffect, createEvent, createStore, restore } from 'effector';
+import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
+import { act } from 'react-dom/test-utils';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

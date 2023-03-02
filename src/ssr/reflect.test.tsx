@@ -1,9 +1,8 @@
-import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
-import { restore, fork, allSettled, createDomain } from 'effector';
-import { Provider } from 'effector-react/ssr';
-
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { allSettled, createDomain, fork, restore } from 'effector';
+import { Provider } from 'effector-react/ssr';
+import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
 import { reflect } from '../ssr';
 
@@ -150,11 +149,7 @@ test('with ssr for client', async () => {
       onChange: (_event: ChangeEvent<HTMLInputElement>) => void;
     }) => {
       return (
-        <input
-          data-testid="name"
-          value={props.value}
-          onChange={props.onChange}
-        />
+        <input data-testid="name" value={props.value} onChange={props.onChange} />
       );
     },
     bind: {

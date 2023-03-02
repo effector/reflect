@@ -1,8 +1,7 @@
-import React, { FC, memo } from 'react';
-import { createStore, createEvent } from 'effector';
-import { useStore } from 'effector-react';
-
 import { render } from '@testing-library/react';
+import { createEvent, createStore } from 'effector';
+import { useStore } from 'effector-react';
+import React, { FC, memo } from 'react';
 import { act } from 'react-dom/test-utils';
 
 import { list } from '../index';
@@ -397,9 +396,7 @@ test('reflect-list: getKey option', async () => {
     fn(props);
     return <Member id={props.id} name={props.name} />;
   };
-  const ReflectList: FC = (props) => (
-    <ul data-testid="reflect">{props.children}</ul>
-  );
+  const ReflectList: FC = (props) => <ul data-testid="reflect">{props.children}</ul>;
   const Members = list({
     source: $members,
     view: ReflectMember,
@@ -424,14 +421,14 @@ test('reflect-list: getKey option', async () => {
 
   // first check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
@@ -444,14 +441,14 @@ test('reflect-list: getKey option', async () => {
 
   // second check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
@@ -464,14 +461,14 @@ test('reflect-list: getKey option', async () => {
 
   // third check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
@@ -484,14 +481,14 @@ test('reflect-list: getKey option', async () => {
 
   // last check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual($members.getState().map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(

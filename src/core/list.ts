@@ -1,15 +1,8 @@
-import React from 'react';
 import { Store } from 'effector';
+import React from 'react';
 
 import { reflectFactory } from './reflect';
-
-import {
-  BindableProps,
-  PartialBoundProps,
-  Context,
-  View,
-  Hooks,
-} from './types';
+import { BindableProps, Context, Hooks, PartialBoundProps, View } from './types';
 
 type ReflectListConfig<Props, Item, Bind> = Item extends Props
   ? {

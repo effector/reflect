@@ -1,9 +1,8 @@
-import React, { FC, InputHTMLAttributes } from 'react';
-import { createStore, createEvent, restore, createEffect } from 'effector';
-import { act } from 'react-dom/test-utils';
-
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createEffect, createEvent, createStore, restore } from 'effector';
+import React, { FC, InputHTMLAttributes } from 'react';
+import { act } from 'react-dom/test-utils';
 
 import { createReflect } from '../index';
 
@@ -158,8 +157,8 @@ describe('hooks', () => {
       true,
     );
 
-    const Branch = createReflect<{ visible: boolean }>(
-      ({ visible, children }) => (visible ? <>{children}</> : null),
+    const Branch = createReflect<{ visible: boolean }>(({ visible, children }) =>
+      visible ? <>{children}</> : null,
     )({
       visible: $visible,
     });

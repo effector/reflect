@@ -1,10 +1,8 @@
-import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
-import { restore, fork, allSettled, createDomain } from 'effector';
-import { Provider } from 'effector-react/ssr';
-
-import { render } from '@testing-library/react';
-
 import { createReflect } from '../../ssr';
+import { render } from '@testing-library/react';
+import { allSettled, createDomain, fork, restore } from 'effector';
+import { Provider } from 'effector-react/ssr';
+import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

@@ -1,8 +1,7 @@
-import React, { FC, memo } from 'react';
-import { createDomain, fork, allSettled } from 'effector';
+import { act, render } from '@testing-library/react';
+import { allSettled, createDomain, fork } from 'effector';
 import { Provider, useStore } from 'effector-react/ssr';
-
-import { render, act } from '@testing-library/react';
+import React, { FC, memo } from 'react';
 
 import { list } from '../ssr';
 
@@ -267,9 +266,7 @@ test('reflect-list: getKey option', async () => {
     fn(props);
     return <Member id={props.id} name={props.name} />;
   };
-  const ReflectList: FC = (props) => (
-    <ul data-testid="reflect">{props.children}</ul>
-  );
+  const ReflectList: FC = (props) => <ul data-testid="reflect">{props.children}</ul>;
   const Members = list({
     source: $members,
     view: ReflectMember,
@@ -295,14 +292,14 @@ test('reflect-list: getKey option', async () => {
 
   // first check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
@@ -315,14 +312,14 @@ test('reflect-list: getKey option', async () => {
 
   // second check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
@@ -335,14 +332,14 @@ test('reflect-list: getKey option', async () => {
 
   // third check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
@@ -355,14 +352,14 @@ test('reflect-list: getKey option', async () => {
 
   // last check
   expect(
-    Array.from(
-      container.getByTestId('plain').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('plain').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
   expect(
-    Array.from(
-      container.getByTestId('reflect').querySelectorAll('li'),
-    ).map((item) => Number(item.dataset.testid)),
+    Array.from(container.getByTestId('reflect').querySelectorAll('li')).map((item) =>
+      Number(item.dataset.testid),
+    ),
   ).toEqual(scope.getState($members).map((member) => member.id));
 
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(

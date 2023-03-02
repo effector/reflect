@@ -1,0 +1,8 @@
+dist-test
+./core
+node_modules
+dist
+.idea
+.vscode
+.husky
+.github

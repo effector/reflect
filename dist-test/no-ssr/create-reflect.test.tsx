@@ -1,11 +1,9 @@
-import React, { FC, InputHTMLAttributes } from 'react';
-import { createStore, createEvent, restore, createEffect } from 'effector';
-import { act } from 'react-dom/test-utils';
-
+import { createReflect } from '../../reflect.cjs';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-import { createReflect } from '../../reflect.cjs';
+import { createEffect, createEvent, createStore, restore } from 'effector';
+import React, { FC, InputHTMLAttributes } from 'react';
+import { act } from 'react-dom/test-utils';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -158,8 +156,8 @@ describe('hooks', () => {
       true,
     );
 
-    const Branch = createReflect<{ visible: boolean }>(
-      ({ visible, children }) => (visible ? <>{children}</> : null),
+    const Branch = createReflect<{ visible: boolean }>(({ visible, children }) =>
+      visible ? <>{children}</> : null,
     )({
       visible: $visible,
     });

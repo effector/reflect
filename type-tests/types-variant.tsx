@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { createEvent, createStore } from 'effector';
 import React from 'react';
 import { expectType } from 'tsd';
-import { createStore, createEvent } from 'effector';
+
 import { variant } from '../src';
 
 // basic variant usage

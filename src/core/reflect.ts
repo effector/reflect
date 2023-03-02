@@ -1,13 +1,13 @@
+import { Effect, Event, is, Store } from 'effector';
 import React from 'react';
-import { Store, Event, Effect, is } from 'effector';
 
 import {
-  Context,
-  View,
   BindableProps,
-  PartialBoundProps,
-  Hooks,
+  Context,
   Hook,
+  Hooks,
+  PartialBoundProps,
+  View,
 } from './types';
 
 export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
@@ -31,9 +31,7 @@ export function reflectFactory(context: Context) {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>,
-  >(
-    config: ReflectConfig<Props, Bind>,
-  ): React.FC<PartialBoundProps<Props, Bind>> {
+  >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
     const { stores, events, data } = sortProps(config);
 
     return (props) => {
@@ -64,10 +62,9 @@ export function reflectFactory(context: Context) {
   };
 }
 
-function sortProps<
-  Props,
-  Bind extends BindableProps<Props> = BindableProps<Props>,
->(config: ReflectConfig<Props, Bind>) {
+function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Props>>(
+  config: ReflectConfig<Props, Bind>,
+) {
   type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
 
   const events: Record<string, GenericEvent> = {};

@@ -21,10 +21,10 @@ It's the API design that, using the classic HOC pattern, allows you to write Rea
 Let's take a look at typical example of hooks usage:
 
 ```tsx
-import { Input, Button, FormContainer, ErrorMessage } from "ui-lib"
-import { useUnit } from "effector-react"
+import { useUnit } from 'effector-react';
+import { Button, ErrorMessage, FormContainer, Input } from 'ui-lib';
 
-import * as model from "./form-model"
+import * as model from './form-model';
 
 export function UserForm() {
   const {
@@ -42,16 +42,16 @@ export function UserForm() {
     lastName: model.lastNameChanged,
     formSubmitted: model.formSubmitted,
     error: model.$error,
-  })
+  });
 
   return (
     <FormContainer>
       <Input value={name} onChange={nameChanged} />
       <Input value={lastName} onChange={lastNameChanged} />
-      {error && (<ErrorMessage text={error} />)}
+      {error && <ErrorMessage text={error} />}
       <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
     </FormContainer>
-  )
+  );
 }
 ```
 
@@ -63,15 +63,12 @@ This can be fixed by moving the subscriptions further down the component tree by
 
 ```tsx
 function UserFormSubmitButton() {
-  const {
-    formValid,
-    formSubmitted,
-  } = useUnit({
+  const { formValid, formSubmitted } = useUnit({
     formValid: model.$formValid,
-    formSubmitted: model.formSubmitted
-  })
+    formSubmitted: model.formSubmitted,
+  });
 
-  return <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
+  return <Button type="submit" disabled={!formValid} onClick={formSubmitted} />;
 }
 ```
 
@@ -84,7 +81,7 @@ Also, in most cases it's not a big problem, since React is pretty fast at diffin
 That's where reflect comes to the rescue:
 
 ```tsx
-import { reflect, variant } from "@effector/reflect"
+import { reflect, variant } from '@effector/reflect';
 
 export function UserForm() {
   return (
@@ -94,24 +91,24 @@ export function UserForm() {
       <Error />
       <SubmitButton />
     </FormContainer>
-  )
+  );
 }
 
 const Name = reflect({
   view: Input,
   bind: {
     value: model.$name,
-    onChange: model.nameChanged
-  }
-})
+    onChange: model.nameChanged,
+  },
+});
 
 const LastName = reflect({
   view: Input,
   bind: {
     value: model.$lastName,
-    onChange: model.lastNameChanged
-  }
-})
+    onChange: model.lastNameChanged,
+  },
+});
 
 const Error = variant({
   if: model.$error,
@@ -119,18 +116,18 @@ const Error = variant({
     view: ErrorMessage,
     bind: {
       text: model.$error,
-    }
-  })
-})
+    },
+  }),
+});
 
 const SubmitButton = reflect({
   view: Button,
   bind: {
-    type: "submit", // plain values are allowed too!
-    disabled: model.$formValid.map(valid => !valid),
-    onClick: model.formSubmitted
-  }
-})
+    type: 'submit', // plain values are allowed too!
+    disabled: model.$formValid.map((valid) => !valid),
+    onClick: model.formSubmitted,
+  },
+});
 ```
 
 Here we've separated this component into small parts, which were created in a convenient way using `reflect` operators, which is a very simple description of the `props -> values` mapping, which is easier to read and modify.
@@ -171,9 +168,9 @@ Static method to create a component bound to effector stores and events as store
 
 ```tsx
 // ./user.tsx
-import React, { FC, ChangeEvent } from 'react';
-import { createEvent, restore } from 'effector';
 import { reflect } from '@effector/reflect';
+import { createEvent, restore } from 'effector';
+import React, { ChangeEvent, FC } from 'react';
 
 // Base components
 type InputProps = {
@@ -202,7 +199,7 @@ const Name = reflect({
   view: Input,
   bind: {
     value: $name,
-    placeholder: "Name",
+    placeholder: 'Name',
     onChange: changeName.prepend(inputChanged),
   },
 });
@@ -211,7 +208,7 @@ const Age = reflect({
   view: Input,
   bind: {
     value: $age,
-    placeholder: "Age",
+    placeholder: 'Age',
     onChange: changeAge.prepend(parseInt).prepend(inputChanged),
   },
 });
@@ -253,10 +250,10 @@ Method allows to change component based on value in `$typeSelector`. Optional `b
 When `Field` is rendered it checks for `$fieldType` value, selects the appropriate component from `cases` and bound props to it.
 
 ```tsx
-import React from 'react';
-import { createStore, createEvent } from 'effector';
 import { variant } from '@effector/reflect';
-import { TextInput, Range, DateSelector } from '@org/ui-lib';
+import { DateSelector, Range, TextInput } from '@org/ui-lib';
+import { createEvent, createStore } from 'effector';
+import React from 'react';
 
 const $fieldType = createStore<'date' | 'number' | 'string'>('string');
 
@@ -315,7 +312,7 @@ const Items: React.FC = list({
   mapItem: {
     propName: (item: Item, index: number) => propValue, // maps array store item to View props
   },
-  getKey: (item: Item) => React.Key // optional, will use index by default
+  getKey: (item: Item) => React.Key, // optional, will use index by default
 });
 ```
 
@@ -337,9 +334,9 @@ Method creates component, which renders list of `view` components based on items
 #### Example
 
 ```tsx
-import React from 'react';
-import { createStore, createEvent } from 'effector';
 import { list } from '@effector/reflect';
+import { createEvent, createStore } from 'effector';
+import React from 'react';
 
 const $color = createStore('red');
 
@@ -382,8 +379,8 @@ Method for creating reflect a view. So you can create a UI kit by views and use 
 
 ```tsx
 // ./ui.tsx
-import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
 import { createReflect } from '@effector/reflect';
+import React, { ChangeEvent, FC, MouseEvent, useCallback } from 'react';
 
 // Input
 type InputProps = {
@@ -416,10 +413,10 @@ export const reflectButton = createReflect(Button);
 
 ```tsx
 // ./user.tsx
-import React, { FC } from 'react';
 import { createEvent, restore } from 'effector';
+import React, { FC } from 'react';
 
-import { reflectInput, reflectButton } from './ui';
+import { reflectButton, reflectInput } from './ui';
 
 // Model
 const changeName = createEvent<string>();
@@ -464,9 +461,9 @@ Hooks is an object passed to `variant()` or `match()` with properties `mounted` 
 #### Example
 
 ```tsx
-import { createStore, createEvent } from 'effector';
 import { reflect, variant } from '@effector/reflect';
-import { TextInput, Range } from '@org/my-ui';
+import { Range, TextInput } from '@org/my-ui';
+import { createEvent, createStore } from 'effector';
 
 const $type = createStore<'text' | 'range'>('text');
 const $value = createStore('');
@@ -493,9 +490,7 @@ const Field = variant({
 
 When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
 
-
 ### SSR and tests via Fork API
-
 
 Since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release, you can just use `@effector/reflect` main imports.
 
@@ -507,7 +502,7 @@ Also for this case you need to use `event.prepend(params => params.something)` i
 
 ```tsx
 // ./ui.tsx
-import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
+import React, { ChangeEvent, FC, MouseEvent, useCallback } from 'react';
 
 // Input
 type InputProps = {
@@ -522,24 +517,24 @@ const Input: FC<InputProps> = ({ value, onChange }) => {
 
 ```tsx
 // ./app.tsx
-import React, { FC } from 'react';
-import { createEvent, restore, sample, Scope } from 'effector';
 import { reflect } from '@effector/reflect';
+import { createEvent, restore, sample, Scope } from 'effector';
 import { Provider } from 'effector-react';
+import React, { FC } from 'react';
 
 import { Input } from './ui';
 
 // Model
-export const appStarted = createEvent<{name: string}>()
+export const appStarted = createEvent<{ name: string }>();
 
 const changeName = createEvent<string>();
 const $name = restore(changeName, '');
 
 sample({
   clock: appStarted,
-  fn: ctx => ctx.name,
+  fn: (ctx) => ctx.name,
   target: changeName,
-})
+});
 
 // Component
 const Name = reflect({
@@ -561,7 +556,7 @@ export const App: FC<{ scope: Scope }> = ({ scope }) => {
 
 ```tsx
 // ./server.tsx
-import { fork, serialize, allSettled } from 'effector';
+import { allSettled, fork, serialize } from 'effector';
 
 import { App, appStarted } from './app';
 
@@ -572,7 +567,7 @@ const render = async (reqCtx) => {
     scope: serverScope,
     params: {
       name: reqCtx.cookies.name,
-    }
+    },
   });
 
   const content = renderToString(<App scope={serverScope} />);
@@ -592,15 +587,15 @@ const render = async (reqCtx) => {
 ```tsx
 // client.tsx
 import { fork } from 'effector';
-import { hydrateRoot } from 'react-dom/client'
+import { hydrateRoot } from 'react-dom/client';
 
 import { App, appStarted } from './app';
 
 const clientScope = fork({
-  values: window.__initialState__
-})
+  values: window.__initialState__,
+});
 
-hydrateRoot(document.body, <App scope={clientScope} />)
+hydrateRoot(document.body, <App scope={clientScope} />);
 ```
 
 ## Release process

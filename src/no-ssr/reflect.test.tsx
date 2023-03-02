@@ -1,9 +1,8 @@
-import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
-import { createStore, createEvent, restore, createEffect } from 'effector';
-import { act } from 'react-dom/test-utils';
-
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createEffect, createEvent, createStore, restore } from 'effector';
+import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
+import { act } from 'react-dom/test-utils';
 
 import { reflect } from '../index';
 
@@ -127,11 +126,7 @@ test('component inside', async () => {
       onChange: (_event: ChangeEvent<HTMLInputElement>) => void;
     }) => {
       return (
-        <input
-          data-testid="name"
-          value={props.value}
-          onChange={props.onChange}
-        />
+        <input data-testid="name" value={props.value} onChange={props.onChange} />
       );
     },
     bind: {

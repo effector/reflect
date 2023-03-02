@@ -1,16 +1,13 @@
-import { FC, ComponentClass } from 'react';
-import { Store, Event, Effect } from 'effector';
-import { useUnit, useList } from 'effector-react';
+import { Effect, Event, Store } from 'effector';
+import { useList, useUnit } from 'effector-react';
+import { ComponentClass, FC } from 'react';
 
 export interface Context {
   useUnit: typeof useUnit;
   useList: typeof useList;
 }
 
-type Storify<Prop> = Omit<
-  Store<Prop>,
-  'updates' | 'reset' | 'on' | 'off' | 'thru'
->;
+type Storify<Prop> = Omit<Store<Prop>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>;
 
 export type BindableProps<Props> = {
   [Key in keyof Props]?: Props[Key] extends (_payload: any) => void

@@ -1,8 +1,9 @@
 import * as context from 'effector-react';
+
 import {
-  reflectFactory,
   listFactory,
   reflectCreateFactory,
+  reflectFactory,
   variantFactory,
 } from './core';
 

@@ -1,9 +1,10 @@
 import * as effectorReactSSR from 'effector-react/scope';
+
 import {
-  variantFactory,
+  listFactory,
   reflectCreateFactory,
   reflectFactory,
-  listFactory,
+  variantFactory,
 } from './core';
 
 export const reflect = reflectFactory(effectorReactSSR);

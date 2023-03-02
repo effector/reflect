@@ -1,9 +1,8 @@
-import React, { FC, InputHTMLAttributes, ChangeEvent } from 'react';
-import { restore, fork, allSettled, createDomain } from 'effector';
-import { Provider } from 'effector-react/ssr';
-
-import { render, act } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { allSettled, createDomain, fork, restore } from 'effector';
+import { Provider } from 'effector-react/ssr';
+import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
 import { createReflect } from '../ssr';
 
