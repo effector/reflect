@@ -7,7 +7,7 @@
 ```sh
 npm install @effector/reflect
 # or
-yarn add @effector/reflect
+pnpm add @effector/reflect
 ```
 
 ## Motivation

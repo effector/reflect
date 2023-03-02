@@ -1,7 +1,7 @@
 {
   "name": "@effector/reflect",
   "version": "0.0.0-real-version-will-be-set-on-ci",
-  "repository": "git@github.com:effector/reflect.git",
+  "repository": "effector/reflect",
   "description": "☄️ Attach effector stores to react components without hooks",
   "maintainers": [
     "Sergey Sova <mail@sergeysova.com> (https://sova.dev)",
@@ -57,12 +57,12 @@
   "scripts": {
     "test:code": "jest ./src",
     "test:types": "tsc -p ./type-tests",
-    "test": "yarn test:code && yarn test:types",
+    "test": "pnpm test:code && pnpm test:types",
     "test:code:build": "jest ./dist-test",
-    "test-build": "yarn test:code:build",
-    "build": "yarn clear-build && yarn rollup --config ./rollup.config.js && cp index.d.ts reflect.d.ts",
+    "test-build": "pnpm test:code:build",
+    "build": "pnpm clear-build && pnpm rollup --config ./rollup.config.js && cp index.d.ts reflect.d.ts",
     "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -f scope.* && rm -rf dist && rm -rf core",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
@@ -109,7 +109,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn eslint ./src"
+      "pre-commit": "pnpm eslint ./src"
     }
   },
   "dependencies": {}
