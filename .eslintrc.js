@@ -1,12 +1,12 @@
-{
-  "extends": [
-    "@eslint-kit/base",
-    "@eslint-kit/typescript",
-    "@eslint-kit/node",
-    "@eslint-kit/prettier"
+const { configure, presets } = require('eslint-kit');
+
+module.exports = configure({
+  root: __dirname,
+  presets: [
+    presets.react(),
+    // presets.effector(),
+    presets.typescript(),
+    presets.prettier(),
+    presets.node(),
   ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./.config/tsconfig.base.json"
-  }
-}
+});
