@@ -11,6 +11,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "packageManager": "pnpm@7.27.0",
   "source": "src/index.ts",
   "exports": {
     ".": {
