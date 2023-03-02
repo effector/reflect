@@ -52,6 +52,31 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish package
+      - name: Check for NEXT tag
+        id: next
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ steps.version.outputs.tag }}
+          regex: '-next'
+
+      - name: Check for RC tag
+        id: rc
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ steps.version.outputs.tag }}
+          regex: '-rc'
+
+      - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with NEXT tag
+        if: ${{ steps.next.outputs.match != '' }}
+        working-directory: './dist/'
+        run: npm publish --tag next
+
+      - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with RC tag
+        if: ${{ steps.rc.outputs.match != '' }}
+        working-directory: './dist/'
+        run: npm publish --tag rc
+
+      - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} to latest
+        if: ${{ steps.next.outputs.match == '' }}
+        working-directory: './dist/'
         run: npm publish
-        working-directory: ./temp
