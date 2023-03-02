@@ -63,7 +63,8 @@
     "test-build": "pnpm test:code:build",
     "build": "pnpm clear-build && pnpm rollup --config rollup.config.cjs && cp index.d.ts reflect.d.ts",
     "clear-build": "rm -f index.* && rm -f reflect.* && rm -f ssr.* && rm -f scope.* && rm -rf dist && rm -rf core",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
@@ -87,7 +88,9 @@
     "eslint": "^8.22.0",
     "eslint-kit": "^6.11.0",
     "fs-extra": "^9.0.1",
+    "husky": "^8.0.3",
     "jest": "^26.6.3",
+    "lint-staged": "^13.1.2",
     "prettier": "^2.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
