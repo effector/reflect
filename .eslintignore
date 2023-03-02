@@ -1,0 +1,10 @@
+type-tests
+node_modules
+dist-test
+core
+.config
+.github
+/index.d.ts
+./reflect.*
+./scope.*
+./ssr.*

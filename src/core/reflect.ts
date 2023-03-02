@@ -30,7 +30,7 @@ export function reflectCreateFactory(context: Context) {
 export function reflectFactory(context: Context) {
   return function reflect<
     Props,
-    Bind extends BindableProps<Props> = BindableProps<Props>
+    Bind extends BindableProps<Props> = BindableProps<Props>,
   >(
     config: ReflectConfig<Props, Bind>,
   ): React.FC<PartialBoundProps<Props, Bind>> {
@@ -59,14 +59,14 @@ export function reflectFactory(context: Context) {
         };
       }, []);
 
-      return React.createElement(config.view, elementProps);
+      return React.createElement(config.view as any, elementProps as any);
     };
   };
 }
 
 function sortProps<
   Props,
-  Bind extends BindableProps<Props> = BindableProps<Props>
+  Bind extends BindableProps<Props> = BindableProps<Props>,
 >(config: ReflectConfig<Props, Bind>) {
   type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
 

@@ -54,9 +54,9 @@ export function listFactory(context: Context) {
   const reflect = reflectFactory(context);
 
   return function list<
-    Item,
+    Item extends Record<any, any>,
     Props,
-    Bind extends BindableProps<Props> = BindableProps<Props>
+    Bind extends BindableProps<Props> = BindableProps<Props>,
   >(config: ReflectListConfig<Props, Item, Bind>): React.FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,

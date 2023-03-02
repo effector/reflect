@@ -1,11 +1,8 @@
-/* eslint-disable import/no-anonymous-default-export */
-
-import typescript from 'rollup-plugin-typescript2';
-import babel from 'rollup-plugin-babel';
-import { terser } from 'rollup-plugin-terser';
-pac;
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
+const typescript = require('rollup-plugin-typescript2');
+const babel = require('@rollup/plugin-babel');
+const terser = require('@rollup/plugin-terser');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const commonjs = require('@rollup/plugin-commonjs');
 
 const babelConfig = require('./babel.config.json');
 
@@ -19,7 +16,7 @@ const plugins = (isEsm) => [
   babel({
     exclude: 'node_modules/**',
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
-    runtimeHelpers: true,
+    babelHelpers: 'runtime',
     presets: babelConfig.presets,
     plugins: isEsm
       ? [
@@ -42,7 +39,7 @@ const plugins = (isEsm) => [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  // terser(),
+  terser(),
 ];
 
 const noSsr = './src/index.ts';
@@ -58,7 +55,7 @@ const external = [
   'effector-react/scope',
 ];
 
-export default [
+module.exports = [
   {
     input: noSsr,
     external,
@@ -132,3 +129,14 @@ export default [
     },
   },
 ];
+
+// pnpm add -D @rollup/plugin-terser uglify-js @rollup/plugin-babel @rollup/plugin-{commonjs,node-resolve}@latest
+// pnpm uninstall rollup-plugin-terser uglify-es rollup-plugin-babel
+
+// pnpm why sourcemap-codec
+// pnpm why sane
+// w3c-hr-time
+// source-map-resolve
+// resolve-url
+// source-map-url
+// urix
