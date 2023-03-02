@@ -141,3 +141,33 @@ import { variant } from '../src';
 
   expectType<React.FC>(CurrentPage);
 }
+
+// overload for boolean source
+{
+  type PageProps = {
+    context: {
+      route: string;
+    };
+  };
+
+  const $ctx = createStore({ route: 'home' });
+
+  const HomePage: React.FC<PageProps> = () => null;
+  const FallbackPage: React.FC<PageProps> = () => null;
+  const $enabled = createStore(true);
+
+  const CurrentPageThenElse = variant({
+    if: $enabled,
+    then: HomePage,
+    else: FallbackPage,
+    bind: { context: $ctx },
+  });
+  expectType<React.FC>(CurrentPageThenElse);
+
+  const CurrentPageOnlyThen = variant({
+    if: $enabled,
+    then: HomePage,
+    bind: { context: $ctx },
+  });
+  expectType<React.FC>(CurrentPageOnlyThen);
+}
