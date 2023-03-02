@@ -1,7 +1,7 @@
-import { createReflect } from '../../ssr';
+import { createReflect } from '../../dist/scope';
 import { render } from '@testing-library/react';
 import { allSettled, createDomain, fork, restore } from 'effector';
-import { Provider } from 'effector-react/ssr';
+import { Provider } from 'effector-react/scope';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
 // Example1 (InputCustom)

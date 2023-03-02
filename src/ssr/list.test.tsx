@@ -1,9 +1,9 @@
 import { act, render } from '@testing-library/react';
 import { allSettled, createDomain, fork } from 'effector';
-import { Provider, useStore } from 'effector-react/ssr';
+import { Provider, useStore } from 'effector-react/scope';
 import React, { FC, memo } from 'react';
 
-import { list } from '../ssr';
+import { list } from '../scope';
 
 const List: FC = (props) => {
   return <ul>{props.children}</ul>;

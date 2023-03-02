@@ -27,7 +27,7 @@ jobs:
         run: pnpm build
 
       - name: Build test
-        run: pnpm test-build
+        run: pnpm test:code:build
 
       - name: Run tests
         run: pnpm test
@@ -41,9 +41,10 @@ jobs:
           tagRegex: 'v(.*)'
 
       - name: Set version from release
-        uses: reedyuk/npm-version@1.0.1
+        uses: reedyuk/npm-version@1.1.1
         with:
           version: ${{ steps.version.outputs.tag }}
+          package: 'dist/'
           git-tag-version: false
 
       - name: Create NPM config
@@ -53,3 +54,4 @@ jobs:
 
       - name: Publish package
         run: npm publish
+        working-directory: ./temp

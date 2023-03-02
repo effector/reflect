@@ -10,7 +10,7 @@ const plugins = (isEsm) => [
   typescript({
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
-      compilerOptions: { declaration: true, declarationDir: '.' },
+      compilerOptions: { declaration: true, declarationDir: './dist' },
     },
   }),
   babel({
@@ -61,7 +61,7 @@ module.exports = [
     external,
     plugins: plugins(true),
     output: {
-      file: './reflect.mjs',
+      file: './dist/reflect.mjs',
       format: 'es',
       sourcemap: true,
       externalLiveBindings: false,
@@ -72,7 +72,7 @@ module.exports = [
     external,
     plugins: plugins(true),
     output: {
-      file: './ssr.mjs',
+      file: './dist/ssr.mjs',
       format: 'es',
       sourcemap: true,
       externalLiveBindings: false,
@@ -83,7 +83,7 @@ module.exports = [
     external,
     plugins: plugins(true),
     output: {
-      file: './scope.mjs',
+      file: './dist/scope.mjs',
       format: 'es',
       sourcemap: true,
       externalLiveBindings: false,
@@ -94,7 +94,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './reflect.cjs.js',
+      file: './dist/reflect.cjs',
       format: 'cjs',
       freeze: false,
       exports: 'named',
@@ -107,7 +107,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './ssr.js',
+      file: './dist/ssr.js',
       format: 'cjs',
       freeze: false,
       exports: 'named',
@@ -120,7 +120,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './scope.js',
+      file: './dist/scope.js',
       format: 'cjs',
       freeze: false,
       exports: 'named',
@@ -129,9 +129,6 @@ module.exports = [
     },
   },
 ];
-
-// pnpm add -D @rollup/plugin-terser uglify-js @rollup/plugin-babel @rollup/plugin-{commonjs,node-resolve}@latest
-// pnpm uninstall rollup-plugin-terser uglify-es rollup-plugin-babel
 
 // pnpm why sourcemap-codec
 // pnpm why sane

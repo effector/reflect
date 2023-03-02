@@ -1,4 +1,4 @@
-import { createReflect } from '../../reflect.cjs';
+import { createReflect } from '../../dist/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEffect, createEvent, createStore, restore } from 'effector';

@@ -4,7 +4,7 @@ import { allSettled, createDomain, fork, restore } from 'effector';
 import { Provider } from 'effector-react/ssr';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
-import { createReflect } from '../ssr';
+import { createReflect } from '../scope';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
