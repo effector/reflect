@@ -12,72 +12,136 @@ yarn add @effector/reflect
 
 ## Motivation
 
-### UI library
+What's the point of reflect?
 
-Let's agree that we have an internal UI library with an input.
+It's the API design that, using the classic HOC pattern, allows you to write React components with Effector in an efficient and composable way.
+
+### The usual way
+
+Let's take a look at typical example of hooks usage:
 
 ```tsx
-// ./ui.ts
-import React, { FC, ChangeEvent, useCallback } from 'react';
+import { Input, Button, FormContainer, ErrorMessage } from "ui-lib"
+import { useUnit } from "effector-react"
 
-type InputProps = {
-  value: string;
-  onChange: ChangeEvent<HTMLInputElement>;
-};
+import * as model from "./form-model"
 
-export const Input: FC<InputProps> = ({ value, onChange }) => {
-  return <input value={value} onChange={onChange} />;
-};
+export function UserForm() {
+  const {
+    formValid,
+    name,
+    nameChanged,
+    lastName,
+    lastNameChanged,
+    formSubmitted,
+    error,
+  } = useUnit({
+    formValid: model.$formValid,
+    name: model.$name,
+    nameChanged: model.nameChanged,
+    lastName: model.lastNameChanged,
+    formSubmitted: model.formSubmitted,
+    error: model.$error,
+  })
+
+  return (
+    <FormContainer>
+      <Input value={name} onChange={nameChanged} />
+      <Input value={lastName} onChange={lastNameChanged} />
+      {error && (<ErrorMessage text={error} />)}
+      <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
+    </FormContainer>
+  )
+}
 ```
 
-### Before
+Here we have a fairly typical structure: the user form is represented by one big component tree, which takes all its subscriptions at the top level, and then the data is provided down the tree via props.
 
-In common case, you need to use `useStore` and `useEvent` (especially for SSR) to use values and call events from React components.
+As you can see, the disadvantage of this approach is that any update to `$formValid` or `$name` will cause a full rendering of that component tree, even though each of those stores is only needed for one specific input or submit button at the bottom. This means that React will have to do more work on diffing to create the update in the DOM.
+
+This can be fixed by moving the subscriptions further down the component tree by creating separate components, as done here
 
 ```tsx
-import React, { FC, ChangeEvent, useCallback } from 'react';
-import { createEvent, restore } from 'effector';
-import { useStore, useEvent } from 'effector-react';
+function UserFormSubmitButton() {
+  const {
+    formValid,
+    formSubmitted,
+  } = useUnit({
+    formValid: model.$formValid,
+    formSubmitted: model.formSubmitted
+  })
 
-import { Input } from './ui';
-
-// Model
-const changeName = createEvent<string>();
-const $name = restore(changeName, '');
-
-// Component
-export const Name: FC = () => {
-  const value = useStore($name);
-  const nameChanged = useEvent(changeName);
-  const changed = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => nameChanged(event.target.value),
-    [],
-  );
-
-  return <Input value={value} onChange={changed} />;
-};
+  return <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
+}
 ```
 
-### Now
+However, it's very often not very convenient to create a separate component with a separate subscription, because it produces more code that's a little harder to read and modify. Since it's essentially mapping store values to props - it's easier to do it just once at the very top.
 
-Now you can create a new component and pass store and event as props without hooks boilerplate.
+Also, in most cases it's not a big problem, since React is pretty fast at diffing. But as the application gets bigger, there are more and more of these small performance problems in the code, and more and more of them combine into bigger performance issues.
+
+### Reflect's way
+
+That's where reflect comes to the rescue:
 
 ```tsx
-import { createEvent, restore } from 'effector';
-import { reflect } from '@effector/reflect';
+import { reflect, variant } from "@effector/reflect"
 
-import { Input } from './ui';
+export function UserForm() {
+  return (
+    <FormContainer>
+      <Name />
+      <LastName />
+      <Error />
+      <SubmitButton />
+    </FormContainer>
+  )
+}
 
-// Model
-const changeName = createEvent<string>();
-const $name = restore(changeName, '');
-
-// Component
-export const Name = reflect({
+const Name = reflect({
   view: Input,
-  bind: { value: $name, onChange: (event) => changeName(event.target.value) },
-});
+  bind: {
+    value: model.$name,
+    onChange: model.nameChanged
+  }
+})
+
+const LastName = reflect({
+  view: Input,
+  bind: {
+    value: model.$lastName,
+    onChange: model.lastNameChanged
+  }
+})
+
+const Error = variant({
+  if: model.$error,
+  then: reflect({
+    view: ErrorMessage,
+    bind: {
+      text: model.$error,
+    }
+  })
+})
+
+const SubmitButton = reflect({
+  view: Button,
+  bind: {
+    type: "submit", // plain values are allowed too!
+    disabled: model.$formValid.map(valid => !valid),
+    onClick: model.formSubmitted
+  }
+})
 ```
+
+Here we've separated this component into small parts, which were created in a convenient way using `reflect` operators, which is a very simple description of the `props -> values` mapping, which is easier to read and modify.
+
+Also, these components are combined into one pure `UserForm` component, which handles only the component structure and has no subscriptions to external sources.
+
+In this way, we have achieved a kind of _"fine-grained"_ subscriptions - each component listens only to the relevant stores, and each update will cause only small individual parts of the component tree to be rendered.
+
+React handles such updates much better than updating one big tree, because it requires it to check and compare many more things than is necessary in this case. You can learn more about React's rendering behavior [from this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
+
+With `@effector/reflect`, our `$formValid` update will only cause the SubmitButton to be re-rendered, and for all other parts of our <UserForm /> there will literally be **zero** React work.
 
 ## API
 
@@ -138,6 +202,7 @@ const Name = reflect({
   view: Input,
   bind: {
     value: $name,
+    placeholder: "Name",
     onChange: changeName.prepend(inputChanged),
   },
 });
@@ -146,6 +211,7 @@ const Age = reflect({
   view: Input,
   bind: {
     value: $age,
+    placeholder: "Age",
     onChange: changeAge.prepend(parseInt).prepend(inputChanged),
   },
 });
@@ -153,8 +219,8 @@ const Age = reflect({
 export const User: FC = () => {
   return (
     <div>
-      <Name placeholder="Name" />
-      <Age placeholder="Age" />
+      <Name />
+      <Age />
     </div>
   );
 };
@@ -376,7 +442,7 @@ const Age = reflectInput({
 });
 
 const Submit = reflectButton({
-  onClick: () => submit(),
+  onClick: submit,
 });
 
 export const User: FC = () => {
@@ -389,107 +455,6 @@ export const User: FC = () => {
     </div>
   );
 };
-```
-
-### SSR and tests via Fork API
-
-> Note: since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release. Just add `Provider` from `effector-react` to your app root, and you are good to go.
-
-For [SSR](https://effector.dev/docs/api/effector-react/useEvent) you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
-
-Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
-
-```tsx
-// ./ui.tsx
-import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
-
-// Input
-type InputProps = {
-  value: string;
-  onChange: ChangeEvent<HTMLInputElement>;
-};
-
-const Input: FC<InputProps> = ({ value, onChange }) => {
-  return <input value={value} onChange={onChange} />;
-};
-```
-
-```tsx
-// ./app.tsx
-import React, { FC } from 'react';
-import { createEvent, restore, Fork, createDomain } from 'effector';
-import { reflect } from '@effector/reflect/ssr';
-import { Provider } from 'effector-react/ssr';
-
-import { Input } from './ui';
-
-// Model
-export const app = createDomain();
-
-export const changeName = app.createEvent<string>();
-const $name = restore(changeName, '');
-
-// Component
-const Name = reflect({
-  view: Input,
-  bind: {
-    value: $name,
-    onChange: changeName.prepend((event) => event.target.value),
-  },
-});
-
-export const App: FC<{ data: Fork }> = ({ data }) => {
-  return (
-    <Provider value={data}>
-      <Name />
-    </Provider>
-  );
-};
-```
-
-```tsx
-// ./server.ts
-import { fork, serialize, allSettled } from 'effector';
-
-import { App, app, changeName } from './app';
-
-const render = async () => {
-  const scope = fork(app);
-
-  await allSettled(changeName, { scope, params: 'Bob' });
-
-  const data = serialize(scope);
-
-  const content = renderToString(<App data={scope} />);
-
-  return `
-    <body>
-      ${content}
-      <script>
-        window.__initialState__ = ${JSON.stringify(data)};
-      </script>
-    </body>
-  `;
-};
-```
-
-> Note: since [effector 22.5.1](https://github.com/effector/effector/releases/tag/effector%4022.5.1) it is no longer necessary to add `@effector/reflect` and `@effector/reflect/ssr` to `factories` array in `effector/babel-plugin` config. It is done by default.
-
-Also, to use reflected components with [SSR and effector](https://effector.dev/docs/api/effector-react/useEvent) or testing via [effector's Fork API](https://effector.dev/docs/api/effector/fork) you will need to mark `@effector/reflect` and `@effector/reflect/ssr` as a [fabric import via effector/babel-plugin](https://effector.dev/docs/api/effector/babel-plugin#factories)
-
-```js
-// in your .babelrc
-{
-  "plugins": [
-    [
-      "effector/babel-plugin",
-      {
-        "factories": ["@effector/reflect", "@effector/reflect/ssr"]
-      }
-    ]
-  ]
-}
-
 ```
 
 ### Hooks
@@ -528,9 +493,115 @@ const Field = variant({
 
 When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.
 
-## Roadmap
 
-- [] Auto moving test from ./src to ./dist-test
+### SSR and tests via Fork API
+
+
+Since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release, you can just use `@effector/reflect` main imports.
+
+Just add `Provider` from `effector-react` to your app root, and you are good to go.
+
+For [SSR](https://effector.dev/docs/api/effector-react/useEvent) and `effector-react` before `2.5.0` release you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
+
+Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
+
+```tsx
+// ./ui.tsx
+import React, { FC, useCallback, ChangeEvent, MouseEvent } from 'react';
+
+// Input
+type InputProps = {
+  value: string;
+  onChange: ChangeEvent<HTMLInputElement>;
+};
+
+const Input: FC<InputProps> = ({ value, onChange }) => {
+  return <input value={value} onChange={onChange} />;
+};
+```
+
+```tsx
+// ./app.tsx
+import React, { FC } from 'react';
+import { createEvent, restore, sample, Scope } from 'effector';
+import { reflect } from '@effector/reflect';
+import { Provider } from 'effector-react';
+
+import { Input } from './ui';
+
+// Model
+export const appStarted = createEvent<{name: string}>()
+
+const changeName = createEvent<string>();
+const $name = restore(changeName, '');
+
+sample({
+  clock: appStarted,
+  fn: ctx => ctx.name,
+  target: changeName,
+})
+
+// Component
+const Name = reflect({
+  view: Input,
+  bind: {
+    value: $name,
+    onChange: changeName.prepend((event) => event.target.value),
+  },
+});
+
+export const App: FC<{ scope: Scope }> = ({ scope }) => {
+  return (
+    <Provider value={scope}>
+      <Name />
+    </Provider>
+  );
+};
+```
+
+```tsx
+// ./server.tsx
+import { fork, serialize, allSettled } from 'effector';
+
+import { App, appStarted } from './app';
+
+const render = async (reqCtx) => {
+  const serverScope = fork();
+
+  await allSettled(appStarted, {
+    scope: serverScope,
+    params: {
+      name: reqCtx.cookies.name,
+    }
+  });
+
+  const content = renderToString(<App scope={serverScope} />);
+  const data = serialize(scope);
+
+  return `
+    <body>
+      ${content}
+      <script>
+        window.__initialState__ = ${JSON.stringify(data)};
+      </script>
+    </body>
+  `;
+};
+```
+
+```tsx
+// client.tsx
+import { fork } from 'effector';
+import { hydrateRoot } from 'react-dom/client'
+
+import { App, appStarted } from './app';
+
+const clientScope = fork({
+  values: window.__initialState__
+})
+
+hydrateRoot(document.body, <App scope={clientScope} />)
+```
 
 ## Release process
 
