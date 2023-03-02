@@ -274,13 +274,39 @@ const Field = variant({
 });
 ```
 
+#### `variant` shorthand for boolean cases
+
+When you have only two cases, you can use `variant` shorthand.
+
+```tsx
+const Component = variant({
+  if: $isError,
+  then: ErrorComponent,
+  else: SuccessComponent,
+});
+```
+
+This is equivalent to
+
+```tsx
+const Component = variant({
+  source: $isError.map((isError) => (isError ? 'error' : 'success')),
+  cases: {
+    error: ErrorComponent,
+    success: SuccessComponent,
+  },
+});
+```
+
+This shorthand supports `bind` and `hooks` fields as well.
+
 ### List
 
 ```tsx
 const Items: React.FC = list({
   view: React.FC<Props>,
   source: Store<Item[]>,
-  bind: { 
+  bind: {
     // regular reflect's bind, for list item view
   },
   hooks: {
@@ -297,13 +323,12 @@ Method creates component, which renders list of `view` components based on items
 
 #### Arguments
 
-1. `source` — Store of `Item[]` value. 
+1. `source` — Store of `Item[]` value.
 1. `view` — A react component, will be used to render list items
 1. `mapItem` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to props of each rendered list item.
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
 1. `getKey` - Optional function `(item: Item) => React.Key` to set key for every item in the list to help React with effecient rerenders. If not provided, index is used. See [`effector-react`](https://effector.dev/docs/api/effector-react/useList) docs for more details.
-
 
 #### Returns
 
@@ -319,10 +344,10 @@ import { list } from '@effector/reflect';
 const $color = createStore('red');
 
 const $users = createStore([
-  {id: 1, name: 'Yung'},
-  {id: 2, name: 'Lean'},
-  {id: 3, name: 'Kyoto'},
-  {id: 4, name: 'Sesh'},
+  { id: 1, name: 'Yung' },
+  { id: 2, name: 'Lean' },
+  { id: 3, name: 'Kyoto' },
+  { id: 4, name: 'Sesh' },
 ]);
 
 const Item = ({ id, name, color }) => {
@@ -337,18 +362,18 @@ const Items = list({
   view: Item,
   source: $users,
   bind: {
-    color: $color
+    color: $color,
   },
   mapItem: {
     id: (user) => user.id,
-    name: (user) => user.name
+    name: (user) => user.name,
   },
-  getKey: (user) => `${user.id}${user.name}`
+  getKey: (user) => `${user.id}${user.name}`,
 });
 
 <List>
   <Items />
-</List>
+</List>;
 ```
 
 ### Create reflect
