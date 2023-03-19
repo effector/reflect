@@ -1,14 +1,8 @@
 import { Effect, Event, is, Store } from 'effector';
+import { useUnit } from 'effector-react';
 import React from 'react';
 
-import {
-  BindableProps,
-  Context,
-  Hook,
-  Hooks,
-  PartialBoundProps,
-  View,
-} from './types';
+import { BindableProps, Hook, Hooks, PartialBoundProps, View } from './types';
 
 export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   view: View<Props>;
@@ -16,8 +10,10 @@ export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   hooks?: Hooks;
 }
 
-export function reflectCreateFactory(context: Context) {
-  const reflect = reflectFactory(context);
+const isClientSide = typeof window !== 'undefined';
+
+export function reflectCreateFactory() {
+  const reflect = reflectFactory();
 
   return function createReflect<Props>(view: View<Props>) {
     return <Bind extends BindableProps<Props> = BindableProps<Props>>(
@@ -27,7 +23,7 @@ export function reflectCreateFactory(context: Context) {
   };
 }
 
-export function reflectFactory(context: Context) {
+export function reflectFactory() {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>,
@@ -35,8 +31,8 @@ export function reflectFactory(context: Context) {
     const { stores, events, data } = sortProps(config);
 
     return (props) => {
-      const storeProps = context.useUnit(stores);
-      const eventsProps = context.useUnit(events);
+      const storeProps = useUnit(stores, { forceScope: !isClientSide });
+      const eventsProps = useUnit(events, { forceScope: !isClientSide });
 
       const elementProps: Props = Object.assign(
         {},
@@ -46,8 +42,8 @@ export function reflectFactory(context: Context) {
         props,
       );
 
-      const mounted = wrapToHook(config.hooks?.mounted, context);
-      const unmounted = wrapToHook(config.hooks?.unmounted, context);
+      const mounted = wrapToHook(config.hooks?.mounted);
+      const unmounted = wrapToHook(config.hooks?.unmounted);
 
       React.useEffect(() => {
         if (mounted) mounted();
@@ -86,9 +82,9 @@ function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Prop
   return { events, stores, data };
 }
 
-function wrapToHook(hook: Hook | void, context: Context) {
+function wrapToHook(hook: Hook | void) {
   if (hookDefined(hook)) {
-    return context.useUnit(hook as Event<void>);
+    return useUnit(hook as Event<void>, { forceScope: !isClientSide });
   }
 
   return hook;
