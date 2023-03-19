@@ -1,3 +1,3 @@
-export { reflectFactory, reflectCreateFactory } from './reflect';
-export { variantFactory } from './variant';
-export { listFactory } from './list';
+export { createReflect, reflect } from './reflect';
+export { variant } from './variant';
+export { list } from './list';
