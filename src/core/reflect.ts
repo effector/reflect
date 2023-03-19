@@ -12,49 +12,43 @@ export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
 
 const isClientSide = typeof window !== 'undefined';
 
-export function reflectCreateFactory() {
-  const reflect = reflectFactory();
-
-  return function createReflect<Props>(view: View<Props>) {
-    return <Bind extends BindableProps<Props> = BindableProps<Props>>(
-      bind: Bind,
-      params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
-    ) => reflect<Props, Bind>({ view, bind, ...params });
-  };
+export function createReflect<Props>(view: View<Props>) {
+  return <Bind extends BindableProps<Props> = BindableProps<Props>>(
+    bind: Bind,
+    params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
+  ) => reflect<Props, Bind>({ view, bind, ...params });
 }
 
-export function reflectFactory() {
-  return function reflect<
-    Props,
-    Bind extends BindableProps<Props> = BindableProps<Props>,
-  >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
-    const { stores, events, data } = sortProps(config);
+export function reflect<
+  Props,
+  Bind extends BindableProps<Props> = BindableProps<Props>,
+>(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
+  const { stores, events, data } = sortProps(config);
 
-    return (props) => {
-      const storeProps = useUnit(stores, { forceScope: !isClientSide });
-      const eventsProps = useUnit(events, { forceScope: !isClientSide });
+  return (props) => {
+    const storeProps = useUnit(stores, { forceScope: !isClientSide });
+    const eventsProps = useUnit(events, { forceScope: !isClientSide });
 
-      const elementProps: Props = Object.assign(
-        {},
-        storeProps,
-        eventsProps,
-        data,
-        props,
-      );
+    const elementProps: Props = Object.assign(
+      {},
+      storeProps,
+      eventsProps,
+      data,
+      props,
+    );
 
-      const mounted = wrapToHook(config.hooks?.mounted);
-      const unmounted = wrapToHook(config.hooks?.unmounted);
+    const mounted = wrapToHook(config.hooks?.mounted);
+    const unmounted = wrapToHook(config.hooks?.unmounted);
 
-      React.useEffect(() => {
-        if (mounted) mounted();
+    React.useEffect(() => {
+      if (mounted) mounted();
 
-        return () => {
-          if (unmounted) unmounted();
-        };
-      }, []);
+      return () => {
+        if (unmounted) unmounted();
+      };
+    }, []);
 
-      return React.createElement(config.view as any, elementProps as any);
-    };
+    return React.createElement(config.view as any, elementProps as any);
   };
 }
 
