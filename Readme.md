@@ -138,7 +138,7 @@ In this way, we have achieved a kind of _"fine-grained"_ subscriptions - each co
 
 React handles such updates much better than updating one big tree, because it requires it to check and compare many more things than is necessary in this case. You can learn more about React's rendering behavior [from this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
 
-With `@effector/reflect`, our `$formValid` update will only cause the SubmitButton to be re-rendered, and for all other parts of our <UserForm /> there will literally be **zero** React work.
+With `@effector/reflect`, our `$formValid` update will only cause the SubmitButton to be re-rendered, and for all other parts of our `<UserForm />` there will literally be **zero** React work.
 
 ## API
 
