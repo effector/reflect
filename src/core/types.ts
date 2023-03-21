@@ -1,6 +1,10 @@
 import { Effect, Event, Store } from 'effector';
 import { ComponentClass, FC } from 'react';
 
+export interface Context {
+  forceScope?: boolean;
+}
+
 type Storify<Prop> = Omit<Store<Prop>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>;
 
 export type BindableProps<Props> = {
