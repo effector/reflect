@@ -2,7 +2,14 @@ import { Effect, Event, is, Store } from 'effector';
 import { useUnit } from 'effector-react';
 import React from 'react';
 
-import { BindableProps, Hook, Hooks, PartialBoundProps, View } from './types';
+import {
+  BindableProps,
+  Context,
+  Hook,
+  Hooks,
+  PartialBoundProps,
+  View,
+} from './types';
 
 export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   view: View<Props>;
@@ -10,45 +17,51 @@ export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   hooks?: Hooks;
 }
 
-const isClientSide = typeof window !== 'undefined';
+const defaultContext: Context = { forceScope: false };
 
-export function createReflect<Props>(view: View<Props>) {
-  return <Bind extends BindableProps<Props> = BindableProps<Props>>(
-    bind: Bind,
-    params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
-  ) => reflect<Props, Bind>({ view, bind, ...params });
+export function reflectCreateFactory(context: Context = defaultContext) {
+  const reflect = reflectFactory(context);
+
+  return function createReflect<Props>(view: View<Props>) {
+    return <Bind extends BindableProps<Props> = BindableProps<Props>>(
+      bind: Bind,
+      params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
+    ) => reflect<Props, Bind>({ view, bind, ...params });
+  };
 }
 
-export function reflect<
-  Props,
-  Bind extends BindableProps<Props> = BindableProps<Props>,
->(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
-  const { stores, events, data } = sortProps(config);
+export function reflectFactory(context: Context = defaultContext) {
+  return function reflect<
+    Props,
+    Bind extends BindableProps<Props> = BindableProps<Props>,
+  >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
+    const { stores, events, data } = sortProps(config);
 
-  return (props) => {
-    const storeProps = useUnit(stores, { forceScope: !isClientSide });
-    const eventsProps = useUnit(events, { forceScope: !isClientSide });
+    return (props) => {
+      const storeProps = useUnit(stores, { forceScope: context.forceScope });
+      const eventsProps = useUnit(events, { forceScope: context.forceScope });
 
-    const elementProps: Props = Object.assign(
-      {},
-      storeProps,
-      eventsProps,
-      data,
-      props,
-    );
+      const elementProps: Props = Object.assign(
+        {},
+        storeProps,
+        eventsProps,
+        data,
+        props,
+      );
 
-    const mounted = wrapToHook(config.hooks?.mounted);
-    const unmounted = wrapToHook(config.hooks?.unmounted);
+      const mounted = wrapToHook(context, config.hooks?.mounted);
+      const unmounted = wrapToHook(context, config.hooks?.unmounted);
 
-    React.useEffect(() => {
-      if (mounted) mounted();
+      React.useEffect(() => {
+        if (mounted) mounted();
 
-      return () => {
-        if (unmounted) unmounted();
-      };
-    }, []);
+        return () => {
+          if (unmounted) unmounted();
+        };
+      }, []);
 
-    return React.createElement(config.view as any, elementProps as any);
+      return React.createElement(config.view as any, elementProps as any);
+    };
   };
 }
 
@@ -76,9 +89,9 @@ function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Prop
   return { events, stores, data };
 }
 
-function wrapToHook(hook: Hook | void) {
+function wrapToHook(context: Context, hook: Hook | void) {
   if (hookDefined(hook)) {
-    return useUnit(hook as Event<void>, { forceScope: !isClientSide });
+    return useUnit(hook as Event<void>, { forceScope: context.forceScope });
   }
 
   return hook;
