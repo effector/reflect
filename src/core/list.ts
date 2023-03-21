@@ -2,8 +2,8 @@ import { Store } from 'effector';
 import { useList } from 'effector-react';
 import React from 'react';
 
-import { reflect } from './reflect';
-import { BindableProps, Hooks, PartialBoundProps, View } from './types';
+import { reflectFactory } from './reflect';
+import { BindableProps, Context, Hooks, PartialBoundProps, View } from './types';
 
 type ReflectListConfig<Props, Item, Bind> = Item extends Props
   ? {
@@ -44,48 +44,53 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
           };
         };
 
-const isClientSide = typeof window !== 'undefined';
+const defaultContext: Context = { forceScope: false };
 
-export function list<
-  Item extends Record<any, any>,
-  Props,
-  Bind extends BindableProps<Props> = BindableProps<Props>,
->(config: ReflectListConfig<Props, Item, Bind>): React.FC {
-  const ItemView = reflect<Props, Bind>({
-    view: config.view,
-    bind: config.bind ? config.bind : ({} as Bind),
-    hooks: config.hooks,
-  });
+export function listFactory(context: Context = defaultContext) {
+  const reflect = reflectFactory(context);
 
-  const listConfig = {
-    getKey: config.getKey,
-    fn: (value: Item, index: number) => {
-      const finalProps = React.useMemo(() => {
-        const props: any = {};
+  return function list<
+    Item extends Record<any, any>,
+    Props,
+    Bind extends BindableProps<Props> = BindableProps<Props>,
+  >(config: ReflectListConfig<Props, Item, Bind>): React.FC {
+    const ItemView = reflect<Props, Bind>({
+      view: config.view,
+      bind: config.bind ? config.bind : ({} as Bind),
+      hooks: config.hooks,
+    });
 
-        if (config.mapItem) {
-          forIn(config.mapItem, (prop) => {
-            const fn =
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              config.mapItem![prop];
-            const propValue = fn(value, index);
+    const listConfig = {
+      getKey: config.getKey,
+      fn: (value: Item, index: number) => {
+        const finalProps = React.useMemo(() => {
+          const props: any = {};
 
-            props[prop] = propValue;
-          });
-        } else {
-          forIn(value, (prop) => {
-            props[prop] = value[prop];
-          });
-        }
+          if (config.mapItem) {
+            forIn(config.mapItem, (prop) => {
+              const fn =
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                config.mapItem![prop];
+              const propValue = fn(value, index);
 
-        return props;
-      }, [value, index]);
+              props[prop] = propValue;
+            });
+          } else {
+            forIn(value, (prop) => {
+              props[prop] = value[prop];
+            });
+          }
 
-      return React.createElement(ItemView, finalProps);
-    },
+          return props;
+        }, [value, index]);
+
+        return React.createElement(ItemView, finalProps);
+      },
+    };
+
+    return () =>
+      useList(config.source, listConfig, { forceScope: context.forceScope });
   };
-
-  return () => useList(config.source, listConfig, { forceScope: !isClientSide });
 }
 
 function forIn<T extends Record<any, any>, R extends any>(
