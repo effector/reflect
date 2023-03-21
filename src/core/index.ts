@@ -1,3 +1,4 @@
-export { createReflect, reflect } from './reflect';
-export { variant } from './variant';
-export { list } from './list';
+export { reflectFactory, reflectCreateFactory } from './reflect';
+export { variantFactory } from './variant';
+export { listFactory } from './list';
+export type { Context } from './types';

@@ -1,5 +1,14 @@
-console.info(
-  '`@effector/reflect/scope` is the same as `@effector/reflect`, so you can import from `@effector/reflect`',
-);
+import {
+  Context,
+  listFactory,
+  reflectCreateFactory,
+  reflectFactory,
+  variantFactory,
+} from './core';
 
-export * from './core';
+const scopeContext: Context = { forceScope: true };
+
+export const reflect = reflectFactory();
+export const createReflect = reflectCreateFactory(scopeContext);
+export const variant = variantFactory(scopeContext);
+export const list = listFactory(scopeContext);
