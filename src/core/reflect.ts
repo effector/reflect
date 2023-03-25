@@ -1,4 +1,5 @@
 import { Effect, Event, is, Store } from 'effector';
+import { useUnit } from 'effector-react';
 import React from 'react';
 
 import {
@@ -16,7 +17,9 @@ export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
   hooks?: Hooks;
 }
 
-export function reflectCreateFactory(context: Context) {
+const defaultContext: Context = { forceScope: false };
+
+export function reflectCreateFactory(context: Context = defaultContext) {
   const reflect = reflectFactory(context);
 
   return function createReflect<Props>(view: View<Props>) {
@@ -27,7 +30,7 @@ export function reflectCreateFactory(context: Context) {
   };
 }
 
-export function reflectFactory(context: Context) {
+export function reflectFactory(context: Context = defaultContext) {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>,
@@ -35,8 +38,8 @@ export function reflectFactory(context: Context) {
     const { stores, events, data } = sortProps(config);
 
     return (props) => {
-      const storeProps = context.useUnit(stores);
-      const eventsProps = context.useUnit(events);
+      const storeProps = useUnit(stores, { forceScope: context.forceScope });
+      const eventsProps = useUnit(events, { forceScope: context.forceScope });
 
       const elementProps: Props = Object.assign(
         {},
@@ -46,8 +49,8 @@ export function reflectFactory(context: Context) {
         props,
       );
 
-      const mounted = wrapToHook(config.hooks?.mounted, context);
-      const unmounted = wrapToHook(config.hooks?.unmounted, context);
+      const mounted = wrapToHook(context, config.hooks?.mounted);
+      const unmounted = wrapToHook(context, config.hooks?.unmounted);
 
       React.useEffect(() => {
         if (mounted) mounted();
@@ -86,9 +89,9 @@ function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Prop
   return { events, stores, data };
 }
 
-function wrapToHook(hook: Hook | void, context: Context) {
+function wrapToHook(context: Context, hook: Hook | void) {
   if (hookDefined(hook)) {
-    return context.useUnit(hook as Event<void>);
+    return useUnit(hook as Event<void>, { forceScope: context.forceScope });
   }
 
   return hook;

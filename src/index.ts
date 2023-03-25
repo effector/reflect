@@ -1,5 +1,3 @@
-import * as context from 'effector-react';
-
 import {
   listFactory,
   reflectCreateFactory,
@@ -7,9 +5,7 @@ import {
   variantFactory,
 } from './core';
 
-export const reflect = reflectFactory(context);
-export const createReflect = reflectCreateFactory(context);
-
-export const variant = variantFactory(context);
-
-export const list = listFactory(context);
+export const reflect = reflectFactory();
+export const createReflect = reflectCreateFactory();
+export const variant = variantFactory();
+export const list = listFactory();

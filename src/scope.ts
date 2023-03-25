@@ -1,15 +1,14 @@
-import * as effectorReactSSR from 'effector-react/scope';
-
 import {
+  Context,
   listFactory,
   reflectCreateFactory,
   reflectFactory,
   variantFactory,
 } from './core';
 
-export const reflect = reflectFactory(effectorReactSSR);
-export const createReflect = reflectCreateFactory(effectorReactSSR);
+const scopeContext: Context = { forceScope: true };
 
-export const variant = variantFactory(effectorReactSSR);
-
-export const list = listFactory(effectorReactSSR);
+export const reflect = reflectFactory(scopeContext);
+export const createReflect = reflectCreateFactory(scopeContext);
+export const variant = variantFactory(scopeContext);
+export const list = listFactory(scopeContext);

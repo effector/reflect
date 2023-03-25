@@ -1,10 +1,8 @@
 import { Effect, Event, Store } from 'effector';
-import { useList, useUnit } from 'effector-react';
 import { ComponentClass, FC } from 'react';
 
 export interface Context {
-  useUnit: typeof useUnit;
-  useList: typeof useList;
+  forceScope?: boolean;
 }
 
 type Storify<Prop> = Omit<Store<Prop>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>;

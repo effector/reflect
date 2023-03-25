@@ -20,7 +20,7 @@ specifiers:
   babel-jest: ^29.4.3
   babel-plugin-module-resolver: ^4.1.0
   effector: ^22.0.6
-  effector-react: ^22.1.0
+  effector-react: ^22.3.0
   eslint: ^8.22.0
   eslint-kit: ^6.11.0
   fs-extra: ^9.0.1
@@ -59,7 +59,7 @@ devDependencies:
   babel-jest: 29.4.3_@babel+core@7.21.0
   babel-plugin-module-resolver: 4.1.0
   effector: 22.5.2
-  effector-react: 22.5.0_ljphihe53hzzpqkbmewyqqpz6i
+  effector-react: 22.5.1_ljphihe53hzzpqkbmewyqqpz6i
   eslint: 8.22.0
   eslint-kit: 6.11.0_eqcc7dcqpetk7diz5y3u642qiq
   fs-extra: 9.1.0
@@ -3277,8 +3277,8 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
 
-  /effector-react/22.5.0_ljphihe53hzzpqkbmewyqqpz6i:
-    resolution: {integrity: sha512-f9aOWFKr4i6fhdoV1uHa2n89f9+9edmOJL9UhMgjUcs2al3fyh3R5j1WDx0cHU6TuFtrlnFsulbhd2D/8q7reQ==}
+  /effector-react/22.5.1_ljphihe53hzzpqkbmewyqqpz6i:
+    resolution: {integrity: sha512-Sy5b/sUEZoCuyoCr+SiHcgd0L+PQqnIGx+SuPCZ7MhECYxezkkeecsk0EVj9sykLL2qlEeg+rdiWvIATJgOTeA==}
     engines: {node: '>=11.0.0'}
     peerDependencies:
       effector: ^22.0.2

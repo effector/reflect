@@ -1,4 +1,5 @@
 import { Store } from 'effector';
+import { useUnit } from 'effector-react';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
@@ -12,8 +13,9 @@ import {
 } from './types';
 
 const Default = () => null;
+const defaultContext: Context = { forceScope: false };
 
-export function variantFactory(context: Context) {
+export function variantFactory(context: Context = defaultContext) {
   const reflect = reflectFactory(context);
 
   return function variant<
@@ -59,7 +61,7 @@ export function variantFactory(context: Context) {
     }
 
     function View(props: Props) {
-      const nameOfCase = context.useUnit($case);
+      const nameOfCase = useUnit($case, { forceScope: context.forceScope });
       const Component = cases[nameOfCase] ?? def;
 
       return React.createElement(Component as any, props as any);

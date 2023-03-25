@@ -1,4 +1,5 @@
 import { Store } from 'effector';
+import { useList } from 'effector-react';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
@@ -43,7 +44,9 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
           };
         };
 
-export function listFactory(context: Context) {
+const defaultContext: Context = { forceScope: false };
+
+export function listFactory(context: Context = defaultContext) {
   const reflect = reflectFactory(context);
 
   return function list<
@@ -85,7 +88,8 @@ export function listFactory(context: Context) {
       },
     };
 
-    return () => context.useList(config.source, listConfig);
+    return () =>
+      useList(config.source, listConfig, { forceScope: context.forceScope });
   };
 }
 
