@@ -18,20 +18,7 @@ const plugins = (isEsm) => [
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     babelHelpers: 'runtime',
     presets: babelConfig.presets,
-    plugins: isEsm
-      ? [
-          [
-            'module-resolver',
-            {
-              alias: {
-                effector$: 'effector/effector.mjs',
-                'effector-react$': 'effector-react/effector-react.mjs',
-              },
-            },
-          ],
-          ...babelConfig.plugins,
-        ]
-      : babelConfig.plugins,
+    plugins: babelConfig.plugins,
   }),
   nodeResolve({
     jsnext: true,
@@ -47,9 +34,7 @@ const ssr = './src/ssr.ts';
 const scope = './src/scope.ts';
 const external = [
   'effector',
-  'effector/effector.mjs',
   'effector-react',
-  'effector-react/effector-react.mjs',
   'react',
   'effector-react/ssr',
   'effector-react/scope',
