@@ -6,7 +6,7 @@ const commonjs = require('@rollup/plugin-commonjs');
 
 const babelConfig = require('./babel.config.json');
 
-const plugins = (isEsm) => [
+const plugins = () => [
   typescript({
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
@@ -18,20 +18,7 @@ const plugins = (isEsm) => [
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     babelHelpers: 'runtime',
     presets: babelConfig.presets,
-    plugins: isEsm
-      ? [
-          [
-            'module-resolver',
-            {
-              alias: {
-                effector$: 'effector/effector.mjs',
-                'effector-react$': 'effector-react/effector-react.mjs',
-              },
-            },
-          ],
-          ...babelConfig.plugins,
-        ]
-      : babelConfig.plugins,
+    plugins: babelConfig.plugins,
   }),
   nodeResolve({
     jsnext: true,
@@ -47,9 +34,7 @@ const ssr = './src/ssr.ts';
 const scope = './src/scope.ts';
 const external = [
   'effector',
-  'effector/effector.mjs',
   'effector-react',
-  'effector-react/effector-react.mjs',
   'react',
   'effector-react/ssr',
   'effector-react/scope',
@@ -59,7 +44,7 @@ module.exports = [
   {
     input: noSsr,
     external,
-    plugins: plugins(true),
+    plugins: plugins(),
     output: {
       file: './dist/reflect.mjs',
       format: 'es',
@@ -70,7 +55,7 @@ module.exports = [
   {
     input: ssr,
     external,
-    plugins: plugins(true),
+    plugins: plugins(),
     output: {
       file: './dist/ssr.mjs',
       format: 'es',
@@ -81,7 +66,7 @@ module.exports = [
   {
     input: scope,
     external,
-    plugins: plugins(true),
+    plugins: plugins(),
     output: {
       file: './dist/scope.mjs',
       format: 'es',
