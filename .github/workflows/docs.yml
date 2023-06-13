@@ -35,7 +35,10 @@ jobs:
         with:
           node-version: 18.x
           cache: 'pnpm'
-          cache-dependency-path: 'docs/pnpm-lock.yaml'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+
+      - name: Setup parent deps
+        run: 'pnpm install'
 
       - name: Setup deps
         run: 'pnpm install'
