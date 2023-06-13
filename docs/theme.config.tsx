@@ -1,7 +1,8 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useRouter } from 'next/router';
+import { type DocsThemeConfig } from 'nextra-theme-docs';
 
-export default {
+const config: DocsThemeConfig = {
   logo: <b>@effector/reflect</b>,
   project: {
     link: 'https://github.com/effector/reflect',
@@ -41,3 +42,5 @@ export default {
     }
   },
 };
+
+export default config;

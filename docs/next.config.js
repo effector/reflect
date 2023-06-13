@@ -2,7 +2,7 @@ const nextra = require('nextra');
 
 const withNextra = nextra({
   theme: 'nextra-theme-docs',
-  themeConfig: './theme.config.jsx',
+  themeConfig: './theme.config.tsx',
   flexsearch: {
     codeblocks: false,
   },
