@@ -1,0 +1,129 @@
+# Motivation
+
+What's the point of reflect?
+
+It's the API design that, using the classic HOC pattern, allows you to write React components with Effector in an efficient and composable way.
+
+## The usual way
+
+Let's take a look at typical example of hooks usage:
+
+```tsx
+import { useUnit } from 'effector-react';
+import { Button, ErrorMessage, FormContainer, Input } from 'ui-lib';
+
+import * as model from './form-model';
+
+export function UserForm() {
+  const {
+    formValid,
+    name,
+    nameChanged,
+    lastName,
+    lastNameChanged,
+    formSubmitted,
+    error,
+  } = useUnit({
+    formValid: model.$formValid,
+    name: model.$name,
+    nameChanged: model.nameChanged,
+    lastName: model.lastNameChanged,
+    formSubmitted: model.formSubmitted,
+    error: model.$error,
+  });
+
+  return (
+    <FormContainer>
+      <Input value={name} onChange={nameChanged} />
+      <Input value={lastName} onChange={lastNameChanged} />
+      {error && <ErrorMessage text={error} />}
+      <Button type="submit" disabled={!formValid} onClick={formSubmitted} />
+    </FormContainer>
+  );
+}
+```
+
+Here we have a fairly typical structure: the user form is represented by one big component tree, which takes all its subscriptions at the top level, and then the data is provided down the tree via props.
+
+As you can see, the disadvantage of this approach is that any update to `$formValid` or `$name` will cause a full rendering of that component tree, even though each of those stores is only needed for one specific input or submit button at the bottom. This means that React will have to do more work on diffing to create the update in the DOM.
+
+This can be fixed by moving the subscriptions further down the component tree by creating separate components, as done here
+
+```tsx
+function UserFormSubmitButton() {
+  const { formValid, formSubmitted } = useUnit({
+    formValid: model.$formValid,
+    formSubmitted: model.formSubmitted,
+  });
+
+  return <Button type="submit" disabled={!formValid} onClick={formSubmitted} />;
+}
+```
+
+However, it's very often not very convenient to create a separate component with a separate subscription, because it produces more code that's a little harder to read and modify. Since it's essentially mapping store values to props - it's easier to do it just once at the very top.
+
+Also, in most cases it's not a big problem, since React is pretty fast at diffing. But as the application gets bigger, there are more and more of these small performance problems in the code, and more and more of them combine into bigger performance issues.
+
+## Reflect's way
+
+That's where reflect comes to the rescue:
+
+```tsx
+import { reflect, variant } from '@effector/reflect';
+
+export function UserForm() {
+  return (
+    <FormContainer>
+      <Name />
+      <LastName />
+      <Error />
+      <SubmitButton />
+    </FormContainer>
+  );
+}
+
+const Name = reflect({
+  view: Input,
+  bind: {
+    value: model.$name,
+    onChange: model.nameChanged,
+  },
+});
+
+const LastName = reflect({
+  view: Input,
+  bind: {
+    value: model.$lastName,
+    onChange: model.lastNameChanged,
+  },
+});
+
+const Error = variant({
+  if: model.$error,
+  then: reflect({
+    view: ErrorMessage,
+    bind: {
+      text: model.$error,
+    },
+  }),
+});
+
+const SubmitButton = reflect({
+  view: Button,
+  bind: {
+    type: 'submit', // plain values are allowed too!
+    disabled: model.$formValid.map((valid) => !valid),
+    onClick: model.formSubmitted,
+  },
+});
+```
+
+Here we've separated this component into small parts, which were created in a convenient way using `reflect` operators, which is a very simple description of the `props -> values` mapping, which is easier to read and modify.
+
+Also, these components are combined into one pure `UserForm` component, which handles only the component structure and has no subscriptions to external sources.
+
+In this way, we have achieved a kind of _"fine-grained"_ subscriptions - each component listens only to the relevant stores, and each update will cause only small individual parts of the component tree to be rendered.
+
+React handles such updates much better than updating one big tree, because it requires it to check and compare many more things than is necessary in this case. You can learn more about React's rendering behavior [from this awesome article](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/)
+
+With `@effector/reflect`, our `$formValid` update will only cause the SubmitButton to be re-rendered, and for all other parts of our `<UserForm />` there will literally be **zero** React work.

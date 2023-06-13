@@ -1,0 +1,21 @@
+{
+  "index": {
+    "title": "Home",
+    "theme": {
+      "breadcrumb": false,
+      "footer": true,
+      "sidebar": false,
+      "toc": false,
+      "pagination": false
+    },
+    "display": "hidden"
+  },
+  "learn": {
+    "title": "Learn",
+    "type": "page"
+  },
+  "docs": {
+    "type": "page",
+    "title": "API"
+  }
+}

@@ -1,0 +1,87 @@
+
+# `createReflect`
+
+```ts
+import {createReflect} from '@effector/reflect'
+// or
+import {createReflect} from '@effector/reflect/scope'
+```
+
+Method for creating reflect a view. So you can create a UI kit by views and use a view with a store already.
+
+```tsx
+// ./ui.tsx
+import { createReflect } from '@effector/reflect';
+import React, { ChangeEvent, FC, MouseEvent, useCallback } from 'react';
+
+// Input
+type InputProps = {
+  value: string;
+  onChange: ChangeEvent<HTMLInputElement>;
+};
+
+const Input: FC<InputProps> = ({ value, onChange }) => {
+  return <input value={value} onChange={onChange} />;
+};
+
+export const reflectInput = createReflect(Input);
+
+// Button
+type ButtonProps = {
+  onClick: MouseEvent<HTMLButtonElement>;
+  title?: string;
+};
+
+const Button: FC<ButtonProps> = ({ onClick, children, title }) => {
+  return (
+    <button onClick={onClick} title={title}>
+      {children}
+    </button>
+  );
+};
+
+export const reflectButton = createReflect(Button);
+```
+
+```tsx
+// ./user.tsx
+import { createEvent, restore } from 'effector';
+import React, { FC } from 'react';
+
+import { reflectButton, reflectInput } from './ui';
+
+// Model
+const changeName = createEvent<string>();
+const $name = restore(changeName, '');
+
+const changeAge = createEvent<number>();
+const $age = restore(changeAge, 0);
+
+const submit = createEvent<void>();
+
+// Components
+const Name = reflectInput({
+  value: $name,
+  onChange: (event) => changeName(event.target.value),
+});
+
+const Age = reflectInput({
+  value: $age,
+  onChange: (event) => changeAge(parsetInt(event.target.value)),
+});
+
+const Submit = reflectButton({
+  onClick: submit,
+});
+
+export const User: FC = () => {
+  return (
+    <div>
+      <Name />
+      <Age />
+      <Submit title="Save left">Save left</Submit>
+      <Submit title="Save right">Save right</Submit>
+    </div>
+  );
+};
+```

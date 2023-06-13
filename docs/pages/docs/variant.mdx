@@ -1,0 +1,80 @@
+
+# `variant`
+
+```ts
+import {variant} from '@effector/reflect'
+// or
+import {variant} from '@effector/reflect/scope'
+```
+
+```tsx
+const Components = variant({
+  source: $typeSelector,
+  bind: Props,
+  cases: ComponentVariants,
+  default: DefaultVariant,
+  hooks: Hooks,
+});
+```
+
+Method allows to change component based on value in `$typeSelector`. Optional `bind` allow to pass props bound to stores or events.
+
+## Arguments
+
+1. `source` — Store of `string` value. Used to select variant of component to render and bound props to.
+1. `bind` — Optional object of stores, events, and static values that would be bound as props.
+1. `cases` — Object of components, key will be used to match
+1. `default` — Optional component, that would be used if no matched in `cases`
+1. `hooks` — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
+
+## Example
+
+When `Field` is rendered it checks for `$fieldType` value, selects the appropriate component from `cases` and bound props to it.
+
+```tsx
+import { variant } from '@effector/reflect';
+import { DateSelector, Range, TextInput } from '@org/ui-lib';
+import { createEvent, createStore } from 'effector';
+import React from 'react';
+
+const $fieldType = createStore<'date' | 'number' | 'string'>('string');
+
+const valueChanged = createEvent<string>();
+const $value = createStore('');
+
+const Field = variant({
+  source: $fieldType,
+  bind: { onChange: valueChanged, value: $value },
+  cases: {
+    date: DateSelector,
+    number: Range,
+  },
+  default: TextInput,
+});
+```
+
+## Shorthand for boolean cases
+
+When you have only two cases, you can use `variant` shorthand.
+
+```tsx
+const Component = variant({
+  if: $isError,
+  then: ErrorComponent,
+  else: SuccessComponent,
+});
+```
+
+This is equivalent to
+
+```tsx
+const Component = variant({
+  source: $isError.map((isError) => (isError ? 'error' : 'success')),
+  cases: {
+    error: ErrorComponent,
+    success: SuccessComponent,
+  },
+});
+```
+
+This shorthand supports `bind` and `hooks` fields as well.

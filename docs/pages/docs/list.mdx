@@ -1,0 +1,82 @@
+
+# `list`
+
+```ts
+import {list} from '@effector/reflect'
+// or
+import {list} from '@effector/reflect/scope'
+```
+
+```tsx
+const Items: React.FC = list({
+  view: React.FC<Props>,
+  source: Store<Item[]>,
+  bind: {
+    // regular reflect's bind, for list item view
+  },
+  hooks: {
+    // regular reflect's hooks, for list item view
+  },
+  mapItem: {
+    propName: (item: Item, index: number) => propValue, // maps array store item to View props
+  },
+  getKey: (item: Item) => React.Key, // optional, will use index by default
+});
+```
+
+Method creates component, which renders list of `view` components based on items in array in `source` store, each item content's will be mapped to View props by `mapItem` rules. On changes to `source` store, rendered list will be updated too
+
+## Arguments
+
+1. `source` — Store of `Item[]` value.
+1. `view` — A react component, will be used to render list items
+1. `mapItem` — Object `{ propName: (Item, index) => propValue }` that defines rules, by which every `Item` will be mapped to props of each rendered list item.
+1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
+1. `hooks` — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
+1. `getKey` - Optional function `(item: Item) => React.Key` to set key for every item in the list to help React with effecient rerenders. If not provided, index is used. See [`effector-react`](https://effector.dev/docs/api/effector-react/useList) docs for more details.
+
+## Returns
+
+- A react component that renders a list of `view` components based on items of array in `source` store. Every `view` component props are bound to array item contents by the rules in `mapItem`, and to stores and events in `bind`, like with regular `reflect`
+
+## Example
+
+```tsx
+import { list } from '@effector/reflect';
+import { createEvent, createStore } from 'effector';
+import React from 'react';
+
+const $color = createStore('red');
+
+const $users = createStore([
+  { id: 1, name: 'Yung' },
+  { id: 2, name: 'Lean' },
+  { id: 3, name: 'Kyoto' },
+  { id: 4, name: 'Sesh' },
+]);
+
+const Item = ({ id, name, color }) => {
+  return (
+    <li style={{ color }}>
+      {id} - {name}
+    </li>
+  );
+};
+
+const Items = list({
+  view: Item,
+  source: $users,
+  bind: {
+    color: $color,
+  },
+  mapItem: {
+    id: (user) => user.id,
+    name: (user) => user.name,
+  },
+  getKey: (user) => `${user.id}${user.name}`,
+});
+
+<List>
+  <Items />
+</List>;
+```

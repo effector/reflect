@@ -1,0 +1,107 @@
+# SSR and tests via Fork API
+
+Since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/effector-react%4022.5.0) it is no longer necessary to use `@effector/reflect/ssr` due to isomorphic nature of `effector-react` hooks after this release, you can just use `@effector/reflect` main imports.
+
+Just add `Provider` from `effector-react` to your app root, and you are good to go.
+
+For [SSR](https://effector.dev/docs/api/effector-react/useEvent) and `effector-react` before `2.5.0` release you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
+
+Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
+
+```tsx
+// ./ui.tsx
+import React, { ChangeEvent, FC, MouseEvent, useCallback } from 'react';
+
+// Input
+type InputProps = {
+  value: string;
+  onChange: ChangeEvent<HTMLInputElement>;
+};
+
+const Input: FC<InputProps> = ({ value, onChange }) => {
+  return <input value={value} onChange={onChange} />;
+};
+```
+
+```tsx
+// ./app.tsx
+import { reflect } from '@effector/reflect';
+import { createEvent, restore, sample, Scope } from 'effector';
+import { Provider } from 'effector-react';
+import React, { FC } from 'react';
+
+import { Input } from './ui';
+
+// Model
+export const appStarted = createEvent<{ name: string }>();
+
+const changeName = createEvent<string>();
+const $name = restore(changeName, '');
+
+sample({
+  clock: appStarted,
+  fn: (ctx) => ctx.name,
+  target: changeName,
+});
+
+// Component
+const Name = reflect({
+  view: Input,
+  bind: {
+    value: $name,
+    onChange: changeName.prepend((event) => event.target.value),
+  },
+});
+
+export const App: FC<{ scope: Scope }> = ({ scope }) => {
+  return (
+    <Provider value={scope}>
+      <Name />
+    </Provider>
+  );
+};
+```
+
+```tsx
+// ./server.tsx
+import { allSettled, fork, serialize } from 'effector';
+
+import { App, appStarted } from './app';
+
+const render = async (reqCtx) => {
+  const serverScope = fork();
+
+  await allSettled(appStarted, {
+    scope: serverScope,
+    params: {
+      name: reqCtx.cookies.name,
+    },
+  });
+
+  const content = renderToString(<App scope={serverScope} />);
+  const data = serialize(scope);
+
+  return `
+    <body>
+      ${content}
+      <script>
+        window.__initialState__ = ${JSON.stringify(data)};
+      </script>
+    </body>
+  `;
+};
+```
+
+```tsx
+// client.tsx
+import { fork } from 'effector';
+import { hydrateRoot } from 'react-dom/client';
+
+import { App, appStarted } from './app';
+
+const clientScope = fork({
+  values: window.__initialState__,
+});
+
+hydrateRoot(document.body, <App scope={clientScope} />);
+```

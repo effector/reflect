@@ -1,0 +1,51 @@
+# Welcome to @effector/reflect
+
+☄️ Attach effector stores to react components without hooks.
+
+```sh
+npm install @effector/reflect
+# or
+pnpm add @effector/reflect
+```
+
+## Usual way to use
+
+```ts
+import { reflect } from '@effector/reflect'
+import { TextInput } from '@ui/lib';
+
+import { $email, emailChanged, $formDisabled } from './model'
+
+// Let's define bound component
+const EmailField = reflect({
+  view: TextInput,
+  bind: {
+    value: $email,
+    onChange: emailChanged,
+    disabled: $formDisabled,
+  },
+})
+```
+
+Now you can safely use it as common React-component:
+
+```tsx
+export const LoginForm: React.FC = () => {
+  return (
+    <form>
+      <EmailField type="email" autoComplete="email" />
+    </form>
+  )
+}
+```
+
+## SSR/SSG projects
+
+The most important difference is the module you import `reflect` from.
+
+Import from `@effector/reflect/scope`:
+
+```ts
+import { reflect } from '@effector/reflect';
+```
+All the rest stay the same.

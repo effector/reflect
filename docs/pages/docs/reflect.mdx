@@ -1,0 +1,87 @@
+
+# `reflect`
+
+```ts
+import {reflect} from '@effector/reflect'
+// or
+import {reflect} from '@effector/reflect/scope'
+```
+
+```tsx
+const Component = reflect({
+  view: SourceComponent,
+  bind: Props,
+  hooks: Hooks,
+});
+```
+
+Static method to create a component bound to effector stores and events as stores.
+
+## Arguments
+
+1. `view` — A react component that should be used to bind to
+1. `bind` — Object of effector stores, events or any value
+1. `hooks` — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
+
+## Returns
+
+- A react component with bound values from stores and events.
+
+## Example
+
+  ```tsx
+// ./user.tsx
+import { reflect } from '@effector/reflect';
+import { createEvent, restore } from 'effector';
+import React, { ChangeEvent, FC } from 'react';
+
+// Base components
+type InputProps = {
+  value: string;
+  onChange: ChangeEvent<HTMLInputElement>;
+  placeholder?: string;
+};
+
+const Input: FC<InputProps> = ({ value, onChange, placeholder }) => {
+  return <input value={value} onChange={onChange} placeholder={placeholder} />;
+};
+
+// Model
+const changeName = createEvent<string>();
+const $name = restore(changeName, '');
+
+const changeAge = createEvent<number>();
+const $age = restore(changeAge, 0);
+
+const inputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+  return event.currentTarget.value;
+};
+
+// Components
+const Name = reflect({
+  view: Input,
+  bind: {
+    value: $name,
+    placeholder: 'Name',
+    onChange: changeName.prepend(inputChanged),
+  },
+});
+
+const Age = reflect({
+  view: Input,
+  bind: {
+    value: $age,
+    placeholder: 'Age',
+    onChange: changeAge.prepend(parseInt).prepend(inputChanged),
+  },
+});
+
+export const User: FC = () => {
+  return (
+    <div>
+      <Name />
+      <Age />
+    </div>
+  );
+};
+```

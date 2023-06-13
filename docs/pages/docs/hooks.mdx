@@ -1,0 +1,36 @@
+
+# Reflect Hooks
+
+Hooks is an object passed to `reflect()`, or `variant()`, etc. with properties `mounted` and `unmounted` all optional.
+
+## Example
+
+```tsx
+import { reflect, variant } from '@effector/reflect';
+import { Range, TextInput } from '@org/my-ui';
+import { createEvent, createStore } from 'effector';
+
+const $type = createStore<'text' | 'range'>('text');
+const $value = createStore('');
+const valueChange = createEvent<string>();
+const rangeMounted = createEvent();
+const fieldMounted = createEvent();
+
+const RangePrimary = reflect({
+  view: Range,
+  bind: { style: 'primary' },
+  hooks: { mounted: rangeMounted },
+});
+
+const Field = variant({
+  source: $type,
+  bind: { value: $value, onChange: valueChange },
+  cases: {
+    text: TextInput,
+    range: RangePrimary,
+  },
+  hooks: { mounted: fieldMounted },
+});
+```
+
+When `Field` is mounted, `fieldMounted` and `rangeMounted` would be called.

@@ -10,13 +10,14 @@ yarn-error.log
 /no-ssr
 /ssr
 
-package*
 effector-reflect-*
 .idea
 core/
-index.*
-ssr.*
-scope.*js
-scope.*map
-scope.d.ts
-reflect.*
+./index.*
+./ssr.*
+./scope.*js
+./scope.*map
+./scope.d.ts
+./reflect.*
+docs/.next
+docs/out
