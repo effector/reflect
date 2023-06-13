@@ -8,7 +8,7 @@ npm install @effector/reflect
 pnpm add @effector/reflect
 ```
 
-## Usual way to use
+## Usage
 
 ```ts
 import { reflect } from '@effector/reflect'
@@ -38,14 +38,3 @@ export const LoginForm: React.FC = () => {
   )
 }
 ```
-
-## SSR/SSG projects
-
-The most important difference is the module you import `reflect` from.
-
-Import from `@effector/reflect/scope`:
-
-```ts
-import { reflect } from '@effector/reflect';
-```
-All the rest stay the same.
