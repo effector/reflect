@@ -7,7 +7,7 @@ const config: DocsThemeConfig = {
   project: {
     link: 'https://github.com/effector/reflect',
   },
-  docsRepositoryBase: 'https://github.com/effector/reflect/blob/master/docs/pages',
+  docsRepositoryBase: 'https://github.com/effector/reflect/blob/master/docs',
   darkMode: true,
   primaryHue: 35,
   banner: {
