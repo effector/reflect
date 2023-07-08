@@ -85,6 +85,16 @@ import { variant } from '../src';
   });
 
   expectType<React.FC>(CurrentPage);
+
+  const Page = variant({
+    source: $page,
+    bind: { context: $pageContext },
+    // @ts-expect-error
+    cases: [],
+    default: NotFoundPage,
+  });
+
+  expectType<React.FC>(Page);
 }
 
 // variant allows to set every possble case
@@ -141,6 +151,37 @@ import { variant } from '../src';
   });
 
   expectType<React.FC>(CurrentPage);
+}
+
+// overload for cases as array
+{
+  type PageProps = {
+    context: {
+      route: string;
+    };
+  };
+
+  const $ctx = createStore({ route: 'home' });
+
+  const UserProfile: React.FC<PageProps> = () => null;
+  const AdminProfile: React.FC<PageProps> = () => null;
+  const $user = createStore({ isAdmin: false });
+
+  const Profile = variant({
+    source: $user,
+    cases: [
+      {
+        filter: (user) => user.isAdmin,
+        view: UserProfile,
+      },
+      {
+        filter: (user) => !user.isAdmin,
+        view: AdminProfile,
+      },
+    ],
+    bind: { context: $ctx },
+  });
+  expectType<React.FC>(Profile);
 }
 
 // overload for boolean source
