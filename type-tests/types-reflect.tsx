@@ -122,3 +122,41 @@ import { reflect } from '../src';
 
   expectType<React.FC>(ReflectedButton);
 }
+
+// reflect should not allow binding ref
+{
+  const Text = React.forwardRef(
+    (_: { value: string }, ref: React.ForwardedRef<HTMLSpanElement>) => null,
+  );
+
+  const ReflectedText = reflect({
+    view: Text,
+    bind: {
+      // @ts-expect-error
+      ref: React.createRef<HTMLSpanElement>(),
+    },
+  });
+
+  expectType<React.VFC>(ReflectedText);
+}
+
+// reflect should pass ref through
+{
+  const $value = createStore<string>('');
+  const Text = React.forwardRef(
+    (_: { value: string }, ref: React.ForwardedRef<HTMLSpanElement>) => null,
+  );
+
+  const ReflectedText = reflect({
+    view: Text,
+    bind: { value: $value },
+  });
+
+  const App: React.FC = () => {
+    const ref = React.useRef(null);
+
+    return <ReflectedText ref={ref} />;
+  };
+
+  expectType<React.FC>(App);
+}

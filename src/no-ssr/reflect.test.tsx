@@ -145,6 +145,20 @@ test('component inside', async () => {
   expect(inputName.value).toBe('Bob');
 });
 
+test('forwardRef', async () => {
+  const Name = reflect({
+    view: React.forwardRef((props, ref: React.ForwardedRef<HTMLInputElement>) => {
+      return <input data-testid="name" ref={ref} />;
+    }),
+    bind: {},
+  });
+
+  const ref = React.createRef<HTMLInputElement>();
+
+  const container = render(<Name ref={ref} />);
+  expect(container.getByTestId('name')).toBe(ref.current);
+});
+
 describe('hooks', () => {
   describe('mounted', () => {
     test('callback', () => {

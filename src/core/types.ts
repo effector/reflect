@@ -7,10 +7,14 @@ export interface Context {
   useList: typeof useList;
 }
 
+type UnbindableProps = 'key' | 'ref';
+
 type Storify<Prop> = Omit<Store<Prop>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>;
 
 export type BindableProps<Props> = {
-  [Key in keyof Props]?: Props[Key] extends (_payload: any) => void
+  [Key in Exclude<keyof Props, UnbindableProps>]?: Props[Key] extends (
+    payload: any,
+  ) => void
     ? Storify<Props[Key]> | Props[Key] | Event<void>
     : Storify<Props[Key]> | Props[Key];
 };
