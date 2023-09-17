@@ -31,15 +31,17 @@ export function reflectFactory(context: Context) {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>,
-  >(config: ReflectConfig<Props, Bind>): React.FC<PartialBoundProps<Props, Bind>> {
+  >(
+    config: ReflectConfig<Props, Bind>,
+  ): React.ExoticComponent<PartialBoundProps<Props, Bind>> {
     const { stores, events, data } = sortProps(config);
 
-    return (props) => {
+    return React.forwardRef((props, ref) => {
       const storeProps = context.useUnit(stores);
       const eventsProps = context.useUnit(events);
 
       const elementProps: Props = Object.assign(
-        {},
+        { ref },
         storeProps,
         eventsProps,
         data,
@@ -58,7 +60,7 @@ export function reflectFactory(context: Context) {
       }, []);
 
       return React.createElement(config.view as any, elementProps as any);
-    };
+    });
   };
 }
 
