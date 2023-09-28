@@ -14,6 +14,7 @@
   "packageManager": "pnpm@7.27.0",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./reflect.mjs",
       "require": "./reflect.cjs",
       "default": "./reflect.mjs"
@@ -21,12 +22,14 @@
     "./reflect.mjs": "./reflect.mjs",
     "./ssr.mjs": "./ssr.mjs",
     "./ssr": {
+      "types": "./ssr.d.ts",
       "import": "./ssr.mjs",
       "require": "./ssr.js",
       "default": "./ssr.mjs"
     },
     "./scope.mjs": "./scope.mjs",
     "./scope": {
+      "types": "./scope.d.ts",
       "import": "./scope.mjs",
       "require": "./scope.js",
       "default": "./scope.mjs"
