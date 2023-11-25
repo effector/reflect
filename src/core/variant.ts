@@ -13,8 +13,8 @@ import {
 
 const Default = () => null;
 
-export function variantFactory(context: Context) {
-  const reflect = reflectFactory(context);
+export function variantFactory<Scoped>(context: Context) {
+  const reflect = reflectFactory<Scoped>(context);
 
   return function variant<
     Props,
@@ -28,6 +28,7 @@ export function variantFactory(context: Context) {
           cases: AtLeastOne<Record<Variant, View<Props>>>;
           hooks?: Hooks;
           default?: View<Props>;
+          forceScope?: Scoped extends true ? never : boolean;
         }
       | {
           if: Store<boolean>;
@@ -35,6 +36,7 @@ export function variantFactory(context: Context) {
           else?: View<Props>;
           hooks?: Hooks;
           bind?: Bind;
+          forceScope?: Scoped extends true ? never : boolean;
         },
   ): React.FC<PartialBoundProps<Props, Bind>> {
     let $case: Store<Variant>;
@@ -59,7 +61,7 @@ export function variantFactory(context: Context) {
     }
 
     function View(props: Props) {
-      const nameOfCase = context.useUnit($case);
+      const nameOfCase = context.useUnit($case, { forceScope: config.forceScope });
       const Component = cases[nameOfCase] ?? def;
 
       return React.createElement(Component as any, props as any);
@@ -71,6 +73,7 @@ export function variantFactory(context: Context) {
       bind,
       view: View,
       hooks: config.hooks,
+      forceScope: config.forceScope,
     });
   };
 }

@@ -7,9 +7,9 @@ import {
   variantFactory,
 } from './core';
 
-export const reflect = reflectFactory(effectorReactSSR);
-export const createReflect = reflectCreateFactory(effectorReactSSR);
+export const reflect = reflectFactory<true>(effectorReactSSR);
+export const createReflect = reflectCreateFactory<true>(effectorReactSSR);
 
-export const variant = variantFactory(effectorReactSSR);
+export const variant = variantFactory<true>(effectorReactSSR);
 
-export const list = listFactory(effectorReactSSR);
+export const list = listFactory<true>(effectorReactSSR);

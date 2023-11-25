@@ -10,35 +10,40 @@ import {
   View,
 } from './types';
 
-export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
+export interface ReflectConfig<
+  Props,
+  Bind extends BindableProps<Props>,
+  Scoped = false,
+> {
   view: View<Props>;
   bind: Bind;
   hooks?: Hooks;
+  forceScope?: Scoped extends true ? never : boolean;
 }
 
-export function reflectCreateFactory(context: Context) {
-  const reflect = reflectFactory(context);
+export function reflectCreateFactory<Scoped>(context: Context) {
+  const reflect = reflectFactory<Scoped>(context);
 
   return function createReflect<Props>(view: View<Props>) {
     return <Bind extends BindableProps<Props> = BindableProps<Props>>(
       bind: Bind,
-      params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
+      params?: Omit<ReflectConfig<Props, Bind, Scoped>, 'view' | 'bind'>,
     ) => reflect<Props, Bind>({ view, bind, ...params });
   };
 }
 
-export function reflectFactory(context: Context) {
+export function reflectFactory<Scoped>(context: Context) {
   return function reflect<
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>,
   >(
-    config: ReflectConfig<Props, Bind>,
+    config: ReflectConfig<Props, Bind, Scoped>,
   ): React.ExoticComponent<PartialBoundProps<Props, Bind>> {
-    const { stores, events, data } = sortProps(config);
+    const { stores, events, data, forceScope } = sortProps(config);
 
     return React.forwardRef((props, ref) => {
-      const storeProps = context.useUnit(stores);
-      const eventsProps = context.useUnit(events);
+      const storeProps = context.useUnit(stores, { forceScope });
+      const eventsProps = context.useUnit(events, { forceScope });
 
       const elementProps: Props = Object.assign(
         { ref },
@@ -48,8 +53,8 @@ export function reflectFactory(context: Context) {
         props,
       );
 
-      const mounted = wrapToHook(config.hooks?.mounted, context);
-      const unmounted = wrapToHook(config.hooks?.unmounted, context);
+      const mounted = wrapToHook(config.hooks?.mounted, context, forceScope);
+      const unmounted = wrapToHook(config.hooks?.unmounted, context, forceScope);
 
       React.useEffect(() => {
         if (mounted) mounted();
@@ -73,6 +78,8 @@ function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Prop
   const stores: Record<string, Store<unknown>> = {};
   const data: Record<string, unknown> = {};
 
+  const forceScope = config.forceScope;
+
   for (const key in config.bind) {
     const value = config.bind[key];
 
@@ -85,12 +92,12 @@ function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Prop
     }
   }
 
-  return { events, stores, data };
+  return { events, stores, data, forceScope };
 }
 
-function wrapToHook(hook: Hook | void, context: Context) {
+function wrapToHook(hook: Hook | void, context: Context, forceScope?: boolean) {
   if (hookDefined(hook)) {
-    return context.useUnit(hook as Event<void>);
+    return context.useUnit(hook as Event<void>, { forceScope });
   }
 
   return hook;

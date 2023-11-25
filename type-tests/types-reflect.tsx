@@ -160,3 +160,16 @@ import { reflect } from '../src';
 
   expectType<React.FC>(App);
 }
+
+// reflect allows forcing scope
+{
+  const View: React.FC<{ value: string }> = () => null;
+
+  const ReflectedView = reflect({
+    view: View,
+    bind: { value: '' },
+    forceScope: true,
+  });
+
+  expectType<React.FC>(ReflectedView);
+}

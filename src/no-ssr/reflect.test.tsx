@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createEffect, createEvent, createStore, restore } from 'effector';
+import { createEffect, createEvent, createStore, fork, restore } from 'effector';
+import { Provider } from 'effector-react';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 import { act } from 'react-dom/test-utils';
 
@@ -157,6 +158,43 @@ test('forwardRef', async () => {
 
   const container = render(<Name ref={ref} />);
   expect(container.getByTestId('name')).toBe(ref.current);
+});
+
+describe('forceScope', () => {
+  test('without provider', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+
+    const $name = createStore('');
+
+    const Input = reflect({
+      view: InputBase,
+      bind: { defaultValue: $name },
+      forceScope: true,
+    });
+
+    expect(() => render(<Input />)).toThrowError(/no scope found/i);
+
+    spy.mockRestore();
+  });
+
+  test('with provider', () => {
+    const scope = fork();
+    const $name = createStore('');
+
+    const Input = reflect({
+      view: InputBase,
+      bind: { defaultValue: $name },
+      forceScope: true,
+    });
+
+    const container = render(
+      <Provider value={scope}>
+        <Input data-testid="name" />
+      </Provider>,
+    );
+
+    expect(container.getByTestId('name')).toBeDefined();
+  });
 });
 
 describe('hooks', () => {

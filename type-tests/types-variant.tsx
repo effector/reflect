@@ -172,3 +172,16 @@ import { variant } from '../src';
   });
   expectType<React.FC>(CurrentPageOnlyThen);
 }
+
+// variant allows forcing scope
+{
+  const View: React.FC<{ value: string }> = () => null;
+
+  const VariantView = variant({
+    if: createStore(true),
+    then: View,
+    forceScope: true,
+  });
+
+  expectType<React.FC>(VariantView);
+}

@@ -1,7 +1,8 @@
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createEvent, createStore, restore } from 'effector';
-import React from 'react';
+import { createEvent, createStore, fork, restore } from 'effector';
+import { Provider } from 'effector-react';
+import React, { InputHTMLAttributes } from 'react';
 
 import { variant } from '../index';
 
@@ -285,5 +286,45 @@ describe('overload for Store<boolean>', () => {
 
     const container = render(<Component testId="then" />);
     expect(() => container.getByTestId('then')).toThrowError();
+  });
+});
+
+describe('forceScope', () => {
+  function InputBase(props: InputHTMLAttributes<HTMLInputElement>) {
+    return <input {...props} />;
+  }
+
+  const $if = createStore(true);
+
+  test('without provider', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+
+    const Input = variant({
+      if: $if,
+      then: InputBase,
+      forceScope: true,
+    });
+
+    expect(() => render(<Input />)).toThrowError(/no scope found/i);
+
+    spy.mockRestore();
+  });
+
+  test('with provider', () => {
+    const scope = fork();
+
+    const Input = variant({
+      if: $if,
+      then: InputBase,
+      forceScope: true,
+    });
+
+    const container = render(
+      <Provider value={scope}>
+        <Input data-testid="name" />
+      </Provider>,
+    );
+
+    expect(container.getByTestId('name')).toBeDefined();
   });
 });

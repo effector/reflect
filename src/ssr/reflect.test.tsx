@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { allSettled, createDomain, fork, restore } from 'effector';
+import { allSettled, createDomain, createStore, fork, restore } from 'effector';
 import { Provider } from 'effector-react/ssr';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
-import { reflect } from '../ssr';
+import { reflect } from '../scope';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -259,4 +259,21 @@ test('use only event for bind', async () => {
 
   expect(name.value).toBe('');
   expect(age.value).toBe('');
+});
+
+test('un-forcing scope does not work', () => {
+  const spy = jest.spyOn(console, 'error').mockImplementation();
+
+  const $name = createStore('');
+
+  const Input = reflect({
+    view: InputBase,
+    bind: { defaultValue: $name },
+    // @ts-expect-error trying to remove requirement for scope
+    forceScope: false,
+  });
+
+  expect(() => render(<Input />)).toThrowError(/no scope found/i);
+
+  spy.mockRestore();
 });

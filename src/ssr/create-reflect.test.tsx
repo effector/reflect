@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { allSettled, createDomain, fork, restore } from 'effector';
 import { Provider } from 'effector-react/ssr';

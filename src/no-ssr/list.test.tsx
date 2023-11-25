@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
-import { createEvent, createStore } from 'effector';
-import { useStore } from 'effector-react';
+import { createEvent, createStore, fork } from 'effector';
+import { Provider, useStore } from 'effector-react';
 import React, { FC, memo } from 'react';
 import { act } from 'react-dom/test-utils';
 
@@ -494,4 +494,40 @@ test('reflect-list: getKey option', async () => {
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
     fn2.mock.calls.map(([arg]) => arg),
   );
+});
+
+describe('forceScope', () => {
+  const $members = createStore([{ name: 'alice', id: 1 }]);
+
+  test('without provider', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+
+    const MembersList = list({
+      source: $members,
+      view: Member,
+      forceScope: true,
+    });
+
+    expect(() => render(<MembersList />)).toThrowError(/no scope found/i);
+
+    spy.mockRestore();
+  });
+
+  test('with provider', () => {
+    const scope = fork();
+
+    const MembersList = list({
+      source: $members,
+      view: Member,
+      forceScope: true,
+    });
+
+    const container = render(
+      <Provider value={scope}>
+        <MembersList />
+      </Provider>,
+    );
+
+    expect(container.getByTestId('1')).toBeDefined();
+  });
 });

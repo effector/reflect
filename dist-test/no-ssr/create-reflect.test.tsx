@@ -1,9 +1,10 @@
 import { createReflect } from '../../dist/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createEffect, createEvent, createStore, restore } from 'effector';
+import { createEffect, createEvent, createStore, fork, restore } from 'effector';
 import React, { FC, InputHTMLAttributes } from 'react';
 import { act } from 'react-dom/test-utils';
+import { Provider } from 'effector-react';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -216,5 +217,32 @@ describe('hooks', () => {
 
       expect(fn.mock.calls.length).toBe(1);
     });
+  });
+});
+
+
+describe('forceScope', () => {
+  test('without provider', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+
+    const Input = inputBase({}, { forceScope: true });
+
+    expect(() => render(<Input />)).toThrowError(/no scope found/i);
+
+    spy.mockRestore();
+  });
+
+  test('with provider', () => {
+    const scope = fork();
+
+    const Input = inputBase({}, { forceScope: true });
+
+    const container = render(
+      <Provider value={scope}>
+        <Input data-testid="name" />
+      </Provider>,
+    );
+
+    expect(container.getByTestId('name')).toBeDefined();
   });
 });

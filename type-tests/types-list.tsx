@@ -155,3 +155,18 @@ import { list } from '../src';
 
   expectType<React.FC>(List);
 }
+
+// list allows forcing scope
+{
+  const Item: React.FC<{ id: number }> = () => null;
+
+  const $items = createStore<{ id: number }[]>([]);
+
+  const List = list({
+    source: $items,
+    view: Item,
+    forceScope: true,
+  });
+
+  expectType<React.FC>(List);
+}

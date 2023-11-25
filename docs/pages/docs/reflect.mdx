@@ -1,8 +1,7 @@
-
 # `reflect`
 
 ```ts
-import {reflect} from '@effector/reflect'
+import { reflect } from '@effector/reflect';
 ```
 
 ```tsx
@@ -27,7 +26,7 @@ Static method to create a component bound to effector stores and events as store
 
 ## Example
 
-  ```tsx
+```tsx
 // ./user.tsx
 import { reflect } from '@effector/reflect';
 import { createEvent, restore } from 'effector';
@@ -82,4 +81,17 @@ export const User: FC = () => {
     </div>
   );
 };
+```
+
+## Scope enforcement
+
+`reflect` is designed to work with [Scope](https://effector.dev/docs/api/effector/scope) out-of-the-box, but you can require the use of Scope by passing an optional `forceScope` argument.
+
+```tsx
+const Component = reflect({
+  view: SourceComponent,
+  bind: Props,
+  hooks: Hooks,
+  forceScope: true,
+});
 ```

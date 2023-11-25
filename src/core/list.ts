@@ -4,7 +4,7 @@ import React from 'react';
 import { reflectFactory } from './reflect';
 import { BindableProps, Context, Hooks, PartialBoundProps, View } from './types';
 
-type ReflectListConfig<Props, Item, Bind> = Item extends Props
+type ReflectListConfig<Props, Item, Bind, Scoped> = Item extends Props
   ? {
       view: View<Props>;
       source: Store<Item[]>;
@@ -17,6 +17,7 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
           index: number,
         ) => PartialBoundProps<Props, Bind>[P];
       };
+      forceScope?: Scoped extends true ? never : boolean;
     }
   :
       | {
@@ -28,6 +29,7 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
           mapItem: {
             [P in keyof Props]: (item: Item, index: number) => Props[P];
           };
+          forceScope?: Scoped extends true ? never : boolean;
         }
       | {
           view: View<Props>;
@@ -41,20 +43,22 @@ type ReflectListConfig<Props, Item, Bind> = Item extends Props
               index: number,
             ) => PartialBoundProps<Props, Bind>[P];
           };
+          forceScope?: Scoped extends true ? never : boolean;
         };
 
-export function listFactory(context: Context) {
-  const reflect = reflectFactory(context);
+export function listFactory<Scoped>(context: Context) {
+  const reflect = reflectFactory<Scoped>(context);
 
   return function list<
     Item extends Record<any, any>,
     Props,
     Bind extends BindableProps<Props> = BindableProps<Props>,
-  >(config: ReflectListConfig<Props, Item, Bind>): React.FC {
+  >(config: ReflectListConfig<Props, Item, Bind, Scoped>): React.FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind ? config.bind : ({} as Bind),
       hooks: config.hooks,
+      forceScope: config.forceScope,
     });
 
     const listConfig = {
@@ -85,7 +89,8 @@ export function listFactory(context: Context) {
       },
     };
 
-    return () => context.useList(config.source, listConfig);
+    return () =>
+      context.useList(config.source, listConfig, { forceScope: config.forceScope });
   };
 }
 
