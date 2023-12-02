@@ -7,6 +7,8 @@ import {
   variantFactory,
 } from './core';
 
+export { intercept } from './core';
+
 export const reflect = reflectFactory(context);
 export const createReflect = reflectCreateFactory(context);
 
