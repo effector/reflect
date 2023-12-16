@@ -164,7 +164,7 @@ describe('hooks', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
 
-      const mounted = jest.fn(() => {});
+      const mounted = vi.fn(() => {});
 
       const Name = reflect({
         view: InputBase,
@@ -185,7 +185,7 @@ describe('hooks', () => {
       const $name = restore(changeName, '');
       const mounted = createEvent<void>();
 
-      const fn = jest.fn(() => {});
+      const fn = vi.fn(() => {});
 
       mounted.watch(fn);
 
@@ -226,7 +226,7 @@ describe('hooks', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
 
-      const unmounted = jest.fn(() => {});
+      const unmounted = vi.fn(() => {});
 
       const Name = reflect({
         view: InputBase,
@@ -251,7 +251,7 @@ describe('hooks', () => {
       const $name = restore(changeName, '');
 
       const unmounted = createEvent<void>();
-      const fn = jest.fn(() => {});
+      const fn = vi.fn(() => {});
 
       unmounted.watch(fn);
 

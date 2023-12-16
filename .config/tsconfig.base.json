@@ -8,13 +8,15 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "esModuleInterop": true,
+    "types": ["vitest/globals"],
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
+      "@effector/reflect/*": ["../dist/*"],
       "@effector/reflect": ["../dist/reflect.d.ts"],
       "@effector/reflect/scope": ["../dist/scope.d.ts"]
     }
   },
-  "include": ["../src"],
-  "exclude": ["../typings", "../**/*.test.*"]
+  "include": ["../src",],
+  "exclude": ["../typings"]
 }

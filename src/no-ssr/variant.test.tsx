@@ -78,7 +78,7 @@ test('hooks works once on mount', async () => {
   const changeType = createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
   const mounted = createEvent();
-  const fn = jest.fn();
+  const fn = vi.fn();
   mounted.watch(fn);
 
   const Input = variant({
@@ -107,7 +107,7 @@ test('hooks works once on unmount', async () => {
   const changeType = createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
   const unmounted = createEvent();
-  const fn = jest.fn();
+  const fn = vi.fn();
   unmounted.watch(fn);
   const setVisible = createEvent<boolean>();
   const $visible = restore(setVisible, true);
@@ -146,10 +146,10 @@ test('hooks works on remount', async () => {
   const $type = restore(changeType, 'first');
 
   const unmounted = createEvent();
-  const onUnmount = jest.fn();
+  const onUnmount = vi.fn();
   unmounted.watch(onUnmount);
   const mounted = createEvent();
-  const onMount = jest.fn();
+  const onMount = vi.fn();
   mounted.watch(onMount);
 
   const setVisible = createEvent<boolean>();

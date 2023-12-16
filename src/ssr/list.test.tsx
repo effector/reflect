@@ -60,13 +60,13 @@ test('relfect-list: reflect hooks called once for every item', async () => {
 
   const mounted = app.createEvent<void>();
 
-  const fn = jest.fn(() => {});
+  const fn = vi.fn(() => {});
 
   mounted.watch(fn);
 
   const unmounted = app.createEvent<void>();
 
-  const unfn = jest.fn(() => {});
+  const unfn = vi.fn(() => {});
 
   unmounted.watch(unfn);
 
@@ -225,8 +225,8 @@ const Member: FC<MemberProps> = (props) => {
 };
 
 test('reflect-list: getKey option', async () => {
-  const fn = jest.fn();
-  const fn2 = jest.fn();
+  const fn = vi.fn();
+  const fn2 = vi.fn();
   const app = createDomain();
 
   const renameUser = app.createEvent<{ id: number; name: string }>();

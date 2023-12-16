@@ -9,6 +9,7 @@ const babelConfig = require('./babel.config.json');
 const plugins = () => [
   typescript({
     tsconfig: './tsconfig.json',
+    check: false,
   }),
   babel({
     exclude: 'node_modules/**',
@@ -23,7 +24,7 @@ const plugins = () => [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  terser(),
+  // terser(),
 ];
 
 const noSsr = './src/index.ts';
