@@ -13,7 +13,7 @@
     "baseUrl": ".",
     "paths": {
       "@effector/reflect/*": ["../dist/*"],
-      "@effector/reflect": ["../dist/reflect.d.ts"],
+      "@effector/reflect": ["../dist/index.d.ts"],
       "@effector/reflect/scope": ["../dist/scope.d.ts"]
     }
   },
