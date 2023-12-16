@@ -47,6 +47,7 @@
     "scope.mjs.map"
   ],
   "scripts": {
+    "validate:dist": "node ./validate_dist.mjs",
     "test:code": "vitest run ./src",
     "test:types": "tsc -p ./type-tests",
     "test": "pnpm test:code && pnpm test:types",
@@ -56,6 +57,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.13.3",
     "@babel/core": "^7.21.0",
     "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
@@ -84,6 +86,7 @@
     "lint-staged": "^13.1.2",
     "prettier": "^2.8.4",
     "pretty-ms": "^8.0.0",
+    "publint": "^0.2.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "rollup": "^3.18.0",

@@ -28,3 +28,5 @@ jobs:
         run: pnpm test
         env:
           CI: true
+      - name: Validate package
+        run: pnpm validate:dist
