@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ESNext",
     "module": "es2015",
     "strict": true,
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -11,7 +11,8 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@effector/reflect": ["./dist"]
+      "@effector/reflect": ["../dist/reflect.d.ts"],
+      "@effector/reflect/scope": ["../dist/scope.d.ts"]
     }
   },
   "include": ["../src"],

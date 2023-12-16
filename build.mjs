@@ -1,9 +1,16 @@
-import fs from 'node:fs/promises';
-
+/* eslint-disable no-undef */
 import prettyMs from 'pretty-ms';
 import { rollup } from 'rollup';
+import 'zx/globals';
 
 import configs from './rollup.config.cjs';
+
+await fs.mkdir('./dist', { recursive: true });
+
+await measure(`public-typings → ./dist/`, `copied in`, async () => {
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/reflect.d.ts');
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/scope.d.ts');
+});
 
 for (const config of configs) {
   await measure(
@@ -29,9 +36,6 @@ await measure(`package.json → ./dist/package.json`, `created in`, async () => 
 
 await fs.copyFile('./Readme.md', './dist/Readme.md');
 console.log(`Copied Readme.md → ./dist/Readme.md`);
-
-await fs.copyFile('public-types/reflect.d.ts', './dist/reflect.d.ts');
-await fs.copyFile('public-types/reflect.d.ts', './dist/scope.d.ts');
 
 async function measure(start, end, fn) {
   console.log(start);

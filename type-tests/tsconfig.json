@@ -16,7 +16,7 @@
     "strictNullChecks": true,
     "paths": {
       "@effector/reflect": ["./public-types/reflect.d.ts"],
-      "@effector/reflect/scope": ["./public-types/scope.d.ts"]
+      "@effector/reflect/scope": ["./public-types/reflect.d.ts"]
     }
   }
 }
