@@ -1,4 +1,4 @@
-export function reflect(unknown: unknown): unknown;
-export function createReflect(unknown: unknown): unknown;
-export function list(unknown: unknown): unknown;
-export function variant(unknown: unknown): unknown;
+export function reflect(any: any): any;
+export function createReflect(any: any): any;
+export function list(any: any): any;
+export function variant(any: any): any;
