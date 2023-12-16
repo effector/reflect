@@ -7,6 +7,10 @@ import {
   variantFactory,
 } from './core';
 
+console.error(
+  '`@effector/reflect/scope` is deprecated, use main `@effector/reflect` package instead',
+);
+
 export const reflect = reflectFactory(effectorReactSSR);
 export const createReflect = reflectCreateFactory(effectorReactSSR);
 
