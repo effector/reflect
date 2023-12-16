@@ -20,13 +20,6 @@
       "default": "./reflect.mjs"
     },
     "./reflect.mjs": "./reflect.mjs",
-    "./ssr.mjs": "./ssr.mjs",
-    "./ssr": {
-      "types": "./ssr.d.ts",
-      "import": "./ssr.mjs",
-      "require": "./ssr.js",
-      "default": "./ssr.mjs"
-    },
     "./scope.mjs": "./scope.mjs",
     "./scope": {
       "types": "./scope.d.ts",
@@ -48,10 +41,6 @@
     "reflect.cjs.map",
     "reflect.mjs",
     "reflect.mjs.map",
-    "ssr.js",
-    "ssr.js.map",
-    "ssr.mjs",
-    "ssr.mjs.map",
     "scope.js",
     "scope.js.map",
     "scope.mjs",

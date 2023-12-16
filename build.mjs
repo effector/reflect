@@ -30,6 +30,9 @@ await measure(`package.json → ./dist/package.json`, `created in`, async () => 
 await fs.copyFile('./Readme.md', './dist/Readme.md');
 console.log(`Copied Readme.md → ./dist/Readme.md`);
 
+await fs.copyFile('public-types/index.d.ts', './dist/index.d.ts');
+await fs.copyFile('public-types/index.d.ts', './dist/scope.d.ts');
+
 async function measure(start, end, fn) {
   console.log(start);
   const time = performance.now();

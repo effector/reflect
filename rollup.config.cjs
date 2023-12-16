@@ -7,12 +7,7 @@ const commonjs = require('@rollup/plugin-commonjs');
 const babelConfig = require('./babel.config.json');
 
 const plugins = () => [
-  typescript({
-    useTsconfigDeclarationDir: true,
-    tsconfigDefaults: {
-      compilerOptions: { declaration: true, declarationDir: './dist' },
-    },
-  }),
+  typescript(),
   babel({
     exclude: 'node_modules/**',
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
