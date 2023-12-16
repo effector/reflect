@@ -47,7 +47,7 @@
     "scope.mjs.map"
   ],
   "scripts": {
-    "test:code": "jest ./src",
+    "test:code": "pnpm build && jest ./src",
     "test:types": "tsc -p ./type-tests",
     "test": "pnpm test:code && pnpm test:types",
     "test:code:build": "jest ./dist-test",
