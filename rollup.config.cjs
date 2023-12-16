@@ -37,7 +37,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './dist/reflect.mjs',
+      file: './dist/index.mjs',
       format: 'es',
       sourcemap: true,
       externalLiveBindings: false,
@@ -59,7 +59,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './dist/reflect.cjs',
+      file: './dist/index.cjs',
       format: 'cjs',
       freeze: false,
       exports: 'named',

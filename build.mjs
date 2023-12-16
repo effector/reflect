@@ -8,8 +8,11 @@ import configs from './rollup.config.cjs';
 await fs.mkdir('./dist', { recursive: true });
 
 await measure(`public-typings → ./dist/`, `copied in`, async () => {
-  await fs.copyFile('./public-types/reflect.d.ts', './dist/reflect.d.ts');
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/index.d.ts');
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/index.d.mts');
+
   await fs.copyFile('./public-types/reflect.d.ts', './dist/scope.d.ts');
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/scope.d.mts');
 });
 
 for (const config of configs) {

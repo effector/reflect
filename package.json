@@ -14,13 +14,11 @@
   "packageManager": "pnpm@7.27.0",
   "exports": {
     ".": {
-      "types": "./reflect.d.ts",
-      "import": "./reflect.mjs",
-      "require": "./reflect.cjs",
-      "default": "./reflect.mjs"
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.cjs",
+      "default": "./index.mjs"
     },
-    "./reflect.mjs": "./reflect.mjs",
-    "./scope.mjs": "./scope.mjs",
     "./scope": {
       "types": "./scope.d.ts",
       "import": "./scope.mjs",
@@ -28,19 +26,19 @@
       "default": "./scope.mjs"
     }
   },
-  "main": "reflect.cjs",
-  "module": "reflect.mjs",
-  "typings": "reflect.d.ts",
+  "main": "index.cjs",
+  "module": "index.mjs",
+  "typings": "index.d.ts",
   "files": [
     "Readme.md",
     "core",
     "index.d.ts",
     "ssr.d.ts",
     "scope.d.ts",
-    "reflect.cjs",
-    "reflect.cjs.map",
-    "reflect.mjs",
-    "reflect.mjs.map",
+    "index.cjs",
+    "index.cjs.map",
+    "index.mjs",
+    "index.mjs.map",
     "scope.js",
     "scope.js.map",
     "scope.mjs",
