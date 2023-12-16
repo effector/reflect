@@ -1,10 +1,9 @@
+import { reflect } from '@effector/reflect/scope';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { allSettled, createDomain, fork, restore } from 'effector';
-import { Provider } from 'effector-react/ssr';
+import { Provider } from 'effector-react/scope';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
-
-import { reflect } from '../ssr';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

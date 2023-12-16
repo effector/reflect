@@ -1,10 +1,9 @@
+import { variant } from '@effector/reflect/scope';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { allSettled, createDomain, fork, restore } from 'effector';
-import { Provider } from 'effector-react/ssr';
+import { Provider } from 'effector-react/scope';
 import React from 'react';
-
-import { variant } from '../ssr';
 
 test('matches first', async () => {
   const app = createDomain();

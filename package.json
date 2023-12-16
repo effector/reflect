@@ -14,7 +14,7 @@
   "packageManager": "pnpm@7.27.0",
   "exports": {
     ".": {
-      "types": "./index.d.ts",
+      "types": "./reflect.d.ts",
       "import": "./reflect.mjs",
       "require": "./reflect.cjs",
       "default": "./reflect.mjs"
@@ -30,7 +30,7 @@
   },
   "main": "reflect.cjs",
   "module": "reflect.mjs",
-  "typings": "index.d.ts",
+  "typings": "reflect.d.ts",
   "files": [
     "Readme.md",
     "core",

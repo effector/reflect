@@ -1,9 +1,8 @@
+import { variant } from '@effector/reflect';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEvent, createStore, restore } from 'effector';
 import React from 'react';
-
-import { variant } from '../index';
 
 test('matches first', async () => {
   const changeValue = createEvent<string>();

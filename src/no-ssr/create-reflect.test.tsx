@@ -1,10 +1,9 @@
+import { createReflect } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEffect, createEvent, createStore, restore } from 'effector';
 import React, { FC, InputHTMLAttributes } from 'react';
 import { act } from 'react-dom/test-utils';
-
-import { createReflect } from '../index';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{

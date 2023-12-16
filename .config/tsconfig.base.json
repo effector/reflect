@@ -8,8 +8,12 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@effector/reflect": ["./dist"]
+    }
   },
   "include": ["../src"],
-  "exclude": ["../typings", "../**/*.test.tsx"]
+  "exclude": ["../typings"]
 }

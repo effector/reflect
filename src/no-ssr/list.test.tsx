@@ -1,10 +1,9 @@
+import { list } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import { createEvent, createStore } from 'effector';
 import { useStore } from 'effector-react';
 import React, { FC, memo } from 'react';
 import { act } from 'react-dom/test-utils';
-
-import { list } from '../index';
 
 const List: FC = (props) => {
   return <ul>{props.children}</ul>;

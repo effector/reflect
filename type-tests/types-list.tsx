@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { list } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
 import React from 'react';
 import { expectType } from 'tsd';
-
-import { list } from '../src';
 
 // basic usage of list
 {
