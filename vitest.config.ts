@@ -12,7 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@effector/reflect/scope': resolve(__dirname, './dist/scope.mjs'),
-      '@effector/reflect': resolve(__dirname, './dist/reflect.mjs'),
+      '@effector/reflect': resolve(__dirname, './dist/index.mjs'),
     },
   },
 });
