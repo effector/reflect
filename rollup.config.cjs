@@ -30,15 +30,8 @@ const plugins = () => [
 ];
 
 const noSsr = './src/index.ts';
-const ssr = './src/ssr.ts';
 const scope = './src/scope.ts';
-const external = [
-  'effector',
-  'effector-react',
-  'react',
-  'effector-react/ssr',
-  'effector-react/scope',
-];
+const external = ['effector', 'effector-react', 'react', 'effector-react/scope'];
 
 module.exports = [
   {
@@ -47,17 +40,6 @@ module.exports = [
     plugins: plugins(),
     output: {
       file: './dist/reflect.mjs',
-      format: 'es',
-      sourcemap: true,
-      externalLiveBindings: false,
-    },
-  },
-  {
-    input: ssr,
-    external,
-    plugins: plugins(),
-    output: {
-      file: './dist/ssr.mjs',
       format: 'es',
       sourcemap: true,
       externalLiveBindings: false,
@@ -80,19 +62,6 @@ module.exports = [
     plugins: plugins(),
     output: {
       file: './dist/reflect.cjs',
-      format: 'cjs',
-      freeze: false,
-      exports: 'named',
-      sourcemap: true,
-      externalLiveBindings: false,
-    },
-  },
-  {
-    input: ssr,
-    external,
-    plugins: plugins(),
-    output: {
-      file: './dist/ssr.js',
       format: 'cjs',
       freeze: false,
       exports: 'named',

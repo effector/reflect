@@ -1,4 +1,4 @@
-import { Effect, Event, is, Store } from 'effector';
+import { Effect, Event, EventCallable, is, Store } from 'effector';
 import React from 'react';
 
 import {
@@ -38,7 +38,7 @@ export function reflectFactory(context: Context) {
 
     return React.forwardRef((props, ref) => {
       const storeProps = context.useUnit(stores);
-      const eventsProps = context.useUnit(events);
+      const eventsProps = context.useUnit(events as any);
 
       const elementProps: Props = Object.assign(
         { ref },
@@ -90,7 +90,7 @@ function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Prop
 
 function wrapToHook(hook: Hook | void, context: Context) {
   if (hookDefined(hook)) {
-    return context.useUnit(hook as Event<void>);
+    return context.useUnit(hook as EventCallable<void>);
   }
 
   return hook;
