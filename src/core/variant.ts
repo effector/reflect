@@ -2,7 +2,7 @@ import { Store } from 'effector';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
-import { BindProps, Context, Hooks, View } from './types';
+import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
 
 const Default = () => null;
 
@@ -21,6 +21,7 @@ export function variantFactory(context: Context) {
           cases: Record<Variant, View<Props>>;
           hooks?: Hooks;
           default?: View<Props>;
+          useUnitConfig?: UseUnitConifg;
         }
       | {
           if: Store<boolean>;
@@ -28,6 +29,7 @@ export function variantFactory(context: Context) {
           else?: View<Props>;
           hooks?: Hooks;
           bind?: Bind;
+          useUnitConfig?: UseUnitConifg;
         },
   ): (p: Props) => React.ReactNode {
     let $case: Store<Variant>;
@@ -52,7 +54,7 @@ export function variantFactory(context: Context) {
     }
 
     function View(props: Props) {
-      const nameOfCase = context.useUnit($case);
+      const nameOfCase = context.useUnit($case, config.useUnitConfig);
       const Component = cases[nameOfCase] ?? def;
 
       return React.createElement(Component as any, props as any);
@@ -64,6 +66,7 @@ export function variantFactory(context: Context) {
       bind,
       view: View,
       hooks: config.hooks,
+      useUnitConfig: config.useUnitConfig,
     }) as unknown as (p: Props) => React.ReactNode;
   };
 }

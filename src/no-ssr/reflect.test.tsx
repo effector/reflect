@@ -457,3 +457,20 @@ describe('fromTag helper', () => {
     expect((body2.container.firstChild as any).type).toBe('email');
   });
 });
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Test = reflect({
+        view: () => null,
+        bind: {},
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
+  });
+});

@@ -218,3 +218,14 @@ describe('hooks', () => {
     });
   });
 });
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Name = inputBase({}, { useUnitConfig: { forceScope: true } });
+      render(<Name data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
+  });
+});

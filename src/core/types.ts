@@ -26,3 +26,5 @@ export interface Hooks {
   mounted?: Hook;
   unmounted?: Hook;
 }
+
+export type UseUnitConifg = Parameters<typeof useUnit>[1];

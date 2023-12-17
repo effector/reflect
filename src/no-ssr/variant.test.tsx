@@ -286,3 +286,40 @@ describe('overload for Store<boolean>', () => {
     expect(() => container.getByTestId('then')).toThrowError();
   });
 });
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Test = variant({
+        source: createStore<'a' | 'b'>('a'),
+        cases: {
+          a: () => null,
+          b: () => null,
+        },
+        bind: {},
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
+  });
+  test('useUnit config should be passed to underlying useUnit (bool overload)', () => {
+    expect(() => {
+      const Test = variant({
+        if: createStore(true),
+        then: () => null,
+        else: () => null,
+        bind: {},
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
+  });
+});

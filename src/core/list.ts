@@ -3,7 +3,7 @@ import { useProvidedScope } from 'effector-react';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
-import { BindProps, Context, Hooks, View } from './types';
+import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
 
 export function listFactory(context: Context) {
   const reflect = reflectFactory(context);
@@ -21,11 +21,13 @@ export function listFactory(context: Context) {
     };
     getKey?: (item: Item) => React.Key;
     hooks?: Hooks;
+    useUnitConfig?: UseUnitConifg;
   }): React.FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind ? config.bind : ({} as Bind),
       hooks: config.hooks,
+      useUnitConfig: config.useUnitConfig,
     });
 
     const listConfig = {

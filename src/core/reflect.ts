@@ -2,12 +2,13 @@ import { Effect, Event, EventCallable, is, scopeBind, Store } from 'effector';
 import { useProvidedScope } from 'effector-react';
 import React from 'react';
 
-import { BindProps, Context, Hook, Hooks, View } from './types';
+import { BindProps, Context, Hook, Hooks, UseUnitConifg, View } from './types';
 
 export interface ReflectConfig<Props, Bind extends BindProps<Props>> {
   view: View<Props>;
   bind: Bind;
   hooks?: Hooks;
+  useUnitConfig?: UseUnitConifg;
 }
 
 export function reflectCreateFactory(context: Context) {
@@ -16,7 +17,7 @@ export function reflectCreateFactory(context: Context) {
   return function createReflect<Props>(view: View<Props>) {
     return <Bind extends BindProps<Props> = BindProps<Props>>(
       bind: Bind,
-      params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
+      params?: Pick<ReflectConfig<Props, Bind>, 'hooks' | 'useUnitConfig'>,
     ) => reflect<Props, Bind>({ view, bind, ...params });
   };
 }
@@ -28,8 +29,8 @@ export function reflectFactory(context: Context) {
     const { stores, events, data, functions } = sortProps(config);
 
     return React.forwardRef((props, ref) => {
-      const storeProps = context.useUnit(stores);
-      const eventsProps = context.useUnit(events as any);
+      const storeProps = context.useUnit(stores, config.useUnitConfig);
+      const eventsProps = context.useUnit(events as any, config.useUnitConfig);
       const functionProps = useBindedFunctions(functions);
 
       const elementProps: Props = Object.assign(
@@ -41,8 +42,16 @@ export function reflectFactory(context: Context) {
         props,
       );
 
-      const mounted = wrapToHook(config.hooks?.mounted, context);
-      const unmounted = wrapToHook(config.hooks?.unmounted, context);
+      const mounted = wrapToHook(
+        config.hooks?.mounted,
+        context,
+        config.useUnitConfig,
+      );
+      const unmounted = wrapToHook(
+        config.hooks?.unmounted,
+        context,
+        config.useUnitConfig,
+      );
 
       React.useEffect(() => {
         if (mounted) mounted();
@@ -100,9 +109,9 @@ function useBindedFunctions(functions: Record<string, Function>) {
   }, [scope, functions]);
 }
 
-function wrapToHook(hook: Hook | void, context: Context) {
+function wrapToHook(hook: Hook | void, context: Context, config?: UseUnitConifg) {
   if (hookDefined(hook)) {
-    return context.useUnit(hook as EventCallable<void>);
+    return context.useUnit(hook as EventCallable<void>, config);
   }
 
   return hook;

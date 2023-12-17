@@ -19,6 +19,7 @@ Static method to create a component bound to effector stores and events as store
 1. `view` — A react component that should be used to bind to
 1. `bind` — Object of effector stores, events or any value
 1. [`hooks`](/docs/hooks) — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
+1. `useUnitConfig` - Optional configuration object, which is passed directly to the second argument of `useUnit` from `effector-react`.
 
 ## Returns
 
@@ -85,7 +86,6 @@ export const User: FC = () => {
 
 ### Fork API auto-compatibility
 
-
 **This feature is available since `9.0.0` release of Reflect.**
 
 The [Fork API](https://effector.dev/en/api/effector/fork/) - is a feature of Effector, which allows to seamlessly create virtualized instances of the application's state and logic called [Scope](https://effector.dev/en/api/effector/scope/)'s.
@@ -107,6 +107,7 @@ const Age = reflect({
   },
 });
 ```
+
 ☝️ This feature works for `bind` field in all of Reflect operators.
 
 In most cases your callbacks will be synchronous and you will not need to do anything besides using [Provider](https://effector.dev/en/api/effector-react/provider/) to set the Scope for the whole React tree.

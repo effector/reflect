@@ -31,6 +31,7 @@ Method creates component, which renders list of `view` components based on items
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. [`hooks`](/docs/hooks) — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
 1. `getKey` - Optional function `(item: Item) => React.Key` to set key for every item in the list to help React with effecient rerenders. If not provided, index is used. See [`effector-react`](https://effector.dev/docs/api/effector-react/useList) docs for more details.
+1. `useUnitConfig` - Optional configuration object, which is passed directly to the second argument of `useUnit` from `effector-react`.
 
 ## Returns
 

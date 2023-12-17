@@ -548,3 +548,20 @@ test('scoped callback support in mapItem', async () => {
   expect(scope.getState($name)).toBe('Bob');
   expect($name.getState()).toBe('');
 });
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Test = list({
+        view: () => null,
+        source: createStore([42]),
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
+  });
+});
