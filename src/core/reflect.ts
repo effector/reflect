@@ -93,7 +93,7 @@ function useBindedFunctions(functions: Record<string, Function>) {
     for (const key in functions) {
       const fn = functions[key];
 
-      bindedFunctions[key] = scopeBind(fn, { scope: scope ?? undefined, safe: true });
+      bindedFunctions[key] = scopeBind(fn, { scope: scope || undefined, safe: true });
     }
 
     return bindedFunctions;

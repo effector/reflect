@@ -1,4 +1,5 @@
-import { Store } from 'effector';
+import { scopeBind, Store } from 'effector';
+import { useProvidedScope } from 'effector-react';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
@@ -30,6 +31,7 @@ export function listFactory(context: Context) {
     const listConfig = {
       getKey: config.getKey,
       fn: (value: Item, index: number) => {
+        const scope = useProvidedScope();
         const finalProps = React.useMemo(() => {
           const props: any = {};
 
@@ -40,7 +42,14 @@ export function listFactory(context: Context) {
                 config.mapItem![prop];
               const propValue = fn(value, index);
 
-              props[prop] = propValue;
+              if (typeof propValue === 'function') {
+                props[prop] = scopeBind(propValue, {
+                  safe: true,
+                  scope: scope || undefined,
+                });
+              } else {
+                props[prop] = propValue;
+              }
             });
           } else {
             forIn(value, (prop) => {

@@ -1,6 +1,6 @@
 import { list } from '@effector/reflect';
 import { render } from '@testing-library/react';
-import { createEffect, createEvent, createStore, fork } from 'effector';
+import { allSettled, createEffect, createEvent, createStore, fork } from 'effector';
 import { Provider, useStore } from 'effector-react';
 import React, { FC, memo } from 'react';
 import { act } from 'react-dom/test-utils';
@@ -543,6 +543,7 @@ test('scoped callback support in mapItem', async () => {
   await act(async () => {
     sendRender('Bob');
   });
+  await allSettled(scope);
 
   expect(scope.getState($name)).toBe('Bob');
   expect($name.getState()).toBe('');
