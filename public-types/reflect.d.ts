@@ -183,9 +183,13 @@ type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<
  * ```
  * import { reflect, fromTag } from '@effector/reflect'
  *
+ * const DomInput = fromTag("input")
+ *
  * const View = reflect({
- *  view:  fromTag("input"),
+ *  view: DomInput,
  *  bind: {
+ *   type: 'radio',
+ *   value: $value,
  *   onChange: (e) => e.target.value,
  *  }
  * })
