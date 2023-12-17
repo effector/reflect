@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { EventCallable, Store } from 'effector';
-import type { ComponentType, ReactNode } from 'react';
+import type {
+  ComponentType,
+  EventHandler,
+  PropsWithChildren,
+  ReactHTML,
+  ReactNode,
+} from 'react';
 
 type UnbindableProps = 'key' | 'ref';
 
@@ -162,3 +168,29 @@ export function variant<
         hooks?: Hooks;
       },
 ): (props: Omit<Props, keyof Bind>) => ReactNode;
+
+// fromTag types
+type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<
+  Parameters<ReactHTML[HtmlTag]>[0],
+  null | undefined
+>;
+
+/**
+ *
+ * Simple helper to allow to use `reflect` with any valid html tag
+ *
+ * @example
+ * ```
+ * import { reflect, fromTag } from '@effector/reflect'
+ *
+ * const View = reflect({
+ *  view:  fromTag("input"),
+ *  bind: {
+ *   onChange: (e) => e.target.value,
+ *  }
+ * })
+ * ```
+ */
+export function fromTag<HtmlTag extends keyof ReactHTML>(
+  htmlTag: HtmlTag,
+): (props: PropsWithChildren<GetProps<HtmlTag>>) => ReactNode;
