@@ -31,8 +31,8 @@ specifiers:
   prettier: ^2.8.4
   pretty-ms: ^8.0.0
   publint: ^0.2.6
-  react: ^17.0.2
-  react-dom: ^17.0.2
+  react: ^18.2.0
+  react-dom: ^18.2.0
   rollup: ^3.18.0
   rollup-plugin-typescript2: ^0.34.1
   svelte: ^3.55.1
@@ -55,7 +55,7 @@ devDependencies:
   '@rollup/plugin-node-resolve': 15.0.1_rollup@3.18.0
   '@rollup/plugin-terser': 0.4.0_rollup@3.18.0
   '@testing-library/dom': 7.31.2
-  '@testing-library/react': 11.2.7_sfoxds7t5ydpegc3knd667wn6m
+  '@testing-library/react': 11.2.7_biqbaboplfbrettd7655fr4n2y
   '@testing-library/user-event': 12.8.3_7izb363m7fjrh7ob6q4a2yqaqe
   '@trivago/prettier-plugin-sort-imports': 4.1.1_prettier@2.8.4
   '@types/jest': 26.0.24
@@ -64,7 +64,7 @@ devDependencies:
   babel-jest: 29.4.3_@babel+core@7.21.0
   babel-plugin-module-resolver: 4.1.0
   effector: 23.1.0
-  effector-react: 23.1.0_rol5omf3orgcdjo5xu6mgokvaq
+  effector-react: 23.1.0_n5b7oxjg3vra2b3yx63k5eyewy
   eslint: 8.56.0
   eslint-kit: 6.12.0_6oivf66i6dulewcc5as4eyqgny
   fs-extra: 9.1.0
@@ -74,8 +74,8 @@ devDependencies:
   prettier: 2.8.4
   pretty-ms: 8.0.0
   publint: 0.2.6
-  react: 17.0.2
-  react-dom: 17.0.2_react@17.0.2
+  react: 18.2.0
+  react-dom: 18.2.0_react@18.2.0
   rollup: 3.18.0
   rollup-plugin-typescript2: 0.34.1_vjug3yta6lblqnvu3zjesxy34m
   svelte: 3.55.1
@@ -2120,7 +2120,7 @@ packages:
       pretty-format: 26.6.2
     dev: true
 
-  /@testing-library/react/11.2.7_sfoxds7t5ydpegc3knd667wn6m:
+  /@testing-library/react/11.2.7_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-tzRNp7pzd5QmbtXNG/mhdcl7Awfu/Iz1RaVHY75zTdOkmHCuzMhRL83gWHSgOAcjS3CCbyfwUHMZgRJb4kAfpA==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -2129,8 +2129,8 @@ packages:
     dependencies:
       '@babel/runtime': 7.21.0
       '@testing-library/dom': 7.31.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: true
 
   /@testing-library/user-event/12.8.3_7izb363m7fjrh7ob6q4a2yqaqe:
@@ -3360,7 +3360,7 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
 
-  /effector-react/23.1.0_rol5omf3orgcdjo5xu6mgokvaq:
+  /effector-react/23.1.0_n5b7oxjg3vra2b3yx63k5eyewy:
     resolution: {integrity: sha512-RrCyu45zhxzIwzy6azjgPjXENRM2AM4y3TJF4faj5vN6z0u8ItR9W91wokHu5+BwFj6MKg2NxQkL4r4jWtIRoQ==}
     engines: {node: '>=11.0.0'}
     peerDependencies:
@@ -3368,8 +3368,8 @@ packages:
       react: '>=16.8.0 <19.0.0'
     dependencies:
       effector: 23.1.0
-      react: 17.0.2
-      use-sync-external-store: 1.2.0_react@17.0.2
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: true
 
   /effector/23.1.0:
@@ -5817,15 +5817,14 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
-  /react-dom/17.0.2_react@17.0.2:
-    resolution: {integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==}
+  /react-dom/18.2.0_react@18.2.0:
+    resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
-      react: 17.0.2
+      react: ^18.2.0
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
-      react: 17.0.2
-      scheduler: 0.20.2
+      react: 18.2.0
+      scheduler: 0.23.0
     dev: true
 
   /react-is/16.13.1:
@@ -5840,12 +5839,11 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: true
 
-  /react/17.0.2:
-    resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
+  /react/18.2.0:
+    resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
     dev: true
 
   /read-pkg-up/7.0.1:
@@ -6091,11 +6089,10 @@ packages:
       xmlchars: 2.2.0
     dev: true
 
-  /scheduler/0.20.2:
-    resolution: {integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==}
+  /scheduler/0.23.0:
+    resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
     dev: true
 
   /semver/5.7.2:
@@ -6718,12 +6715,12 @@ packages:
       requires-port: 1.0.0
     dev: true
 
-  /use-sync-external-store/1.2.0_react@17.0.2:
+  /use-sync-external-store/1.2.0_react@18.2.0:
     resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      react: 17.0.2
+      react: 18.2.0
     dev: true
 
   /util-deprecate/1.0.2:
