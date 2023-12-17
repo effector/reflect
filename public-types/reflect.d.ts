@@ -17,7 +17,7 @@ type BindFromProps<Props> = {
 
 // relfect types
 /**
- * A method to create a component reactively bound to a store or statically - to any other value.
+ * Operator that creates a component, which props are reactively bound to a store or statically - to any other value.
  *
  * @example
  * ```
@@ -38,11 +38,25 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
 }): FC<Omit<Props, keyof Bind>>;
 
 // createReflect types
+/**
+ * Method to create a `reflect` function with a predefined `view` component.
+ *
+ * @example
+ * ```
+ * const reflectInput = createReflect(Input);
+ *
+ * const Name = reflectInput({
+ *   value: $name,
+ *   placeholder: 'Name',
+ *   onChange: changeName.prepend(inputChanged),
+ * });
+ * ```
+ */
 export function createReflect<Props, Bind extends BindFromProps<Props>>(
   component: ComponentType<Props>,
 ): (
   bind: Bind,
-  optionals?: {
+  features?: {
     hooks?: Hooks;
   },
 ) => FC<Omit<Props, keyof Bind>>;
@@ -54,6 +68,24 @@ type PropsifyBind<Bind> = {
 
 type ReflectedProps<Item, Bind> = Item & PropsifyBind<Bind>;
 
+/**
+ * Operator to create a component, which reactivly renders a list of `view` components based on the `source` store with an array value.
+ * Also supports `bind`, like the `reflect` operator.
+ *
+ * @example
+ * ```
+ * const List = list({
+ *  source: $items,
+ *  view: Item,
+ *  mapItem: {
+ *    id: (item) => item.id,
+ *    value: (item) => item.value,
+ *   onChange: (_item) => (_params) => {},
+ *  },
+ *});
+ *
+ * ```
+ */
 export function list<
   Props,
   Item,
@@ -83,6 +115,27 @@ export function list<
 
 // variant types
 
+/**
+ * Operator to conditionally render a component based on the reactive `source` store value.
+ *
+ * @example
+ * ```
+ * // source is a store with a string
+ * const Component = variant({
+ *  source: $isError.map((isError) => (isError ? 'error' : 'success')),
+ *  cases: {
+ *    error: ErrorComponent,
+ *    success: SuccessComponent,
+ *  },
+ *});
+ * // shorthand for boolean source
+ * const Component = variant({
+ *  if: $isError,
+ *  then: ErrorComponent,
+ *  else: SuccessComponent,
+ * });
+ * ```
+ */
 export function variant<
   Props,
   CaseType extends string,
