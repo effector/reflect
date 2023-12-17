@@ -1,8 +1,7 @@
-
 # `reflect`
 
 ```ts
-import {reflect} from '@effector/reflect'
+import { reflect } from '@effector/reflect';
 ```
 
 ```tsx
@@ -27,7 +26,7 @@ Static method to create a component bound to effector stores and events as store
 
 ## Example
 
-  ```tsx
+```tsx
 // ./user.tsx
 import { reflect } from '@effector/reflect';
 import { createEvent, restore } from 'effector';
@@ -83,3 +82,35 @@ export const User: FC = () => {
   );
 };
 ```
+
+### Fork API auto-compatibility
+
+:::info
+This feature is available since `9.0.0` release of Reflect.
+:::
+
+The [Fork API](https://effector.dev/en/api/effector/fork/) - is a feature of Effector, which allows to seamlessly create virtualized instances of the application's state and logic called [Scope](https://effector.dev/en/api/effector/scope/)'s.
+In React to render an App in specific `Scope` a [Provider](https://effector.dev/en/api/effector-react/provider/) component should be used.
+
+When an external system (like React) calls an Effector event and Fork API is used - target `Scope` should be provided before call via `allSettled` or `scopeBind` API.
+
+The `reflect` operator does it for you under the hood, so you can provide arbitary callbacks into `bind`:
+
+```tsx
+const Age = reflect({
+  view: Input,
+  bind: {
+    value: $age,
+    placeholder: 'Age',
+    onChange: (event) => {
+      changeAge(parseInt(event.currentTarget.value));
+    },
+  },
+});
+```
+
+In most cases your callbacks will be synchronous and you will not need to do anything besides using [Provider](https://effector.dev/en/api/effector-react/provider/) to set the Scope for the whole React tree.
+
+#### Special case: Asynchronous callbacks
+
+Asynchronous callbacks are also allowed, but those should follow the rules of [Imperative Effect calls with Scope](https://effector.dev/en/api/effector/scope/) to be compatible.
