@@ -122,6 +122,31 @@ import { expectType } from 'tsd';
   expectType<React.FC>(List);
 }
 
+// list does not allow to set prop in mapItem, if it is already set in bind
+{
+  const Item: React.FC<{
+    id: number;
+    value: string;
+    common: string;
+  }> = () => null;
+  const $common = createStore<string>('common prop');
+  const $items = createStore<{ id: number; value: string }[]>([]);
+
+  const List = list({
+    source: $items,
+    bind: {
+      common: $common,
+    },
+    mapItem: {
+      // @ts-expect-error
+      common: () => 'common prop',
+    },
+    view: Item,
+  });
+
+  expectType<React.FC>(List);
+}
+
 // list allows not to set both `bind` and `mapItem` if source type matches with props
 {
   const Item: React.FC<{
