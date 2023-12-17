@@ -16,8 +16,8 @@ specifiers:
   '@testing-library/user-event': ^12.8.3
   '@trivago/prettier-plugin-sort-imports': ^4.1.1
   '@types/jest': ^26.0.24
-  '@types/react': ^16.14.35
-  '@types/react-dom': ^16.9.18
+  '@types/react': ^18.2.45
+  '@types/react-dom': ^18.2.18
   babel-jest: ^29.4.3
   babel-plugin-module-resolver: ^4.1.0
   effector: ^23.1.0
@@ -59,8 +59,8 @@ devDependencies:
   '@testing-library/user-event': 12.8.3_7izb363m7fjrh7ob6q4a2yqaqe
   '@trivago/prettier-plugin-sort-imports': 4.1.1_prettier@2.8.4
   '@types/jest': 26.0.24
-  '@types/react': 16.14.35
-  '@types/react-dom': 16.9.18
+  '@types/react': 18.2.45
+  '@types/react-dom': 18.2.18
   babel-jest: 29.4.3_@babel+core@7.21.0
   babel-plugin-module-resolver: 4.1.0
   effector: 23.1.0
@@ -2288,14 +2288,22 @@ packages:
     resolution: {integrity: sha512-PtrlVaOaI44/3pl3cvnlK+GxOM3re2526TJvPvh7W+keHIXdV4TE0ylpPBAcvFQCbGitaTXwL9u+RF7qtVeazQ==}
     dev: true
 
-  /@types/react-dom/16.9.18:
-    resolution: {integrity: sha512-lmNARUX3+rNF/nmoAFqasG0jAA7q6MeGZK/fdeLwY3kAA4NPgHHrG5bNQe2B5xmD4B+x6Z6h0rEJQ7MEEgQxsw==}
+  /@types/react-dom/18.2.18:
+    resolution: {integrity: sha512-TJxDm6OfAX2KJWJdMEVTwWke5Sc/E/RlnPGvGfS0W7+6ocy2xhDVQVh/KvC2Uf7kACs+gDytdusDSdWfWkaNzw==}
     dependencies:
       '@types/react': 16.14.35
     dev: true
 
   /@types/react/16.14.35:
     resolution: {integrity: sha512-NUEiwmSS1XXtmBcsm1NyRRPYjoZF2YTE89/5QiLt5mlGffYK9FQqOKuOLuXNrjPQV04oQgaZG+Yq02ZfHoFyyg==}
+    dependencies:
+      '@types/prop-types': 15.7.5
+      '@types/scheduler': 0.16.2
+      csstype: 3.1.1
+    dev: true
+
+  /@types/react/18.2.45:
+    resolution: {integrity: sha512-TtAxCNrlrBp8GoeEp1npd5g+d/OejJHFxS3OWmrPBMFaVQMSN0OFySozJio5BHxTuTeug00AVXVAjfDSfk+lUg==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
