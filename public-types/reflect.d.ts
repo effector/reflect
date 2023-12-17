@@ -9,6 +9,12 @@ type Hooks = {
   unmounted?: EventCallable<void> | (() => unknown);
 };
 
+type BindFromProps<Props> = {
+  [K in keyof Props]?: K extends UnbindableProps
+    ? never
+    : Props[K] | Store<Props[K]> | EventCallable<void>;
+};
+
 // relfect types
 /**
  * A method to create a component reactively bound to a store or statically - to any other value.
@@ -25,28 +31,14 @@ type Hooks = {
  * });
  * ```
  */
-export function reflect<
-  Props,
-  Bind extends {
-    [K in keyof Props]?: K extends UnbindableProps
-      ? never
-      : Props[K] | Store<Props[K]> | EventCallable<void>;
-  },
->(config: {
+export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
   view: ComponentType<Props>;
   bind: Bind;
   hooks?: Hooks;
 }): FC<Omit<Props, keyof Bind>>;
 
 // createReflect types
-export function createReflect<
-  Props,
-  Bind extends {
-    [K in keyof Props]?: K extends UnbindableProps
-      ? never
-      : Props[K] | Store<Props[K]> | EventCallable<void>;
-  },
->(
+export function createReflect<Props, Bind extends BindFromProps<Props>>(
   component: ComponentType<Props>,
 ): (
   bind: Bind,
@@ -56,15 +48,7 @@ export function createReflect<
 ) => FC<Omit<Props, keyof Bind>>;
 
 // list types
-export function list<
-  Props,
-  Item,
-  Bind extends {
-    [K in keyof Props]?: K extends UnbindableProps
-      ? never
-      : Props[K] | Store<Props[K]> | EventCallable<void>;
-  },
->(config: {
+export function list<Props, Item, Bind extends BindFromProps<Props>>(config: {
   source: Store<Item[]>;
   view: ComponentType<Props>;
   bind?: Bind;
@@ -80,11 +64,7 @@ export function list<
 export function variant<
   Props,
   CaseType extends string,
-  Bind extends {
-    [K in keyof Props]?: K extends UnbindableProps
-      ? never
-      : Props[K] | Store<Props[K]> | EventCallable<void>;
-  },
+  Bind extends BindFromProps<Props>,
 >(
   config:
     | {
