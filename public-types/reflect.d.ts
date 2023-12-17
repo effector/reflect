@@ -48,16 +48,38 @@ export function createReflect<Props, Bind extends BindFromProps<Props>>(
 ) => FC<Omit<Props, keyof Bind>>;
 
 // list types
-export function list<Props, Item, Bind extends BindFromProps<Props>>(config: {
-  source: Store<Item[]>;
-  view: ComponentType<Props>;
-  bind?: Bind;
-  mapItem?: {
+type PropsifyBind<Bind> = {
+  [K in keyof Bind]: Bind[K] extends Store<infer Value> ? Value : Bind[K];
+};
+
+type ReflectedProps<Item, Bind> = Item & PropsifyBind<Bind>;
+
+export function list<
+  Props,
+  Item,
+  MapItem extends {
     [M in keyof Omit<Props, keyof Bind>]: (item: Item, index: number) => Props[M];
-  };
-  getKey?: (item: Item) => React.Key;
-  hooks?: Hooks;
-}): FC;
+  },
+  Bind extends BindFromProps<Props> = object,
+>(
+  config: ReflectedProps<Item, Bind> extends Props
+    ? {
+        source: Store<Item[]>;
+        view: ComponentType<Props>;
+        bind?: Bind;
+        mapItem?: MapItem;
+        getKey?: (item: Item) => React.Key;
+        hooks?: Hooks;
+      }
+    : {
+        source: Store<Item[]>;
+        view: ComponentType<Props>;
+        bind?: Bind;
+        mapItem: MapItem;
+        getKey?: (item: Item) => React.Key;
+        hooks?: Hooks;
+      },
+): FC;
 
 // variant types
 
