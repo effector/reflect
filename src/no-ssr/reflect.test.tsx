@@ -1,4 +1,4 @@
-import { reflect } from '@effector/reflect';
+import { fromTag, reflect } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -409,5 +409,51 @@ describe('hooks', () => {
 
       expect(fn.mock.calls.length).toBe(1);
     });
+  });
+});
+
+describe('fromTag helper', () => {
+  test('Basic usage work', async () => {
+    const changed = createEvent<unknown>();
+    const $fromHandler = createStore<any>(null).on(changed, (_, next) => next);
+    const $type = createStore<string>('hidden');
+
+    const DomInput = fromTag('input');
+
+    const Input = reflect({
+      view: DomInput,
+      bind: {
+        type: $type,
+        onChange: changed.prepend((event) => event),
+        'data-testid': 'test-input',
+      },
+    });
+
+    const scopeText = fork({
+      values: [[$type, 'text']],
+    });
+    const scopeEmail = fork({
+      values: [[$type, 'email']],
+    });
+
+    const body = render(
+      <Provider value={scopeText}>
+        <Input />
+      </Provider>,
+    );
+
+    expect((body.container.firstChild as any).type).toBe('text');
+
+    await userEvent.type(body.getByTestId('test-input'), 'bob');
+
+    expect(scopeText.getState($fromHandler).target.value).toBe('bob');
+
+    const body2 = render(
+      <Provider value={scopeEmail}>
+        <Input />
+      </Provider>,
+    );
+
+    expect((body2.container.firstChild as any).type).toBe('email');
   });
 });
