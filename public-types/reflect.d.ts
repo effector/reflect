@@ -85,10 +85,20 @@ export function variant<
       ? never
       : Props[K] | Store<Props[K]> | EventCallable<void>;
   },
->(config: {
-  source: Store<CaseType>;
-  cases: Partial<Record<CaseType, ComponentType<Props>>>;
-  default?: ComponentType<Props>;
-  bind?: Bind;
-  hooks?: Hooks;
-}): FC<Omit<Props, keyof Bind>>;
+>(
+  config:
+    | {
+        source: Store<CaseType>;
+        cases: Partial<Record<CaseType, ComponentType<Props>>>;
+        default?: ComponentType<Props>;
+        bind?: Bind;
+        hooks?: Hooks;
+      }
+    | {
+        if: Store<boolean>;
+        then: ComponentType<Props>;
+        else?: ComponentType<Props>;
+        bind?: Bind;
+        hooks?: Hooks;
+      },
+): FC<Omit<Props, keyof Bind>>;
