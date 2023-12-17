@@ -1,7 +1,15 @@
 import { reflect } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createEffect, createEvent, createStore, restore } from 'effector';
+import {
+  allSettled,
+  createEffect,
+  createEvent,
+  createStore,
+  fork,
+  restore,
+} from 'effector';
+import { Provider } from 'effector-react';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 import { act } from 'react-dom/test-utils';
 
@@ -156,6 +164,135 @@ test('forwardRef', async () => {
 
   const container = render(<Name ref={ref} />);
   expect(container.getByTestId('name')).toBe(ref.current);
+});
+
+describe('plain callbacks with scopeBind under the hood', () => {
+  test('sync callback in bind', async () => {
+    let sendRender = (v: string) => {};
+    const Input = (props: { value: string; onChange: (_event: string) => void }) => {
+      const [render, setRender] = React.useState<any>(null);
+      React.useLayoutEffect(() => {
+        if (render) {
+          props.onChange(render);
+        }
+      }, [render]);
+      sendRender = setRender;
+      return <input data-testid="name" value={props.value} />;
+    };
+
+    const $name = createStore<string>('');
+    const changeName = createEvent<string>();
+    $name.on(changeName, (_, next) => next);
+
+    const Name = reflect({
+      view: Input,
+      bind: {
+        value: $name,
+        onChange: (v) => changeName(v),
+      },
+    });
+
+    render(<Name />);
+
+    await act(() => {
+      sendRender('Bob');
+    });
+
+    expect($name.getState()).toBe('Bob');
+  });
+
+  test('sync callback in bind (scope)', async () => {
+    let sendRender = (v: string) => {};
+    const Input = (props: { value: string; onChange: (_event: string) => void }) => {
+      const [render, setRender] = React.useState<any>(null);
+      React.useLayoutEffect(() => {
+        if (render) {
+          props.onChange(render);
+        }
+      }, [render]);
+      sendRender = setRender;
+      return <input data-testid="name" value={props.value} />;
+    };
+
+    const $name = createStore<string>('');
+    const changeName = createEvent<string>();
+    $name.on(changeName, (_, next) => next);
+
+    const Name = reflect({
+      view: Input,
+      bind: {
+        value: $name,
+        onChange: (v) => changeName(v),
+      },
+    });
+
+    const scope = fork();
+
+    render(
+      <Provider value={scope}>
+        <Name />
+      </Provider>,
+    );
+
+    await act(() => {
+      sendRender('Bob');
+    });
+
+    expect(scope.getState($name)).toBe('Bob');
+    expect($name.getState()).toBe('');
+  });
+
+  test('async callback in bind (scope)', async () => {
+    const sleepFx = createEffect(
+      async (ms: number) => new Promise((rs) => setTimeout(rs, ms)),
+    );
+    let sendRender = (v: string) => {};
+    const Input = (props: {
+      value: string;
+      onChange: (_event: string) => Promise<void>;
+    }) => {
+      const [render, setRender] = React.useState<any>(null);
+      React.useLayoutEffect(() => {
+        if (render) {
+          props.onChange(render);
+        }
+      }, [render]);
+      sendRender = setRender;
+      return <input data-testid="name" value={props.value} />;
+    };
+
+    const $name = createStore<string>('');
+    const changeName = createEvent<string>();
+    $name.on(changeName, (_, next) => next);
+
+    const Name = reflect({
+      view: Input,
+      bind: {
+        value: $name,
+        onChange: async (v) => {
+          await sleepFx(1);
+          changeName(v);
+        },
+      },
+    });
+
+    const scope = fork();
+
+    render(
+      <Provider value={scope}>
+        <Name />
+      </Provider>,
+    );
+
+    await act(() => {
+      sendRender('Bob');
+    });
+
+    await allSettled(scope);
+
+    expect(scope.getState($name)).toBe('Bob');
+    expect($name.getState()).toBe('');
+  });
 });
 
 describe('hooks', () => {
