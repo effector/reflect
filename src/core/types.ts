@@ -1,38 +1,28 @@
-import { Effect, Event, Store } from 'effector';
+import { Effect, EventCallable, Store } from 'effector';
 import { useList, useUnit } from 'effector-react';
-import { ComponentClass, FC } from 'react';
+import { ComponentType } from 'react';
+
+/**
+ * This is the internal typings - for the library internals, where we do not really care about real-world user data.
+ *
+ * Public types are stored separately from the source code, so it is easier to develop and test them.
+ * You can find public types in `public-types` folder and tests for type inference at the `type-tests` folder.
+ */
 
 export interface Context {
   useUnit: typeof useUnit;
   useList: typeof useList;
 }
 
-type UnbindableProps = 'key' | 'ref';
+export type View<T> = ComponentType<T>;
 
-type Storify<Prop> = Omit<Store<Prop>, 'updates' | 'reset' | 'on' | 'off' | 'thru'>;
-
-export type BindableProps<Props> = {
-  [Key in Exclude<keyof Props, UnbindableProps>]?: Props[Key] extends (
-    payload: any,
-  ) => void
-    ? Storify<Props[Key]> | Props[Key] | Event<void>
-    : Storify<Props[Key]> | Props[Key];
+export type BindProps<Props> = {
+  [K in keyof Props]: Props[K] | Store<Props[K]> | EventCallable<void>;
 };
 
-export type View<T> = FC<T> | ComponentClass<T>;
-
-type UnboundProps<Props, Bind> = Omit<Props, keyof Bind>;
-type BoundProps<Props, Bind> = Omit<Props, keyof UnboundProps<Props, Bind>>;
-
-export type PartialBoundProps<Props, Bind> = UnboundProps<Props, Bind> &
-  Partial<BoundProps<Props, Bind>>;
-
-export type Hook = (() => any) | Event<void> | Effect<void, any, any>;
+export type Hook = (() => any) | EventCallable<void> | Effect<void, any, any>;
 
 export interface Hooks {
   mounted?: Hook;
   unmounted?: Hook;
 }
-
-export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
-  U[keyof U];

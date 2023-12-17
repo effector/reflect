@@ -2,14 +2,7 @@ import { Store } from 'effector';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
-import {
-  AtLeastOne,
-  BindableProps,
-  Context,
-  Hooks,
-  PartialBoundProps,
-  View,
-} from './types';
+import { BindProps, Context, Hooks, View } from './types';
 
 const Default = () => null;
 
@@ -19,13 +12,13 @@ export function variantFactory(context: Context) {
   return function variant<
     Props,
     Variant extends string,
-    Bind extends BindableProps<Props>,
+    Bind extends BindProps<Props>,
   >(
     config:
       | {
           source: Store<Variant>;
           bind?: Bind;
-          cases: AtLeastOne<Record<Variant, View<Props>>>;
+          cases: Record<Variant, View<Props>>;
           hooks?: Hooks;
           default?: View<Props>;
         }
@@ -36,9 +29,9 @@ export function variantFactory(context: Context) {
           hooks?: Hooks;
           bind?: Bind;
         },
-  ): React.FC<PartialBoundProps<Props, Bind>> {
+  ): React.FC<Props> {
     let $case: Store<Variant>;
-    let cases: AtLeastOne<Record<Variant, View<Props>>>;
+    let cases: Record<Variant, View<Props>>;
     let def: View<Props>;
 
     // Shortcut for Store<boolean>
@@ -48,7 +41,7 @@ export function variantFactory(context: Context) {
       cases = {
         then: config.then,
         else: config.else,
-      } as unknown as AtLeastOne<Record<Variant, View<Props>>>;
+      } as unknown as Record<Variant, View<Props>>;
       def = Default;
     }
     // Full form for Store<string>

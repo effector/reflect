@@ -1,16 +1,9 @@
 import { Effect, Event, EventCallable, is, Store } from 'effector';
 import React from 'react';
 
-import {
-  BindableProps,
-  Context,
-  Hook,
-  Hooks,
-  PartialBoundProps,
-  View,
-} from './types';
+import { BindProps, Context, Hook, Hooks, View } from './types';
 
-export interface ReflectConfig<Props, Bind extends BindableProps<Props>> {
+export interface ReflectConfig<Props, Bind extends BindProps<Props>> {
   view: View<Props>;
   bind: Bind;
   hooks?: Hooks;
@@ -20,7 +13,7 @@ export function reflectCreateFactory(context: Context) {
   const reflect = reflectFactory(context);
 
   return function createReflect<Props>(view: View<Props>) {
-    return <Bind extends BindableProps<Props> = BindableProps<Props>>(
+    return <Bind extends BindProps<Props> = BindProps<Props>>(
       bind: Bind,
       params?: Pick<ReflectConfig<Props, Bind>, 'hooks'>,
     ) => reflect<Props, Bind>({ view, bind, ...params });
@@ -28,12 +21,9 @@ export function reflectCreateFactory(context: Context) {
 }
 
 export function reflectFactory(context: Context) {
-  return function reflect<
-    Props,
-    Bind extends BindableProps<Props> = BindableProps<Props>,
-  >(
+  return function reflect<Props, Bind extends BindProps<Props> = BindProps<Props>>(
     config: ReflectConfig<Props, Bind>,
-  ): React.ExoticComponent<PartialBoundProps<Props, Bind>> {
+  ): React.ExoticComponent<{}> {
     const { stores, events, data } = sortProps(config);
 
     return React.forwardRef((props, ref) => {
@@ -64,7 +54,7 @@ export function reflectFactory(context: Context) {
   };
 }
 
-function sortProps<Props, Bind extends BindableProps<Props> = BindableProps<Props>>(
+function sortProps<Props, Bind extends BindProps<Props> = BindProps<Props>>(
   config: ReflectConfig<Props, Bind>,
 ) {
   type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
