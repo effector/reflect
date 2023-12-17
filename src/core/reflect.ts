@@ -1,4 +1,5 @@
-import { Effect, Event, EventCallable, is, Store } from 'effector';
+import { Effect, Event, EventCallable, is, scopeBind, Store } from 'effector';
+import { useProvidedScope } from 'effector-react';
 import React from 'react';
 
 import { BindProps, Context, Hook, Hooks, View } from './types';
@@ -24,17 +25,19 @@ export function reflectFactory(context: Context) {
   return function reflect<Props, Bind extends BindProps<Props> = BindProps<Props>>(
     config: ReflectConfig<Props, Bind>,
   ): React.ExoticComponent<{}> {
-    const { stores, events, data } = sortProps(config);
+    const { stores, events, data, functions } = sortProps(config);
 
     return React.forwardRef((props, ref) => {
       const storeProps = context.useUnit(stores);
       const eventsProps = context.useUnit(events as any);
+      const functionProps = useBindedFunctions(functions);
 
       const elementProps: Props = Object.assign(
         { ref },
         storeProps,
         eventsProps,
         data,
+        functionProps,
         props,
       );
 
@@ -62,6 +65,7 @@ function sortProps<Props, Bind extends BindProps<Props> = BindProps<Props>>(
   const events: Record<string, GenericEvent> = {};
   const stores: Record<string, Store<unknown>> = {};
   const data: Record<string, unknown> = {};
+  const functions: Record<string, Function> = {};
 
   for (const key in config.bind) {
     const value = config.bind[key];
@@ -70,12 +74,30 @@ function sortProps<Props, Bind extends BindProps<Props> = BindProps<Props>>(
       events[key] = value;
     } else if (is.store(value)) {
       stores[key] = value;
+    } else if (typeof value === 'function') {
+      functions[key] = value;
     } else {
       data[key] = value;
     }
   }
 
-  return { events, stores, data };
+  return { events, stores, data, functions };
+}
+
+function useBindedFunctions(functions: Record<string, Function>) {
+  const scope = useProvidedScope();
+
+  return React.useMemo(() => {
+    const bindedFunctions: Record<string, Function> = {};
+
+    for (const key in functions) {
+      const fn = functions[key];
+
+      bindedFunctions[key] = scopeBind(fn, { scope: scope ?? undefined, safe: true });
+    }
+
+    return bindedFunctions;
+  }, [scope, functions]);
 }
 
 function wrapToHook(hook: Hook | void, context: Context) {

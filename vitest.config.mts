@@ -1,6 +1,14 @@
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
+import { $ } from 'zx';
+
+/**
+ * Vitest tests are always run against the built package.
+ */
+console.log('Building the package...');
+await $`pnpm build`;
+$.log = () => {};
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
