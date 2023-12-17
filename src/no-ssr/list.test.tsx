@@ -1,7 +1,7 @@
 import { list } from '@effector/reflect';
 import { render } from '@testing-library/react';
-import { createEvent, createStore } from 'effector';
-import { useStore } from 'effector-react';
+import { createEffect, createEvent, createStore, fork } from 'effector';
+import { Provider, useStore } from 'effector-react';
 import React, { FC, memo } from 'react';
 import { act } from 'react-dom/test-utils';
 
@@ -493,4 +493,57 @@ test('reflect-list: getKey option', async () => {
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
     fn2.mock.calls.map(([arg]) => arg),
   );
+});
+
+test('scoped callback support in mapItem', async () => {
+  const sleepFx = createEffect(
+    async (ms: number) => new Promise((rs) => setTimeout(rs, ms)),
+  );
+  let sendRender = (v: string) => {};
+  const Input = (props: {
+    value: string;
+    onChange: (_event: string) => Promise<void>;
+  }) => {
+    const [render, setRender] = React.useState<any>(null);
+    React.useLayoutEffect(() => {
+      if (render) {
+        props.onChange(render);
+      }
+    }, [render]);
+    sendRender = setRender;
+    return <input data-testid="name" value={props.value} />;
+  };
+
+  const $names = createStore<string[]>(['name']);
+  const $name = createStore<string>('');
+  const changeName = createEvent<string>();
+  $name.on(changeName, (_, next) => next);
+
+  const Names = list({
+    source: $names,
+    view: Input,
+    bind: {
+      value: $name,
+    },
+    mapItem: {
+      onChange: (_name) => async (event: string) => {
+        await sleepFx(100);
+        changeName(event);
+      },
+    },
+  });
+
+  const scope = fork();
+  render(
+    <Provider value={scope}>
+      <Names />
+    </Provider>,
+  );
+
+  await act(async () => {
+    sendRender('Bob');
+  });
+
+  expect(scope.getState($name)).toBe('Bob');
+  expect($name.getState()).toBe('');
 });
