@@ -4,5 +4,6 @@
   "variant": "variant",
   "list": "list",
   "create-reflect": "createReflect",
-  "hooks": "Reflect Hooks"
+  "hooks": "Reflect Hooks",
+  "fromTag": "fromTag"
 }
