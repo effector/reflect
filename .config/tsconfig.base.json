@@ -10,12 +10,6 @@
     "esModuleInterop": true,
     "types": ["vitest/globals"],
     "strictNullChecks": true,
-    "baseUrl": ".",
-    "paths": {
-      "@effector/reflect/*": ["../dist/*"],
-      "@effector/reflect": ["../dist/index.d.ts"],
-      "@effector/reflect/scope": ["../dist/scope.d.ts"]
-    }
   },
   "include": ["../src",],
   "exclude": ["../typings"]
