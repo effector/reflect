@@ -9,6 +9,7 @@ type Hooks = {
   unmounted?: EventCallable<void> | (() => unknown);
 };
 
+// relfect types
 /**
  * A method to create a component reactively bound to a store or statically - to any other value.
  *
@@ -37,6 +38,7 @@ export function reflect<
   hooks?: Hooks;
 }): FC<Omit<Props, keyof Bind>>;
 
+// createReflect types
 export function createReflect<
   Props,
   Bind extends {
@@ -53,6 +55,7 @@ export function createReflect<
   },
 ) => FC<Omit<Props, keyof Bind>>;
 
+// list types
 export function list<
   Props,
   Item,
@@ -72,4 +75,20 @@ export function list<
   hooks?: Hooks;
 }): FC;
 
-export function variant(any: any): any;
+// variant types
+
+export function variant<
+  Props,
+  CaseType extends string,
+  Bind extends {
+    [K in keyof Props]?: K extends UnbindableProps
+      ? never
+      : Props[K] | Store<Props[K]> | EventCallable<void>;
+  },
+>(config: {
+  source: Store<CaseType>;
+  cases: Partial<Record<CaseType, ComponentType<Props>>>;
+  default?: ComponentType<Props>;
+  bind?: Bind;
+  hooks?: Hooks;
+}): FC<Omit<Props, keyof Bind>>;
