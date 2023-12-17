@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { EventCallable, Store } from 'effector';
-import type { ComponentType, FC } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 type UnbindableProps = 'key' | 'ref';
 
@@ -35,7 +35,7 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
   view: ComponentType<Props>;
   bind: Bind;
   hooks?: Hooks;
-}): FC<Omit<Props, keyof Bind>>;
+}): (props: Omit<Props, keyof Bind>) => ReactNode;
 
 // createReflect types
 /**
@@ -59,7 +59,7 @@ export function createReflect<Props, Bind extends BindFromProps<Props>>(
   features?: {
     hooks?: Hooks;
   },
-) => FC<Omit<Props, keyof Bind>>;
+) => (props: Omit<Props, keyof Bind>) => ReactNode;
 
 // list types
 type PropsifyBind<Bind> = {
@@ -111,7 +111,7 @@ export function list<
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks;
       },
-): FC;
+): () => ReactNode;
 
 // variant types
 
@@ -156,4 +156,4 @@ export function variant<
         bind?: Bind;
         hooks?: Hooks;
       },
-): FC<Omit<Props, keyof Bind>>;
+): (props: Omit<Props, keyof Bind>) => ReactNode;

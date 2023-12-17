@@ -29,7 +29,7 @@ export function variantFactory(context: Context) {
           hooks?: Hooks;
           bind?: Bind;
         },
-  ): React.FC<Props> {
+  ): (p: Props) => React.ReactNode {
     let $case: Store<Variant>;
     let cases: Record<Variant, View<Props>>;
     let def: View<Props>;
@@ -64,6 +64,6 @@ export function variantFactory(context: Context) {
       bind,
       view: View,
       hooks: config.hooks,
-    });
+    }) as unknown as (p: Props) => React.ReactNode;
   };
 }
