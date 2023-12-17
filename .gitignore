@@ -13,12 +13,5 @@ yarn-error.log
 
 effector-reflect-*
 .idea
-core/
-./index.*
-./ssr.*
-./scope.*js
-./scope.*map
-./scope.d.ts
-./reflect.*
 docs/.next
 docs/out
