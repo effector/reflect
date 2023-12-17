@@ -51,7 +51,6 @@ import { expectType } from 'tsd';
     source: $type,
     bind: {
       value: $value,
-      // @ts-expect-error
       onChange: changed,
     },
     cases: {
