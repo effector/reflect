@@ -104,7 +104,7 @@ import { expectType } from 'tsd';
   expectType<React.FC>(AppFixed);
 }
 
-// reflect should allow to pass Event<void> as click event handler
+// reflect should allow to pass EventCallable<void> as click event handler
 {
   const Button: React.FC<{
     onClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>>;
@@ -158,4 +158,26 @@ import { expectType } from 'tsd';
   };
 
   expectType<React.FC>(App);
+}
+
+// reflect should allow to pass any callback
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: (e) => {
+        expectType<string>(e);
+        changed(e);
+      },
+    },
+  });
+
+  expectType<React.FC>(ReflectedInput);
 }

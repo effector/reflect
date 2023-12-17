@@ -12,7 +12,12 @@ type Hooks = {
 type BindFromProps<Props> = {
   [K in keyof Props]?: K extends UnbindableProps
     ? never
-    : Props[K] | Store<Props[K]> | EventCallable<void>;
+    : Props[K] extends (...args: any[]) => any
+    ? // To force TS infer types for any provided callback
+      | ((...args: Parameters<Props[K]>) => ReturnType<Props[K]>)
+        // Edge-case: allow to pass an event listener without any parameters (e.g. onClick: () => ...)
+        | (() => ReturnType<Props[K]>)
+    : Store<Props[K]> | Props[K];
 };
 
 // relfect types
