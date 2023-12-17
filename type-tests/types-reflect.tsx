@@ -181,3 +181,50 @@ import { expectType } from 'tsd';
 
   expectType<React.FC>(ReflectedInput);
 }
+
+// should support useUnit configuration
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: (e) => {
+        expectType<string>(e);
+        changed(e);
+      },
+    },
+    useUnitConfig: {
+      forceScope: true,
+    },
+  });
+}
+
+// should not support invalud useUnit configuration
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: (e) => {
+        expectType<string>(e);
+        changed(e);
+      },
+    },
+    useUnitConfig: {
+      // @ts-expect-error
+      forseScope: true,
+    },
+  });
+}

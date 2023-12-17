@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { EventCallable, Store } from 'effector';
+import type { useUnit } from 'effector-react';
 import type {
   ComponentType,
   EventHandler,
@@ -7,6 +8,8 @@ import type {
   ReactHTML,
   ReactNode,
 } from 'react';
+
+type UseUnitConfig = Parameters<typeof useUnit>[1];
 
 type UnbindableProps = 'key' | 'ref';
 
@@ -46,6 +49,10 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
   view: ComponentType<Props>;
   bind: Bind;
   hooks?: Hooks;
+  /**
+   * This configuration is passed directly to `useUnit`'s hook second argument.
+   */
+  useUnitConfig?: UseUnitConfig;
 }): (props: Omit<Props, keyof Bind>) => ReactNode;
 
 // createReflect types
@@ -69,6 +76,10 @@ export function createReflect<Props, Bind extends BindFromProps<Props>>(
   bind: Bind,
   features?: {
     hooks?: Hooks;
+    /**
+     * This configuration is passed directly to `useUnit`'s hook second argument.
+     */
+    useUnitConfig?: UseUnitConfig;
   },
 ) => (props: Omit<Props, keyof Bind>) => ReactNode;
 
@@ -113,6 +124,10 @@ export function list<
         mapItem?: MapItem;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks;
+        /**
+         * This configuration is passed directly to `useUnit`'s hook second argument.
+         */
+        useUnitConfig?: UseUnitConfig;
       }
     : {
         source: Store<Item[]>;
@@ -121,6 +136,10 @@ export function list<
         mapItem: MapItem;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks;
+        /**
+         * This configuration is passed directly to `useUnit`'s hook second argument.
+         */
+        useUnitConfig?: UseUnitConfig;
       },
 ): () => ReactNode;
 
@@ -159,6 +178,10 @@ export function variant<
         default?: ComponentType<Props>;
         bind?: Bind;
         hooks?: Hooks;
+        /**
+         * This configuration is passed directly to `useUnit`'s hook second argument.
+         */
+        useUnitConfig?: UseUnitConfig;
       }
     | {
         if: Store<boolean>;
@@ -166,6 +189,10 @@ export function variant<
         else?: ComponentType<Props>;
         bind?: Bind;
         hooks?: Hooks;
+        /**
+         * This configuration is passed directly to `useUnit`'s hook second argument.
+         */
+        useUnitConfig?: UseUnitConfig;
       },
 ): (props: Omit<Props, keyof Bind>) => ReactNode;
 
