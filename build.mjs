@@ -9,10 +9,9 @@ await fs.mkdir('./dist', { recursive: true });
 
 await measure(`public-typings → ./dist/`, `copied in`, async () => {
   await fs.copyFile('./public-types/reflect.d.ts', './dist/index.d.ts');
-  await fs.copyFile('./public-types/reflect.d.ts', './dist/index.d.mts');
 
+  // `@effector/reflect/scope` types - this export is deprecated
   await fs.copyFile('./public-types/reflect.d.ts', './dist/scope.d.ts');
-  await fs.copyFile('./public-types/reflect.d.ts', './dist/scope.d.mts');
 });
 
 for (const config of configs) {
