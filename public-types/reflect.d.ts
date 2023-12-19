@@ -49,6 +49,12 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
   useUnitConfig?: UseUnitConfig;
 }): FC<Omit<Props, keyof Bind>>;
 
+// Note: FC is used as a return type, because tests on a real Next.js project showed,
+// that if theoretically better option like (props: ...) => React.ReactNode is used,
+// then TS type inference works worse in some cases - didn't manage to reproduce it in a reflect type tests though.
+//
+// It is not clear why it works this way (FC return type is actually compatible with ReactNode), but it seems that FC is the best option here :shrug:
+
 // createReflect types
 /**
  * Method to create a `reflect` function with a predefined `view` component.
