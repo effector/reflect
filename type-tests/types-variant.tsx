@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { variant } from '@effector/reflect';
+import { reflect, variant } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { expectType } from 'tsd';
 
 // basic variant usage
@@ -147,4 +147,44 @@ import { expectType } from 'tsd';
     bind: { context: $ctx },
   });
   expectType<React.FC>(CurrentPageOnlyThen);
+}
+
+// supports nesting
+{
+  const Test = (props: { test: string }) => <></>;
+
+  const $test = createStore('test');
+  const $bool = createStore(true);
+
+  const NestedVariant = variant({
+    source: $test,
+    cases: {
+      test: variant({
+        if: $bool,
+        then: reflect({
+          view: Test,
+          bind: {},
+        }),
+      }),
+    },
+  });
+}
+
+// allows variants of compatible types
+{
+  const Test = (props: PropsWithChildren<{ test: string }>) => <div>content</div>;
+  const Loader = () => <>loader</>;
+
+  const $test = createStore(false);
+
+  const View = variant({
+    if: $test,
+    then: reflect({
+      view: Test,
+      bind: {
+        test: $test.map(() => 'test'),
+      },
+    }),
+    else: Loader,
+  });
 }

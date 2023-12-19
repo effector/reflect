@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import React, { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import { expectType } from 'tsd';
 
 // basic reflect
@@ -227,4 +227,18 @@ import { expectType } from 'tsd';
       forseScope: true,
     },
   });
+}
+
+// reflect fits ComponentType
+{
+  const Input = (props: PropsWithChildren<{ value: string }>) => null;
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+    },
+  });
+
+  const Test: ComponentType<{ value: string; children: ReactNode }> = Input;
 }
