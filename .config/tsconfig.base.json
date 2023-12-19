@@ -9,8 +9,8 @@
     "jsx": "react",
     "esModuleInterop": true,
     "types": ["vitest/globals"],
-    "strictNullChecks": true,
+    "strictNullChecks": true
   },
-  "include": ["../src",],
+  "include": ["../src"],
   "exclude": ["../typings"]
 }
