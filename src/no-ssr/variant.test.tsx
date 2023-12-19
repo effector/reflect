@@ -1,9 +1,8 @@
+import { variant } from '@effector/reflect';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEvent, createStore, restore } from 'effector';
 import React from 'react';
-
-import { variant } from '../index';
 
 test('matches first', async () => {
   const changeValue = createEvent<string>();
@@ -79,7 +78,7 @@ test('hooks works once on mount', async () => {
   const changeType = createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
   const mounted = createEvent();
-  const fn = jest.fn();
+  const fn = vi.fn();
   mounted.watch(fn);
 
   const Input = variant({
@@ -108,7 +107,7 @@ test('hooks works once on unmount', async () => {
   const changeType = createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
   const unmounted = createEvent();
-  const fn = jest.fn();
+  const fn = vi.fn();
   unmounted.watch(fn);
   const setVisible = createEvent<boolean>();
   const $visible = restore(setVisible, true);
@@ -147,10 +146,10 @@ test('hooks works on remount', async () => {
   const $type = restore(changeType, 'first');
 
   const unmounted = createEvent();
-  const onUnmount = jest.fn();
+  const onUnmount = vi.fn();
   unmounted.watch(onUnmount);
   const mounted = createEvent();
-  const onMount = jest.fn();
+  const onMount = vi.fn();
   mounted.watch(onMount);
 
   const setVisible = createEvent<boolean>();
@@ -285,5 +284,42 @@ describe('overload for Store<boolean>', () => {
 
     const container = render(<Component testId="then" />);
     expect(() => container.getByTestId('then')).toThrowError();
+  });
+});
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Test = variant({
+        source: createStore<'a' | 'b'>('a'),
+        cases: {
+          a: () => null,
+          b: () => null,
+        },
+        bind: {},
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
+  });
+  test('useUnit config should be passed to underlying useUnit (bool overload)', () => {
+    expect(() => {
+      const Test = variant({
+        if: createStore(true),
+        then: () => null,
+        else: () => null,
+        bind: {},
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
   });
 });

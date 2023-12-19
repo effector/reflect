@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { list } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
 import React from 'react';
 import { expectType } from 'tsd';
-
-import { list } from '../src';
 
 // basic usage of list
 {
@@ -116,6 +115,31 @@ import { list } from '../src';
     source: $items,
     bind: {
       common: $common,
+    },
+    view: Item,
+  });
+
+  expectType<React.FC>(List);
+}
+
+// list does not allow to set prop in mapItem, if it is already set in bind
+{
+  const Item: React.FC<{
+    id: number;
+    value: string;
+    common: string;
+  }> = () => null;
+  const $common = createStore<string>('common prop');
+  const $items = createStore<{ id: number; value: string }[]>([]);
+
+  const List = list({
+    source: $items,
+    bind: {
+      common: $common,
+    },
+    mapItem: {
+      // @ts-expect-error
+      common: () => 'common prop',
     },
     view: Item,
   });

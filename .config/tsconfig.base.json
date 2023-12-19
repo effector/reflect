@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ESNext",
     "module": "es2015",
     "strict": true,
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -8,8 +8,9 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "esModuleInterop": true,
+    "types": ["vitest/globals"],
     "strictNullChecks": true
   },
   "include": ["../src"],
-  "exclude": ["../typings", "../**/*.test.tsx"]
+  "exclude": ["../typings"]
 }

@@ -1,9 +1,18 @@
-import fs from 'node:fs/promises';
-
+/* eslint-disable no-undef */
 import prettyMs from 'pretty-ms';
 import { rollup } from 'rollup';
+import 'zx/globals';
 
 import configs from './rollup.config.cjs';
+
+await fs.mkdir('./dist', { recursive: true });
+
+await measure(`public-typings → ./dist/`, `copied in`, async () => {
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/index.d.ts');
+
+  // `@effector/reflect/scope` types - this export is deprecated
+  await fs.copyFile('./public-types/reflect.d.ts', './dist/scope.d.ts');
+});
 
 for (const config of configs) {
   await measure(

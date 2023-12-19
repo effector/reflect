@@ -1,8 +1,7 @@
-
 # `list`
 
 ```ts
-import {list} from '@effector/reflect'
+import { list } from '@effector/reflect';
 ```
 
 ```tsx
@@ -32,6 +31,7 @@ Method creates component, which renders list of `view` components based on items
 1. `bind` — Optional object of stores, events, and static values that will be bound as props to every list item.
 1. [`hooks`](/docs/hooks) — Optional object `{ mounted, unmounted }` to handle when any list item component is mounted or unmounted.
 1. `getKey` - Optional function `(item: Item) => React.Key` to set key for every item in the list to help React with effecient rerenders. If not provided, index is used. See [`effector-react`](https://effector.dev/docs/api/effector-react/useList) docs for more details.
+1. `useUnitConfig` - Optional configuration object, which is passed directly to the second argument of `useUnit` from `effector-react`.
 
 ## Returns
 
@@ -78,3 +78,31 @@ const Items = list({
   <Items />
 </List>;
 ```
+
+### Fork API auto-compatibility
+
+**This feature is available since `9.0.0` release of Reflect.**
+
+The `list` operator also supports automatic Fork API support for callbacks **created** from `mapItem`:
+
+```ts
+const userChanged = createEvent();
+const Items = list({
+  view: Item,
+  source: $users,
+  bind: {
+    color: $color,
+  },
+  mapItem: {
+    id: (user) => user.id,
+    name: (user) => user.name,
+    onChange: (user) => (nextUser) => {
+      userChanged({ oldUser: user, nextUser });
+    },
+  },
+  getKey: (user) => `${user.id}${user.name}`,
+});
+```
+
+☝️ Notice, how `mapItem.onChange` creates a event handler callback for every rendered item. Those callbacks are also binded to Scope, if it is provided.
+For more details read the "Fork API auto-compatibility" part of the `reflect` operator documentation.

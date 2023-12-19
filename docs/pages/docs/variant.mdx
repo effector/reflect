@@ -1,8 +1,7 @@
-
 # `variant`
 
 ```ts
-import {variant} from '@effector/reflect'
+import { variant } from '@effector/reflect';
 ```
 
 ```tsx
@@ -24,6 +23,7 @@ Method allows to change component based on value in `$typeSelector`. Optional `b
 1. `cases` — Object of components, key will be used to match
 1. `default` — Optional component, that would be used if no matched in `cases`
 1. [`hooks`](/docs/hooks) — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
+1. `useUnitConfig` - Optional configuration object, which is passed directly to the second argument of `useUnit` from `effector-react`.
 
 ## Example
 

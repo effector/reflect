@@ -1,10 +1,17 @@
+import { fromTag, reflect } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createEffect, createEvent, createStore, restore } from 'effector';
+import {
+  allSettled,
+  createEffect,
+  createEvent,
+  createStore,
+  fork,
+  restore,
+} from 'effector';
+import { Provider } from 'effector-react';
 import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
 import { act } from 'react-dom/test-utils';
-
-import { reflect } from '../index';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -159,13 +166,142 @@ test('forwardRef', async () => {
   expect(container.getByTestId('name')).toBe(ref.current);
 });
 
+describe('plain callbacks with scopeBind under the hood', () => {
+  test('sync callback in bind', async () => {
+    let sendRender = (v: string) => {};
+    const Input = (props: { value: string; onChange: (_event: string) => void }) => {
+      const [render, setRender] = React.useState<any>(null);
+      React.useLayoutEffect(() => {
+        if (render) {
+          props.onChange(render);
+        }
+      }, [render]);
+      sendRender = setRender;
+      return <input data-testid="name" value={props.value} />;
+    };
+
+    const $name = createStore<string>('');
+    const changeName = createEvent<string>();
+    $name.on(changeName, (_, next) => next);
+
+    const Name = reflect({
+      view: Input,
+      bind: {
+        value: $name,
+        onChange: (v) => changeName(v),
+      },
+    });
+
+    render(<Name />);
+
+    await act(() => {
+      sendRender('Bob');
+    });
+
+    expect($name.getState()).toBe('Bob');
+  });
+
+  test('sync callback in bind (scope)', async () => {
+    let sendRender = (v: string) => {};
+    const Input = (props: { value: string; onChange: (_event: string) => void }) => {
+      const [render, setRender] = React.useState<any>(null);
+      React.useLayoutEffect(() => {
+        if (render) {
+          props.onChange(render);
+        }
+      }, [render]);
+      sendRender = setRender;
+      return <input data-testid="name" value={props.value} />;
+    };
+
+    const $name = createStore<string>('');
+    const changeName = createEvent<string>();
+    $name.on(changeName, (_, next) => next);
+
+    const Name = reflect({
+      view: Input,
+      bind: {
+        value: $name,
+        onChange: (v) => changeName(v),
+      },
+    });
+
+    const scope = fork();
+
+    render(
+      <Provider value={scope}>
+        <Name />
+      </Provider>,
+    );
+
+    await act(() => {
+      sendRender('Bob');
+    });
+
+    expect(scope.getState($name)).toBe('Bob');
+    expect($name.getState()).toBe('');
+  });
+
+  test('async callback in bind (scope)', async () => {
+    const sleepFx = createEffect(
+      async (ms: number) => new Promise((rs) => setTimeout(rs, ms)),
+    );
+    let sendRender = (v: string) => {};
+    const Input = (props: {
+      value: string;
+      onChange: (_event: string) => Promise<void>;
+    }) => {
+      const [render, setRender] = React.useState<any>(null);
+      React.useLayoutEffect(() => {
+        if (render) {
+          props.onChange(render);
+        }
+      }, [render]);
+      sendRender = setRender;
+      return <input data-testid="name" value={props.value} />;
+    };
+
+    const $name = createStore<string>('');
+    const changeName = createEvent<string>();
+    $name.on(changeName, (_, next) => next);
+
+    const Name = reflect({
+      view: Input,
+      bind: {
+        value: $name,
+        onChange: async (v) => {
+          await sleepFx(1);
+          changeName(v);
+        },
+      },
+    });
+
+    const scope = fork();
+
+    render(
+      <Provider value={scope}>
+        <Name />
+      </Provider>,
+    );
+
+    await act(() => {
+      sendRender('Bob');
+    });
+
+    await allSettled(scope);
+
+    expect(scope.getState($name)).toBe('Bob');
+    expect($name.getState()).toBe('');
+  });
+});
+
 describe('hooks', () => {
   describe('mounted', () => {
     test('callback', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
 
-      const mounted = jest.fn(() => {});
+      const mounted = vi.fn(() => {});
 
       const Name = reflect({
         view: InputBase,
@@ -186,7 +322,7 @@ describe('hooks', () => {
       const $name = restore(changeName, '');
       const mounted = createEvent<void>();
 
-      const fn = jest.fn(() => {});
+      const fn = vi.fn(() => {});
 
       mounted.watch(fn);
 
@@ -227,7 +363,7 @@ describe('hooks', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
 
-      const unmounted = jest.fn(() => {});
+      const unmounted = vi.fn(() => {});
 
       const Name = reflect({
         view: InputBase,
@@ -252,7 +388,7 @@ describe('hooks', () => {
       const $name = restore(changeName, '');
 
       const unmounted = createEvent<void>();
-      const fn = jest.fn(() => {});
+      const fn = vi.fn(() => {});
 
       unmounted.watch(fn);
 
@@ -273,5 +409,68 @@ describe('hooks', () => {
 
       expect(fn.mock.calls.length).toBe(1);
     });
+  });
+});
+
+describe('fromTag helper', () => {
+  test('Basic usage work', async () => {
+    const changed = createEvent<unknown>();
+    const $fromHandler = createStore<any>(null).on(changed, (_, next) => next);
+    const $type = createStore<string>('hidden');
+
+    const DomInput = fromTag('input');
+
+    const Input = reflect({
+      view: DomInput,
+      bind: {
+        type: $type,
+        onChange: changed.prepend((event) => event),
+        'data-testid': 'test-input',
+      },
+    });
+
+    const scopeText = fork({
+      values: [[$type, 'text']],
+    });
+    const scopeEmail = fork({
+      values: [[$type, 'email']],
+    });
+
+    const body = render(
+      <Provider value={scopeText}>
+        <Input />
+      </Provider>,
+    );
+
+    expect((body.container.firstChild as any).type).toBe('text');
+
+    await userEvent.type(body.getByTestId('test-input'), 'bob');
+
+    expect(scopeText.getState($fromHandler).target.value).toBe('bob');
+
+    const body2 = render(
+      <Provider value={scopeEmail}>
+        <Input />
+      </Provider>,
+    );
+
+    expect((body2.container.firstChild as any).type).toBe('email');
+  });
+});
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Test = reflect({
+        view: () => null,
+        bind: {},
+        useUnitConfig: {
+          forceScope: true,
+        },
+      });
+      render(<Test data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
   });
 });

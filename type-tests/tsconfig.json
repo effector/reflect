@@ -12,8 +12,12 @@
     "noImplicitThis": true,
     "noUnusedLocals": false,
     "strict": true,
+    "skipLibCheck": true,
     "jsx": "react",
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true
+    "paths": {
+      "@effector/reflect": ["../public-types/reflect.d.ts"],
+      "@effector/reflect/scope": ["../public-types/reflect.d.ts"]
+    }
   }
 }

@@ -8,10 +8,8 @@ const babelConfig = require('./babel.config.json');
 
 const plugins = () => [
   typescript({
-    useTsconfigDeclarationDir: true,
-    tsconfigDefaults: {
-      compilerOptions: { declaration: true, declarationDir: './dist' },
-    },
+    tsconfig: './tsconfig.json',
+    check: false,
   }),
   babel({
     exclude: 'node_modules/**',
@@ -26,19 +24,12 @@ const plugins = () => [
     extensions: ['.js', '.mjs'],
   }),
   commonjs({ extensions: ['.js', '.mjs'] }),
-  terser(),
+  // terser(),
 ];
 
 const noSsr = './src/index.ts';
-const ssr = './src/ssr.ts';
 const scope = './src/scope.ts';
-const external = [
-  'effector',
-  'effector-react',
-  'react',
-  'effector-react/ssr',
-  'effector-react/scope',
-];
+const external = ['effector', 'effector-react', 'react', 'effector-react/scope'];
 
 module.exports = [
   {
@@ -46,18 +37,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './dist/reflect.mjs',
-      format: 'es',
-      sourcemap: true,
-      externalLiveBindings: false,
-    },
-  },
-  {
-    input: ssr,
-    external,
-    plugins: plugins(),
-    output: {
-      file: './dist/ssr.mjs',
+      file: './dist/index.mjs',
       format: 'es',
       sourcemap: true,
       externalLiveBindings: false,
@@ -79,20 +59,7 @@ module.exports = [
     external,
     plugins: plugins(),
     output: {
-      file: './dist/reflect.cjs',
-      format: 'cjs',
-      freeze: false,
-      exports: 'named',
-      sourcemap: true,
-      externalLiveBindings: false,
-    },
-  },
-  {
-    input: ssr,
-    external,
-    plugins: plugins(),
-    output: {
-      file: './dist/ssr.js',
+      file: './dist/index.cjs',
       format: 'cjs',
       freeze: false,
       exports: 'named',

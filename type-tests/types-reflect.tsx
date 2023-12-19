@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { reflect } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import React, { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import { expectType } from 'tsd';
-
-import { reflect } from '../src';
 
 // basic reflect
 {
@@ -105,7 +104,7 @@ import { reflect } from '../src';
   expectType<React.FC>(AppFixed);
 }
 
-// reflect should allow to pass Event<void> as click event handler
+// reflect should allow to pass EventCallable<void> as click event handler
 {
   const Button: React.FC<{
     onClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>>;
@@ -159,4 +158,87 @@ import { reflect } from '../src';
   };
 
   expectType<React.FC>(App);
+}
+
+// reflect should allow to pass any callback
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: (e) => {
+        expectType<string>(e);
+        changed(e);
+      },
+    },
+  });
+
+  expectType<React.FC>(ReflectedInput);
+}
+
+// should support useUnit configuration
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: (e) => {
+        expectType<string>(e);
+        changed(e);
+      },
+    },
+    useUnitConfig: {
+      forceScope: true,
+    },
+  });
+}
+
+// should not support invalud useUnit configuration
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: (e) => {
+        expectType<string>(e);
+        changed(e);
+      },
+    },
+    useUnitConfig: {
+      // @ts-expect-error
+      forseScope: true,
+    },
+  });
+}
+
+// reflect fits ComponentType
+{
+  const Input = (props: PropsWithChildren<{ value: string }>) => null;
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+    },
+  });
+
+  const Test: ComponentType<{ value: string; children: ReactNode }> = Input;
 }

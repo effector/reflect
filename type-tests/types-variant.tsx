@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { reflect, variant } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { expectType } from 'tsd';
-
-import { variant } from '../src';
 
 // basic variant usage
 {
@@ -52,7 +51,6 @@ import { variant } from '../src';
     source: $type,
     bind: {
       value: $value,
-      // @ts-expect-error
       onChange: changed,
     },
     cases: {
@@ -65,29 +63,7 @@ import { variant } from '../src';
   expectType<React.FC>(VariableInput);
 }
 
-// variant warns, if no cases provided
-{
-  type PageProps = {
-    context: {
-      route: string;
-    };
-  };
-  const NotFoundPage: React.FC<PageProps> = () => null;
-  const $page = createStore<'home' | 'faq' | 'profile' | 'products'>('home');
-  const $pageContext = $page.map((route) => ({ route }));
-
-  const CurrentPage = variant({
-    source: $page,
-    bind: { context: $pageContext },
-    // @ts-expect-error
-    cases: {},
-    default: NotFoundPage,
-  });
-
-  expectType<React.FC>(CurrentPage);
-}
-
-// variant allows to set every possble case
+// variant allows not to set every possble case
 // for e.g. if we want to cover only specific ones and render default for the rest
 {
   type PageProps = {
@@ -171,4 +147,44 @@ import { variant } from '../src';
     bind: { context: $ctx },
   });
   expectType<React.FC>(CurrentPageOnlyThen);
+}
+
+// supports nesting
+{
+  const Test = (props: { test: string }) => <></>;
+
+  const $test = createStore('test');
+  const $bool = createStore(true);
+
+  const NestedVariant = variant({
+    source: $test,
+    cases: {
+      test: variant({
+        if: $bool,
+        then: reflect({
+          view: Test,
+          bind: {},
+        }),
+      }),
+    },
+  });
+}
+
+// allows variants of compatible types
+{
+  const Test = (props: PropsWithChildren<{ test: string }>) => <div>content</div>;
+  const Loader = () => <>loader</>;
+
+  const $test = createStore(false);
+
+  const View = variant({
+    if: $test,
+    then: reflect({
+      view: Test,
+      bind: {
+        test: $test.map(() => 'test'),
+      },
+    }),
+    else: Loader,
+  });
 }

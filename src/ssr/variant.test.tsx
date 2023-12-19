@@ -1,10 +1,9 @@
+import { variant } from '@effector/reflect/scope';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { allSettled, createDomain, fork, restore } from 'effector';
-import { Provider } from 'effector-react/ssr';
+import { Provider } from 'effector-react/scope';
 import React from 'react';
-
-import { variant } from '../ssr';
 
 test('matches first', async () => {
   const app = createDomain();
@@ -56,7 +55,7 @@ test('hooks works once on mount', async () => {
   const changeType = app.createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
   const mounted = app.createEvent();
-  const fn = jest.fn();
+  const fn = vi.fn();
   mounted.watch(fn);
 
   const Input = variant({
@@ -92,7 +91,7 @@ test('hooks works once on unmount', async () => {
   const changeType = app.createEvent<'first' | 'second' | 'third'>();
   const $type = restore(changeType, 'first');
   const unmounted = app.createEvent();
-  const fn = jest.fn();
+  const fn = vi.fn();
   unmounted.watch(fn);
   const setVisible = app.createEvent<boolean>();
   const $visible = restore(setVisible, true);
@@ -138,10 +137,10 @@ test('hooks works on remount', async () => {
   const $type = restore(changeType, 'first');
 
   const unmounted = app.createEvent();
-  const onUnmount = jest.fn();
+  const onUnmount = vi.fn();
   unmounted.watch(onUnmount);
   const mounted = app.createEvent();
-  const onMount = jest.fn();
+  const onMount = vi.fn();
   mounted.watch(onMount);
 
   const setVisible = app.createEvent<boolean>();

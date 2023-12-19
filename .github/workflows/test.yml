@@ -24,10 +24,9 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Build test
-        run: pnpm test:code:build
-
       - name: Run tests
         run: pnpm test
         env:
           CI: true
+      - name: Validate package
+        run: pnpm validate:dist

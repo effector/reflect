@@ -1,0 +1,57 @@
+# `fromTag`
+
+```ts
+import { fromTag } from '@effector/reflect';
+```
+
+```ts
+const DomInput = fromTag('input');
+```
+
+**This feature is available since `9.0.0` release of Reflect.**
+
+Helper to simplify `reflect` usage with pure DOM elements by creating simple components based on a html tag.
+Such cases can happen, when project uses tools like Tailwind.
+
+## Arguments
+
+1. `htmlTag` - any valid and React-supported html tag.
+
+## Returns
+
+- React Component, which renders dom element.
+
+## Example
+
+Tailwind users sometimes don't create components, but simply compose classes to apply to regular HTML elements.
+
+```ts
+import { fromTag, reflect } from '@effector/reflect';
+
+const DomInput = fromTag('input');
+
+const inputEl = cva('px-3 py-2', {
+  variants: {
+    size: {
+      base: 'text-base',
+      large: 'text-3xl',
+    },
+  },
+});
+
+const NameField = reflect({
+  view: DomInput,
+  bind: {
+    type: 'email',
+    value: $value,
+    className: inputEl({ size: $inputSize }),
+  },
+});
+```
+
+### Type inference caveat
+
+For some reason Typescript type inference works a bit worse, when `fromTag` call is inlined into `reflect` - specifically, callback types are not properly inferred.
+Typescript still will check it properly, if you type your callback manually though. 🤷‍♂️
+
+It is recommended to save `fromTag` call result into separate variable instead, since for some reason it works better with TS.

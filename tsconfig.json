@@ -1,3 +1,10 @@
 {
-  "extends": "./.config/tsconfig.base.json"
+  "extends": "./.config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@effector/reflect": ["./public-types/reflect.d.ts"],
+      "@effector/reflect/scope": ["./public-types/reflect.d.ts"]
+    }
+  }
 }

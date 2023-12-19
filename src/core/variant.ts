@@ -2,14 +2,7 @@ import { Store } from 'effector';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
-import {
-  AtLeastOne,
-  BindableProps,
-  Context,
-  Hooks,
-  PartialBoundProps,
-  View,
-} from './types';
+import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
 
 const Default = () => null;
 
@@ -19,15 +12,16 @@ export function variantFactory(context: Context) {
   return function variant<
     Props,
     Variant extends string,
-    Bind extends BindableProps<Props>,
+    Bind extends BindProps<Props>,
   >(
     config:
       | {
           source: Store<Variant>;
           bind?: Bind;
-          cases: AtLeastOne<Record<Variant, View<Props>>>;
+          cases: Record<Variant, View<Props>>;
           hooks?: Hooks;
           default?: View<Props>;
+          useUnitConfig?: UseUnitConifg;
         }
       | {
           if: Store<boolean>;
@@ -35,10 +29,11 @@ export function variantFactory(context: Context) {
           else?: View<Props>;
           hooks?: Hooks;
           bind?: Bind;
+          useUnitConfig?: UseUnitConifg;
         },
-  ): React.FC<PartialBoundProps<Props, Bind>> {
+  ): (p: Props) => React.ReactNode {
     let $case: Store<Variant>;
-    let cases: AtLeastOne<Record<Variant, View<Props>>>;
+    let cases: Record<Variant, View<Props>>;
     let def: View<Props>;
 
     // Shortcut for Store<boolean>
@@ -48,7 +43,7 @@ export function variantFactory(context: Context) {
       cases = {
         then: config.then,
         else: config.else,
-      } as unknown as AtLeastOne<Record<Variant, View<Props>>>;
+      } as unknown as Record<Variant, View<Props>>;
       def = Default;
     }
     // Full form for Store<string>
@@ -59,7 +54,7 @@ export function variantFactory(context: Context) {
     }
 
     function View(props: Props) {
-      const nameOfCase = context.useUnit($case);
+      const nameOfCase = context.useUnit($case, config.useUnitConfig);
       const Component = cases[nameOfCase] ?? def;
 
       return React.createElement(Component as any, props as any);
@@ -71,6 +66,7 @@ export function variantFactory(context: Context) {
       bind,
       view: View,
       hooks: config.hooks,
-    });
+      useUnitConfig: config.useUnitConfig,
+    }) as unknown as (p: Props) => React.ReactNode;
   };
 }

@@ -1,10 +1,9 @@
+import { createReflect } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEffect, createEvent, createStore, restore } from 'effector';
 import React, { FC, InputHTMLAttributes } from 'react';
 import { act } from 'react-dom/test-utils';
-
-import { createReflect } from '../index';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -112,7 +111,7 @@ describe('hooks', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
 
-      const mounted = jest.fn(() => {});
+      const mounted = vi.fn(() => {});
 
       const Name = inputBase(
         {
@@ -132,7 +131,7 @@ describe('hooks', () => {
       const $name = restore(changeName, '');
       const mounted = createEvent<void>();
 
-      const fn = jest.fn(() => {});
+      const fn = vi.fn(() => {});
 
       mounted.watch(fn);
 
@@ -173,7 +172,7 @@ describe('hooks', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
 
-      const unmounted = jest.fn(() => {});
+      const unmounted = vi.fn(() => {});
 
       const Name = inputBase(
         {
@@ -197,7 +196,7 @@ describe('hooks', () => {
       const $name = restore(changeName, '');
 
       const unmounted = createEvent<void>();
-      const fn = jest.fn(() => {});
+      const fn = vi.fn(() => {});
 
       unmounted.watch(fn);
 
@@ -217,5 +216,16 @@ describe('hooks', () => {
 
       expect(fn.mock.calls.length).toBe(1);
     });
+  });
+});
+
+describe('useUnitConfig', () => {
+  test('useUnit config should be passed to underlying useUnit', () => {
+    expect(() => {
+      const Name = inputBase({}, { useUnitConfig: { forceScope: true } });
+      render(<Name data-testid="name" />);
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: No scope found, consider adding <Provider> to app root]`,
+    );
   });
 });
