@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { EventCallable, Store } from 'effector';
 import type { useUnit } from 'effector-react';
-import type {
-  ComponentType,
-  EventHandler,
-  PropsWithChildren,
-  ReactHTML,
-  ReactNode,
-} from 'react';
+import type { ComponentType, FC, PropsWithChildren, ReactHTML } from 'react';
 
 type UseUnitConfig = Parameters<typeof useUnit>[1];
 
@@ -53,7 +47,7 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
    * This configuration is passed directly to `useUnit`'s hook second argument.
    */
   useUnitConfig?: UseUnitConfig;
-}): (props: Omit<Props, keyof Bind>) => ReactNode;
+}): FC<Omit<Props, keyof Bind>>;
 
 // createReflect types
 /**
@@ -81,7 +75,7 @@ export function createReflect<Props, Bind extends BindFromProps<Props>>(
      */
     useUnitConfig?: UseUnitConfig;
   },
-) => (props: Omit<Props, keyof Bind>) => ReactNode;
+) => FC<Omit<Props, keyof Bind>>;
 
 // list types
 type PropsifyBind<Bind> = {
@@ -141,7 +135,7 @@ export function list<
          */
         useUnitConfig?: UseUnitConfig;
       },
-): () => ReactNode;
+): FC;
 
 // variant types
 
@@ -194,7 +188,7 @@ export function variant<
          */
         useUnitConfig?: UseUnitConfig;
       },
-): (props: Omit<Props, keyof Bind>) => ReactNode;
+): FC<Omit<Props, keyof Bind>>;
 
 // fromTag types
 type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<
@@ -224,4 +218,4 @@ type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<
  */
 export function fromTag<HtmlTag extends keyof ReactHTML>(
   htmlTag: HtmlTag,
-): (props: PropsWithChildren<GetProps<HtmlTag>>) => ReactNode;
+): FC<PropsWithChildren<GetProps<HtmlTag>>>;
