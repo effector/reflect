@@ -22,9 +22,9 @@ export type BindProps<Props> = {
 
 export type Hook = (() => any) | EventCallable<void> | Effect<void, any, any>;
 
-export interface Hooks {
+export type Hooks = {
   mounted?: Hook;
   unmounted?: Hook;
-}
+};
 
 export type UseUnitConifg = Parameters<typeof useUnit>[1];
