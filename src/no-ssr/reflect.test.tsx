@@ -317,6 +317,28 @@ describe('hooks', () => {
       expect(mounted.mock.calls.length).toBe(1);
     });
 
+    test('callback in scope', () => {
+      const mounted = createEvent();
+      const $isMounted = createStore(false).on(mounted, () => true);
+
+      const scope = fork();
+
+      const Name = reflect({
+        view: InputBase,
+        bind: {},
+        hooks: { mounted: () => mounted() },
+      });
+
+      render(
+        <Provider value={scope}>
+          <Name data-testid="name" />
+        </Provider>,
+      );
+
+      expect($isMounted.getState()).toBe(false);
+      expect(scope.getState($isMounted)).toBe(true);
+    });
+
     test('event', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
@@ -338,6 +360,28 @@ describe('hooks', () => {
       render(<Name data-testid="name" />);
 
       expect(fn.mock.calls.length).toBe(1);
+    });
+
+    test('event in scope', () => {
+      const mounted = createEvent();
+      const $isMounted = createStore(false).on(mounted, () => true);
+
+      const scope = fork();
+
+      const Name = reflect({
+        view: InputBase,
+        bind: {},
+        hooks: { mounted },
+      });
+
+      render(
+        <Provider value={scope}>
+          <Name data-testid="name" />
+        </Provider>,
+      );
+
+      expect($isMounted.getState()).toBe(false);
+      expect(scope.getState($isMounted)).toBe(true);
     });
   });
 
