@@ -31,7 +31,7 @@ export function reflectFactory(context: Context) {
     return React.forwardRef((props, ref) => {
       const storeProps = context.useUnit(stores, config.useUnitConfig);
       const eventsProps = context.useUnit(events as any, config.useUnitConfig);
-      const functionProps = useBindedFunctions(functions);
+      const functionProps = useBoundFunctions(functions);
 
       const elementProps: Props = Object.assign(
         { ref },
@@ -93,19 +93,19 @@ function sortProps<Props, Bind extends BindProps<Props> = BindProps<Props>>(
   return { events, stores, data, functions };
 }
 
-function useBindedFunctions(functions: Record<string, Function>) {
+function useBoundFunctions(functions: Record<string, Function>) {
   const scope = useProvidedScope();
 
   return React.useMemo(() => {
-    const bindedFunctions: Record<string, Function> = {};
+    const boundFunctions: Record<string, Function> = {};
 
     for (const key in functions) {
       const fn = functions[key];
 
-      bindedFunctions[key] = scopeBind(fn, { scope: scope || undefined, safe: true });
+      boundFunctions[key] = scopeBind(fn, { scope: scope || undefined, safe: true });
     }
 
-    return bindedFunctions;
+    return boundFunctions;
   }, [scope, functions]);
 }
 
