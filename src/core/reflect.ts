@@ -26,7 +26,8 @@ export function reflectFactory(context: Context) {
   return function reflect<Props, Bind extends BindProps<Props> = BindProps<Props>>(
     config: ReflectConfig<Props, Bind>,
   ): React.ExoticComponent<{}> {
-    const { stores, events, data, functions } = sortProps(config);
+    const { stores, events, data, functions } = sortProps(config.bind);
+    const hooks = sortProps(config.hooks || {});
 
     return React.forwardRef((props, ref) => {
       const storeProps = context.useUnit(stores, config.useUnitConfig);
@@ -42,33 +43,29 @@ export function reflectFactory(context: Context) {
         props,
       );
 
-      const mounted = wrapToHook(
-        config.hooks?.mounted,
-        context,
-        config.useUnitConfig,
-      );
-      const unmounted = wrapToHook(
-        config.hooks?.unmounted,
-        context,
-        config.useUnitConfig,
-      );
+      const eventsHooks = context.useUnit(hooks.events as any, config.useUnitConfig);
+      const functionsHooks = useBoundFunctions(hooks.functions);
 
       React.useEffect(() => {
-        if (mounted) mounted();
+        const hooks: Hooks = Object.assign({}, functionsHooks, eventsHooks);
+
+        if (hooks.mounted) {
+          hooks.mounted();
+        }
 
         return () => {
-          if (unmounted) unmounted();
+          if (hooks.unmounted) {
+            hooks.unmounted();
+          }
         };
-      }, []);
+      }, [eventsHooks, functionsHooks]);
 
       return React.createElement(config.view as any, elementProps as any);
     });
   };
 }
 
-function sortProps<Props, Bind extends BindProps<Props> = BindProps<Props>>(
-  config: ReflectConfig<Props, Bind>,
-) {
+function sortProps<T extends object>(props: T) {
   type GenericEvent = Event<unknown> | Effect<unknown, unknown, unknown>;
 
   const events: Record<string, GenericEvent> = {};
@@ -76,8 +73,8 @@ function sortProps<Props, Bind extends BindProps<Props> = BindProps<Props>>(
   const data: Record<string, unknown> = {};
   const functions: Record<string, Function> = {};
 
-  for (const key in config.bind) {
-    const value = config.bind[key];
+  for (const key in props) {
+    const value = props[key];
 
     if (is.event(value) || is.effect(value)) {
       events[key] = value;
@@ -107,16 +104,4 @@ function useBoundFunctions(functions: Record<string, Function>) {
 
     return boundFunctions;
   }, [scope, functions]);
-}
-
-function wrapToHook(hook: Hook | void, context: Context, config?: UseUnitConifg) {
-  if (hookDefined(hook)) {
-    return context.useUnit(hook as EventCallable<void>, config);
-  }
-
-  return hook;
-}
-
-function hookDefined(hook: Hook | void): hook is Hook {
-  return Boolean(hook && (is.event(hook) || is.effect(hook)));
 }
