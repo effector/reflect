@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect, variant } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React, { PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 import { expectType } from 'tsd';
 
 // basic variant usage
@@ -187,4 +187,66 @@ import { expectType } from 'tsd';
     }),
     else: Loader,
   });
+}
+
+// Issue #81 reproduce 1
+{
+  const Component = (props: { name: string }) => {
+    return null;
+  };
+
+  const Variant = variant({
+    source: createStore<'a'>('a'),
+    cases: { a: Component },
+  });
+
+  // should not report error here
+  const element = <Variant name="test" />;
+}
+
+// Issue #81 reproduce 2
+{
+  const $enabled = createStore(true);
+  const $name = createStore('reflect');
+
+  const MyView: FC<{ name: string; slot: ReactNode }> = ({ name, slot }) => {
+    return (
+      <div>
+        <h1>Hello, {name}!</h1>
+        {slot}
+      </div>
+    );
+  };
+
+  const ComponentWithReflectOnly = reflect({
+    bind: {
+      name: $name,
+    },
+    view: MyView,
+  });
+
+  const ComponentWithVariantAndReflect = variant({
+    if: $enabled,
+    then: reflect({
+      bind: {
+        name: $name,
+      },
+      view: MyView,
+    }),
+  });
+
+  // Should not report error for "Another slot type"
+  const App = () => {
+    return (
+      <main>
+        <ComponentWithReflectOnly slot={<h2>Good slot type</h2>} />
+        <ComponentWithVariantAndReflect slot={<h2>Another slot type(</h2>} />
+        <ComponentWithVariantAndReflect
+          slot={<h2>Should report error for "name"</h2>}
+          // @ts-expect-error
+          name="kek"
+        />
+      </main>
+    );
+  };
 }
