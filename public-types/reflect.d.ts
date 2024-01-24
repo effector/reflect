@@ -169,7 +169,10 @@ export function list<
 export function variant<
   Props,
   CaseType extends string,
-  Bind extends BindFromProps<Props>,
+  // It is ok here - it fixed bunch of type inference issues, when `bind` is not provided
+  // but it is not clear why it works this way - Record<string, never> or any option other than `{}` doesn't work
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  Bind extends BindFromProps<Props> = {},
 >(
   config:
     | {
