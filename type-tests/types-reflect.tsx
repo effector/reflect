@@ -182,6 +182,50 @@ import { expectType } from 'tsd';
   expectType<React.FC>(ReflectedInput);
 }
 
+// should allow store with a function as a callback value
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+  }> = () => null;
+  const $changed = createStore<(newValue: string) => void>(() => {});
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: $changed,
+    },
+  });
+
+  expectType<React.FC>(ReflectedInput);
+}
+
+function localize<T extends 'b'>(value: T): { lol: boolean };
+function localize<T extends 'a'>(value: T): { kek: boolean };
+function localize(value: string): unknown {
+  return value;
+}
+
+// should allow store with generics
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: typeof localize;
+  }> = () => null;
+  const $changed = createStore<typeof localize>(localize);
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: 'plain string',
+      onChange: $changed,
+    },
+  });
+
+  expectType<React.FC>(ReflectedInput);
+}
+
 // should support useUnit configuration
 {
   const Input: React.FC<{
