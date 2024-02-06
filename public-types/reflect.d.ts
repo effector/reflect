@@ -20,6 +20,8 @@ type BindFromProps<Props> = {
       | ((...args: Parameters<Props[K]>) => ReturnType<Props[K]>)
         // Edge-case: allow to pass an event listener without any parameters (e.g. onClick: () => ...)
         | (() => ReturnType<Props[K]>)
+        // Edge-case: allow to pass an Store, which contains a function
+        | Store<Props[K]>
     : Store<Props[K]> | Props[K];
 };
 
