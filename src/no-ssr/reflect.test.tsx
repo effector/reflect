@@ -293,6 +293,42 @@ describe('plain callbacks with scopeBind under the hood', () => {
     expect(scope.getState($name)).toBe('Bob');
     expect($name.getState()).toBe('');
   });
+
+  test('render props work', async () => {
+    const RenderComp = (props: {
+      prefix: string;
+      renderMe: (props: { value: string }) => React.ReactNode;
+    }) => {
+      return <div>{props.renderMe({ value: `${props.prefix}: text` })}</div>;
+    };
+    const Text = (props: { value: string }) => {
+      return <span>{props.value}</span>;
+    };
+
+    const ReflectedRender = reflect({
+      view: RenderComp,
+      bind: {
+        prefix: createStore('Hello'),
+        renderMe: Text,
+      },
+    });
+
+    const scope = fork();
+
+    const container = render(
+      <Provider value={scope}>
+        <ReflectedRender />
+      </Provider>,
+    );
+
+    expect(container.container.firstChild).toMatchInlineSnapshot(`
+      <div>
+        <span>
+          Hello: text
+        </span>
+      </div>
+    `);
+  });
 });
 
 describe('hooks', () => {
