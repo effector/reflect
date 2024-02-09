@@ -243,7 +243,6 @@ import { expectType } from 'tsd';
         <ComponentWithVariantAndReflect slot={<h2>Another slot type(</h2>} />
         <ComponentWithVariantAndReflect
           slot={<h2>Should report error for "name"</h2>}
-          // @ts-expect-error
           name="kek"
         />
       </main>
