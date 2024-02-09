@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-import type { EventCallable, Store } from 'effector';
+import type { EventCallable, Show, Store } from 'effector';
 import type { useUnit } from 'effector-react';
 import type { ComponentType, FC, PropsWithChildren, ReactHTML } from 'react';
 
@@ -12,6 +12,12 @@ type Hooks = {
   unmounted?: EventCallable<void> | (() => unknown);
 };
 
+/**
+ * `bind` object type:
+ * prop key -> store (unwrapped to reactive subscription) or any other value (used as is)
+ *
+ * Also handles some edge-cases like enforcing type inference for inlined callbacks
+ */
 type BindFromProps<Props> = {
   [K in keyof Props]?: K extends UnbindableProps
     ? never
@@ -24,6 +30,18 @@ type BindFromProps<Props> = {
         | Store<Props[K]>
     : Store<Props[K]> | Props[K];
 };
+
+/**
+ * Computes final props type based on Props of the view component and Bind object.
+ *
+ * Props that are "taken" by Bind object are made **optional** in the final type,
+ * so it is possible to owerrite them in the component usage anyway
+ */
+type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
+  Omit<Props, keyof Bind> & {
+    [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+  }
+>;
 
 // relfect types
 /**
@@ -49,7 +67,7 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
    * This configuration is passed directly to `useUnit`'s hook second argument.
    */
   useUnitConfig?: UseUnitConfig;
-}): FC<Omit<Props, keyof Bind>>;
+}): FC<FinalProps<Props, Bind>>;
 
 // Note: FC is used as a return type, because tests on a real Next.js project showed,
 // that if theoretically better option like (props: ...) => React.ReactNode is used,
@@ -83,7 +101,7 @@ export function createReflect<Props, Bind extends BindFromProps<Props>>(
      */
     useUnitConfig?: UseUnitConfig;
   },
-) => FC<Omit<Props, keyof Bind>>;
+) => FC<FinalProps<Props, Bind>>;
 
 // list types
 type PropsifyBind<Bind> = {
@@ -199,7 +217,7 @@ export function variant<
          */
         useUnitConfig?: UseUnitConfig;
       },
-): FC<Omit<Props, keyof Bind>>;
+): FC<FinalProps<Props, Bind>>;
 
 // fromTag types
 type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<

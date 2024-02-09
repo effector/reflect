@@ -73,6 +73,35 @@ import { expectType } from 'tsd';
   expectType<React.FC>(ReflectedInput);
 }
 
+// reflect should not allow wrong props in final types
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+    color: 'red';
+  }> = () => null;
+  const $value = createStore<string>('');
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: $value,
+      onChange: changed,
+    },
+  });
+
+  const App: React.FC = () => {
+    return (
+      <ReflectedInput
+        // @ts-expect-error
+        color="blue"
+      />
+    );
+  };
+  expectType<React.FC>(App);
+}
+
 // reflect should allow not-to pass required props - as they can be added later in react
 {
   const Input: React.FC<{
@@ -102,6 +131,65 @@ import { expectType } from 'tsd';
   };
   expectType<React.FC>(App);
   expectType<React.FC>(AppFixed);
+}
+
+// reflect should make "binded" props optional - so it is allowed to overwrite them in react anyway
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+    color: 'red';
+  }> = () => null;
+  const $value = createStore<string>('');
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: $value,
+      onChange: changed,
+    },
+  });
+
+  const App: React.FC = () => {
+    return <ReflectedInput value="kek" color="red" />;
+  };
+
+  const AppFixed: React.FC = () => {
+    return <ReflectedInput color="red" />;
+  };
+  expectType<React.FC>(App);
+  expectType<React.FC>(AppFixed);
+}
+
+// reflect should not allow to override "binded" props with wrong types
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+    color: 'red';
+  }> = () => null;
+  const $value = createStore<string>('');
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: $value,
+      onChange: changed,
+      color: 'red',
+    },
+  });
+
+  const App: React.FC = () => {
+    return (
+      <ReflectedInput
+        // @ts-expect-error
+        color="blue"
+      />
+    );
+  };
+  expectType<React.FC>(App);
 }
 
 // reflect should allow to pass EventCallable<void> as click event handler
