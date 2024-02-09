@@ -104,6 +104,36 @@ import { expectType } from 'tsd';
   expectType<React.FC>(AppFixed);
 }
 
+// reflect should exclude "binded" props from the final component props
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+    color: 'red';
+  }> = () => null;
+  const $value = createStore<string>('');
+  const changed = createEvent<string>();
+
+  const ReflectedInput = reflect({
+    view: Input,
+    bind: {
+      value: $value,
+      onChange: changed,
+    },
+  });
+
+  const App: React.FC = () => {
+    // @ts-expect-error
+    return <ReflectedInput value="kek" color="red" />;
+  };
+
+  const AppFixed: React.FC = () => {
+    return <ReflectedInput color="red" />;
+  };
+  expectType<React.FC>(App);
+  expectType<React.FC>(AppFixed);
+}
+
 // reflect should allow to pass EventCallable<void> as click event handler
 {
   const Button: React.FC<{
