@@ -104,7 +104,7 @@ import { expectType } from 'tsd';
   expectType<React.FC>(AppFixed);
 }
 
-// reflect should exclude "binded" props from the final component props
+// reflect should make "binded" props optional - so it is allowed to overwrite them in react anyway
 {
   const Input: React.FC<{
     value: string;
@@ -123,7 +123,6 @@ import { expectType } from 'tsd';
   });
 
   const App: React.FC = () => {
-    // @ts-expect-error
     return <ReflectedInput value="kek" color="red" />;
   };
 
