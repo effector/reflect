@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React, { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import React, { ComponentType, FC, PropsWithChildren, ReactNode } from 'react';
 import { expectType } from 'tsd';
 
 // basic reflect
@@ -373,4 +373,42 @@ function localize(value: string): unknown {
   });
 
   const Test: ComponentType<{ value: string; children: ReactNode }> = Input;
+}
+
+// reflect supports mounted as EventCallable<void>
+{
+  type Props = { loading: boolean };
+
+  const mounted = createEvent();
+
+  const Foo: FC<Props> = (props) => <></>;
+
+  const $loading = createStore(true);
+
+  const Bar = reflect({
+    view: Foo,
+    bind: {
+      loading: $loading,
+    },
+    hooks: { mounted },
+  });
+}
+
+// reflect supports mounted as EventCallable<Props>
+{
+  type Props = { loading: boolean };
+
+  const mounted = createEvent<Props>();
+
+  const Foo: FC<Props> = (props) => <></>;
+
+  const $loading = createStore(true);
+
+  const Bar = reflect({
+    view: Foo,
+    bind: {
+      loading: $loading,
+    },
+    hooks: { mounted },
+  });
 }

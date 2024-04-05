@@ -19,7 +19,7 @@ export function variantFactory(context: Context) {
           source: Store<Variant>;
           bind?: Bind;
           cases: Record<Variant, View<Props>>;
-          hooks?: Hooks;
+          hooks?: Hooks<Props>;
           default?: View<Props>;
           useUnitConfig?: UseUnitConifg;
         }
@@ -27,7 +27,7 @@ export function variantFactory(context: Context) {
           if: Store<boolean>;
           then: View<Props>;
           else?: View<Props>;
-          hooks?: Hooks;
+          hooks?: Hooks<Props>;
           bind?: Bind;
           useUnitConfig?: UseUnitConifg;
         },

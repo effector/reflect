@@ -20,11 +20,14 @@ export type BindProps<Props> = {
   [K in keyof Props]: Props[K] | Store<Props[K]> | EventCallable<void>;
 };
 
-export type Hook = (() => any) | EventCallable<void> | Effect<void, any, any>;
+export type Hook<Props> =
+  | ((props: Props) => any)
+  | EventCallable<Props>
+  | Effect<Props, any, any>;
 
-export type Hooks = {
-  mounted?: Hook;
-  unmounted?: Hook;
+export type Hooks<Props> = {
+  mounted?: Hook<Props>;
+  unmounted?: Hook<void>;
 };
 
 export type UseUnitConifg = Parameters<typeof useUnit>[1];

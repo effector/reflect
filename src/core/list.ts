@@ -20,7 +20,7 @@ export function listFactory(context: Context) {
       [K in keyof Props]: (item: Item, index: number) => Props[K];
     };
     getKey?: (item: Item) => React.Key;
-    hooks?: Hooks;
+    hooks?: Hooks<Props>;
     useUnitConfig?: UseUnitConifg;
   }): React.FC {
     const ItemView = reflect<Props, Bind>({

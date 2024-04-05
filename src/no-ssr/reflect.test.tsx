@@ -71,7 +71,8 @@ test('InputCustom [replace value]', async () => {
 });
 
 // Example 2 (InputBase)
-const InputBase: FC<InputHTMLAttributes<HTMLInputElement>> = (props) => {
+type InputBaseProps = InputHTMLAttributes<HTMLInputElement>;
+const InputBase: FC<InputBaseProps> = (props) => {
   return <input {...props} />;
 };
 
@@ -375,6 +376,37 @@ describe('hooks', () => {
       expect(scope.getState($isMounted)).toBe(true);
     });
 
+    test('callback with props', () => {
+      const mounted = createEvent<InputBaseProps>();
+      const $lastProps = restore(mounted, null);
+
+      const $value = createStore('test');
+
+      const scope = fork();
+
+      const Name = reflect({
+        view: InputBase,
+        bind: {
+          value: $value,
+        },
+        hooks: {
+          mounted: (props: InputBaseProps) => mounted(props),
+        },
+      });
+
+      render(
+        <Provider value={scope}>
+          <Name data-testid="name" />
+        </Provider>,
+      );
+
+      expect($lastProps.getState()).toBeNull();
+      expect(scope.getState($lastProps)).toStrictEqual({
+        value: 'test',
+        'data-testid': 'name',
+      });
+    });
+
     test('event', () => {
       const changeName = createEvent<string>();
       const $name = restore(changeName, '');
@@ -419,10 +451,41 @@ describe('hooks', () => {
       expect($isMounted.getState()).toBe(false);
       expect(scope.getState($isMounted)).toBe(true);
     });
+
+    test('event with props', () => {
+      const mounted = createEvent<InputBaseProps>();
+      const $lastProps = restore(mounted, null);
+
+      const $value = createStore('test');
+
+      const scope = fork();
+
+      const Name = reflect({
+        view: InputBase,
+        bind: {
+          value: $value,
+        },
+        hooks: { mounted },
+      });
+
+      render(
+        <Provider value={scope}>
+          <Name data-testid="name" />
+        </Provider>,
+      );
+
+      expect($lastProps.getState()).toBeNull();
+      expect(scope.getState($lastProps)).toStrictEqual({
+        value: 'test',
+        'data-testid': 'name',
+      });
+    });
   });
 
   describe('unmounted', () => {
-    const changeVisible = createEffect<boolean, void>({ handler: () => {} });
+    const changeVisible = createEffect<boolean, void>({
+      handler: () => {},
+    });
     const $visible = restore(
       changeVisible.finally.map(({ params }) => params),
       true,
