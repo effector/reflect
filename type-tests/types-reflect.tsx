@@ -412,3 +412,16 @@ function localize(value: string): unknown {
     hooks: { mounted },
   });
 }
+
+// should error if mounted event doesn't satisfy component props
+{
+  const mounted = createEvent<{ foo: string }>();
+
+  const Foo: FC<{ bar: number }> = () => null;
+
+  const Bar = reflect({
+    view: Foo,
+    // @ts-expect-error
+    hooks: { mounted },
+  });
+}
