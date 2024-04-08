@@ -3,6 +3,8 @@
 
 Hooks is an object passed to `reflect()`, or `variant()`, etc. with properties `mounted` and `unmounted` all optional.
 
+Both `mounted` and `unmounted` can be either function or Effector's Event. Reflect will call provided function with rendered props of the component.
+
 ## Example
 
 ```tsx
