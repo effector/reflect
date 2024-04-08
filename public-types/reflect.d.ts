@@ -8,8 +8,14 @@ type UseUnitConfig = Parameters<typeof useUnit>[1];
 type UnbindableProps = 'key' | 'ref';
 
 type Hooks<Props> = {
-  mounted?: EventCallable<Props> | EventCallable<void> | ((props: Props) => unknown);
-  unmounted?: EventCallable<void> | (() => unknown);
+  mounted?:
+    | EventCallable<Props extends infer HookArg ? HookArg : never>
+    | EventCallable<void>
+    | ((props: Props) => unknown);
+  unmounted?:
+    | EventCallable<Props extends infer HookArg ? HookArg : never>
+    | EventCallable<void>
+    | ((props: Props) => unknown);
 };
 
 /**

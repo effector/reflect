@@ -34,8 +34,14 @@ export function reflectFactory(context: Context) {
       const eventsProps = context.useUnit(events as any, config.useUnitConfig);
       const functionProps = useBoundFunctions(functions);
 
+      const finalProps: any = {};
+
+      if (ref) {
+        finalProps.ref = ref;
+      }
+
       const elementProps: Props = Object.assign(
-        { ref },
+        finalProps,
         storeProps,
         eventsProps,
         data,
@@ -50,12 +56,12 @@ export function reflectFactory(context: Context) {
         const hooks: Hooks<Props> = Object.assign({}, functionsHooks, eventsHooks);
 
         if (hooks.mounted) {
-          hooks.mounted(props);
+          hooks.mounted(elementProps);
         }
 
         return () => {
           if (hooks.unmounted) {
-            hooks.unmounted();
+            hooks.unmounted(elementProps);
           }
         };
       }, [eventsHooks, functionsHooks]);

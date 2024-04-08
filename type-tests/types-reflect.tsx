@@ -380,6 +380,7 @@ function localize(value: string): unknown {
   type Props = { loading: boolean };
 
   const mounted = createEvent();
+  const unmounted = createEvent();
 
   const Foo: FC<Props> = (props) => <></>;
 
@@ -390,7 +391,7 @@ function localize(value: string): unknown {
     bind: {
       loading: $loading,
     },
-    hooks: { mounted },
+    hooks: { mounted, unmounted },
   });
 }
 
@@ -399,6 +400,7 @@ function localize(value: string): unknown {
   type Props = { loading: boolean };
 
   const mounted = createEvent<Props>();
+  const unmounted = createEvent<Props>();
 
   const Foo: FC<Props> = (props) => <></>;
 
@@ -409,19 +411,54 @@ function localize(value: string): unknown {
     bind: {
       loading: $loading,
     },
-    hooks: { mounted },
+    hooks: { mounted, unmounted },
   });
 }
 
 // should error if mounted event doesn't satisfy component props
 {
   const mounted = createEvent<{ foo: string }>();
+  const unmounted = createEvent<{ foo: string }>();
 
   const Foo: FC<{ bar: number }> = () => null;
 
   const Bar = reflect({
     view: Foo,
     // @ts-expect-error
-    hooks: { mounted },
+    hooks: { mounted, unmounted },
+  });
+}
+
+// reflect supports partial match of mounted event and component props
+{
+  const mounted = createEvent<{ foo: string }>();
+  const unmounted = createEvent<{ foo: string }>();
+
+  const Foo: FC<{ foo: string; bar: number }> = () => null;
+
+  const Bar = reflect({
+    view: Foo,
+    bind: {
+      foo: 'foo',
+      bar: 42,
+    },
+    hooks: { mounted, unmounted },
+  });
+}
+
+// reflect supports partial match of mounted callback and component props
+{
+  const mounted = (args: { foo: string }) => {};
+  const unmounted = (args: { foo: string }) => {};
+
+  const Foo: FC<{ foo: string; bar: number }> = () => null;
+
+  const Bar = reflect({
+    view: Foo,
+    bind: {
+      foo: 'foo',
+      bar: 42,
+    },
+    hooks: { mounted, unmounted },
   });
 }

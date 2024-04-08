@@ -401,7 +401,7 @@ describe('hooks', () => {
       );
 
       expect($lastProps.getState()).toBeNull();
-      expect(scope.getState($lastProps)).toStrictEqual({
+      expect(scope.getState($lastProps)).toEqual({
         value: 'test',
         'data-testid': 'name',
       });
@@ -475,7 +475,7 @@ describe('hooks', () => {
       );
 
       expect($lastProps.getState()).toBeNull();
-      expect(scope.getState($lastProps)).toStrictEqual({
+      expect(scope.getState($lastProps)).toEqual({
         value: 'test',
         'data-testid': 'name',
       });

@@ -27,7 +27,7 @@ export type Hook<Props> =
 
 export type Hooks<Props> = {
   mounted?: Hook<Props>;
-  unmounted?: Hook<void>;
+  unmounted?: Hook<Props>;
 };
 
 export type UseUnitConifg = Parameters<typeof useUnit>[1];
