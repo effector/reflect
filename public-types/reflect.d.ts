@@ -7,8 +7,8 @@ type UseUnitConfig = Parameters<typeof useUnit>[1];
 
 type UnbindableProps = 'key' | 'ref';
 
-type Hooks = {
-  mounted?: EventCallable<void> | (() => unknown);
+type Hooks<Props> = {
+  mounted?: EventCallable<Props> | EventCallable<void> | ((props: Props) => unknown);
   unmounted?: EventCallable<void> | (() => unknown);
 };
 
@@ -26,7 +26,7 @@ type BindFromProps<Props> = {
       | ((...args: Parameters<Props[K]>) => ReturnType<Props[K]>)
         // Edge-case: allow to pass an event listener without any parameters (e.g. onClick: () => ...)
         | (() => ReturnType<Props[K]>)
-        // Edge-case: allow to pass an Store, which contains a function
+        // Edge-case: allow to pass a Store, which contains a function
         | Store<Props[K]>
     : Store<Props[K]> | Props[K];
 };
@@ -35,7 +35,7 @@ type BindFromProps<Props> = {
  * Computes final props type based on Props of the view component and Bind object.
  *
  * Props that are "taken" by Bind object are made **optional** in the final type,
- * so it is possible to owerrite them in the component usage anyway
+ * so it is possible to overwrite them in the component usage anyway
  */
 type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
   Omit<Props, keyof Bind> & {
@@ -62,7 +62,7 @@ type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
 export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
   view: ComponentType<Props>;
   bind: Bind;
-  hooks?: Hooks;
+  hooks?: Hooks<Props>;
   /**
    * This configuration is passed directly to `useUnit`'s hook second argument.
    */
@@ -95,7 +95,7 @@ export function createReflect<Props, Bind extends BindFromProps<Props>>(
 ): (
   bind: Bind,
   features?: {
-    hooks?: Hooks;
+    hooks?: Hooks<Props>;
     /**
      * This configuration is passed directly to `useUnit`'s hook second argument.
      */
@@ -143,7 +143,7 @@ export function list<
         bind?: Bind;
         mapItem?: MapItem;
         getKey?: (item: Item) => React.Key;
-        hooks?: Hooks;
+        hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
          */
@@ -155,7 +155,7 @@ export function list<
         bind?: Bind;
         mapItem: MapItem;
         getKey?: (item: Item) => React.Key;
-        hooks?: Hooks;
+        hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
          */
@@ -200,7 +200,7 @@ export function variant<
         cases: Partial<Record<CaseType, ComponentType<Props>>>;
         default?: ComponentType<Props>;
         bind?: Bind;
-        hooks?: Hooks;
+        hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
          */
@@ -211,7 +211,7 @@ export function variant<
         then: ComponentType<Props>;
         else?: ComponentType<Props>;
         bind?: Bind;
-        hooks?: Hooks;
+        hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
          */

@@ -1,13 +1,13 @@
-import { Effect, Event, EventCallable, is, scopeBind, Store } from 'effector';
+import { Effect, Event, is, scopeBind, Store } from 'effector';
 import { useProvidedScope } from 'effector-react';
-import React from 'react';
+import React, { PropsWithoutRef, RefAttributes } from 'react';
 
-import { BindProps, Context, Hook, Hooks, UseUnitConifg, View } from './types';
+import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
 
 export interface ReflectConfig<Props, Bind extends BindProps<Props>> {
   view: View<Props>;
   bind: Bind;
-  hooks?: Hooks;
+  hooks?: Hooks<Props>;
   useUnitConfig?: UseUnitConifg;
 }
 
@@ -25,11 +25,11 @@ export function reflectCreateFactory(context: Context) {
 export function reflectFactory(context: Context) {
   return function reflect<Props, Bind extends BindProps<Props> = BindProps<Props>>(
     config: ReflectConfig<Props, Bind>,
-  ): React.ExoticComponent<{}> {
+  ): React.ExoticComponent<PropsWithoutRef<Props> & RefAttributes<unknown>> {
     const { stores, events, data, functions } = sortProps(config.bind);
     const hooks = sortProps(config.hooks || {});
 
-    return React.forwardRef((props, ref) => {
+    return React.forwardRef((props: Props, ref) => {
       const storeProps = context.useUnit(stores, config.useUnitConfig);
       const eventsProps = context.useUnit(events as any, config.useUnitConfig);
       const functionProps = useBoundFunctions(functions);
@@ -47,10 +47,10 @@ export function reflectFactory(context: Context) {
       const functionsHooks = useBoundFunctions(hooks.functions);
 
       React.useEffect(() => {
-        const hooks: Hooks = Object.assign({}, functionsHooks, eventsHooks);
+        const hooks: Hooks<Props> = Object.assign({}, functionsHooks, eventsHooks);
 
         if (hooks.mounted) {
-          hooks.mounted();
+          hooks.mounted(props);
         }
 
         return () => {
