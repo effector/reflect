@@ -1,6 +1,13 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { fromTag, reflect } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import {
+  ChangeEvent,
+  ClassAttributes,
+  InputHTMLAttributes,
+  PropsWithChildren,
+  ReactNode,
+} from 'react';
 import { expectType } from 'tsd';
 
 // fromTag creates a valid component
@@ -9,11 +16,10 @@ import { expectType } from 'tsd';
 
   expectType<
     (
-      props: React.PropsWithChildren<
-        React.ClassAttributes<HTMLInputElement> &
-          React.InputHTMLAttributes<HTMLInputElement>
+      props: PropsWithChildren<
+        ClassAttributes<HTMLInputElement> & InputHTMLAttributes<HTMLInputElement>
       >,
-    ) => React.ReactNode
+    ) => ReactNode
   >(Input);
 }
 
@@ -56,7 +62,7 @@ import { expectType } from 'tsd';
        * TypeScript won't allow invalid value,
        * but also won't infer correct type for us here, like it does with non-inline usage :shrug:
        */
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange: (e: ChangeEvent<HTMLInputElement>) => {
         handleChange(e.target.value);
       },
     },

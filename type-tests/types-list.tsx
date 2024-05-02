@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { list } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import { FC } from 'react';
 import { expectType } from 'tsd';
 
 // basic usage of list
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
     onChange: (update: [id: string, newValue: string]) => void;
@@ -27,12 +27,12 @@ import { expectType } from 'tsd';
     getKey: (item) => item.id,
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
 // list has default option for getKey, so this should not be required
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
     onChange: (update: [id: string, newValue: string]) => void;
@@ -52,13 +52,13 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
 // list highlightes missing props for items view
 // since missing props cannot be added at react later (contrary to reflect)
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
     onChange: (update: [id: string, newValue: string]) => void;
@@ -76,12 +76,12 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
 // list allows optional bind
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
     onChange: (update: [id: string, newValue: string]) => void;
@@ -98,12 +98,12 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
 // list allows optional mapItem
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
     common: string;
@@ -119,12 +119,12 @@ import { expectType } from 'tsd';
     view: Item,
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
 // list does not allow to set prop in mapItem, if it is already set in bind
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
     common: string;
@@ -144,12 +144,12 @@ import { expectType } from 'tsd';
     view: Item,
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
 // list allows not to set both `bind` and `mapItem` if source type matches with props
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
   }> = () => null;
@@ -160,12 +160,12 @@ import { expectType } from 'tsd';
     view: Item,
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }
 
-// list doesn't allow not to set both `bind` and `mapItem` if source type doesn't matches with props
+// list doesn't allow to not set both `bind` and `mapItem` if source type doesn't matches with props
 {
-  const Item: React.FC<{
+  const Item: FC<{
     id: number;
     value: string;
   }> = () => null;
@@ -177,5 +177,5 @@ import { expectType } from 'tsd';
     view: Item,
   });
 
-  expectType<React.FC>(List);
+  expectType<FC>(List);
 }

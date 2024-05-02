@@ -1,8 +1,8 @@
-import { Store } from 'effector';
-import React from 'react';
+import { Store, StoreWritable } from 'effector';
+import { createElement, ReactNode } from 'react';
 
 import { reflectFactory } from './reflect';
-import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
+import { BindProps, Context, Hooks, UseUnitConfig, View } from './types';
 
 const Default = () => null;
 
@@ -16,27 +16,27 @@ export function variantFactory(context: Context) {
   >(
     config:
       | {
-          source: Store<Variant>;
+          source: StoreWritable<Variant>;
           bind?: Bind;
           cases: Record<Variant, View<Props>>;
           hooks?: Hooks<Props>;
           default?: View<Props>;
-          useUnitConfig?: UseUnitConifg;
+          useUnitConfig?: UseUnitConfig;
         }
       | {
-          if: Store<boolean>;
+          if: StoreWritable<boolean>;
           then: View<Props>;
           else?: View<Props>;
           hooks?: Hooks<Props>;
           bind?: Bind;
-          useUnitConfig?: UseUnitConifg;
+          useUnitConfig?: UseUnitConfig;
         },
-  ): (p: Props) => React.ReactNode {
+  ): (p: Props) => ReactNode {
     let $case: Store<Variant>;
     let cases: Record<Variant, View<Props>>;
     let def: View<Props>;
 
-    // Shortcut for Store<boolean>
+    // Shortcut for StoreWritableWritable<boolean>
     if ('if' in config) {
       $case = config.if.map((value): Variant => (value ? 'then' : 'else') as Variant);
 
@@ -46,7 +46,7 @@ export function variantFactory(context: Context) {
       } as unknown as Record<Variant, View<Props>>;
       def = Default;
     }
-    // Full form for Store<string>
+    // Full form for StoreWritableWritable<string>
     else {
       $case = config.source;
       cases = config.cases;
@@ -57,7 +57,7 @@ export function variantFactory(context: Context) {
       const nameOfCase = context.useUnit($case, config.useUnitConfig);
       const Component = cases[nameOfCase] ?? def;
 
-      return React.createElement(Component as any, props as any);
+      return createElement(Component as any, props as any);
     }
 
     const bind = config.bind ?? ({} as Bind);
@@ -67,6 +67,6 @@ export function variantFactory(context: Context) {
       view: View,
       hooks: config.hooks,
       useUnitConfig: config.useUnitConfig,
-    }) as unknown as (p: Props) => React.ReactNode;
+    }) as unknown as (p: Props) => ReactNode;
   };
 }

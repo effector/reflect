@@ -1,9 +1,10 @@
-import { scopeBind, Store } from 'effector';
+import { scopeBind, StoreWritable } from 'effector';
 import { useProvidedScope } from 'effector-react';
-import React from 'react';
 
 import { reflectFactory } from './reflect';
-import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
+import { BindProps, Context, Hooks, UseUnitConfig, View } from './types';
+import { createElement, useMemo } from 'react';
+import type { Key, FC } from 'react';
 
 export function listFactory(context: Context) {
   const reflect = reflectFactory(context);
@@ -13,16 +14,16 @@ export function listFactory(context: Context) {
     Props,
     Bind extends BindProps<Props>,
   >(config: {
-    source: Store<Item[]>;
+    source: StoreWritable<Item[]>;
     view: View<Props>;
     bind?: Bind;
     mapItem?: {
       [K in keyof Props]: (item: Item, index: number) => Props[K];
     };
-    getKey?: (item: Item) => React.Key;
+    getKey?: (item: Item) => Key;
     hooks?: Hooks<Props>;
-    useUnitConfig?: UseUnitConifg;
-  }): React.FC {
+    useUnitConfig?: UseUnitConfig;
+  }): FC {
     const ItemView = reflect<Props, Bind>({
       view: config.view,
       bind: config.bind ? config.bind : ({} as Bind),
@@ -34,15 +35,14 @@ export function listFactory(context: Context) {
       getKey: config.getKey,
       fn: (value: Item, index: number) => {
         const scope = useProvidedScope();
-        const finalProps = React.useMemo(() => {
+        const finalProps = useMemo(() => {
           const props: any = {};
 
           if (config.mapItem) {
             forIn(config.mapItem, (prop) => {
               const fn =
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                config.mapItem![prop];
-              const propValue = fn(value, index);
+                config.mapItem?.[prop];
+              const propValue = fn?.(value, index);
 
               if (typeof propValue === 'function') {
                 props[prop] = scopeBind(propValue, {
@@ -62,7 +62,7 @@ export function listFactory(context: Context) {
           return props;
         }, [value, index]);
 
-        return React.createElement(ItemView, finalProps);
+        return createElement(ItemView, finalProps);
       },
     };
 
@@ -74,8 +74,7 @@ function forIn<T extends Record<any, any>, R extends any>(
   target: T,
   fn: (_t: keyof T) => R,
 ): void {
-  const hasProp = {}.hasOwnProperty;
   for (const prop in target) {
-    if (hasProp.call(target, prop)) fn(prop);
+    if (Object.hasOwn(target, prop)) fn(prop);
   }
 }

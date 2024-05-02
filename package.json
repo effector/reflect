@@ -11,7 +11,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "pnpm@7.27.0",
+  "packageManager": "pnpm@9.0.6",
   "exports": {
     ".": {
       "types": "./index.d.ts",
@@ -74,8 +74,8 @@
     "@types/react-dom": "^18.2.18",
     "babel-jest": "^29.4.3",
     "babel-plugin-module-resolver": "^4.1.0",
-    "effector": "^23.1.0",
-    "effector-react": "^23.1.0",
+    "effector": "^23.2.1",
+    "effector-react": "^23.2.0",
     "eslint": "^8.56.0",
     "eslint-kit": "^6.12.0",
     "fs-extra": "^9.1.0",
@@ -85,8 +85,8 @@
     "prettier": "^2.8.4",
     "pretty-ms": "^8.0.0",
     "publint": "^0.2.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "rollup": "^3.18.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "svelte": "^3.55.1",

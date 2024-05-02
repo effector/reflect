@@ -1,14 +1,22 @@
 import { Effect, Event, is, scopeBind, Store } from 'effector';
 import { useProvidedScope } from 'effector-react';
-import React, { PropsWithoutRef, RefAttributes } from 'react';
+import {
+  createElement,
+  type ExoticComponent,
+  forwardRef,
+  type PropsWithoutRef,
+  type RefAttributes,
+  useEffect,
+  useMemo,
+} from 'react';
 
-import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
+import { BindProps, Context, Hooks, UseUnitConfig, View } from './types';
 
 export interface ReflectConfig<Props, Bind extends BindProps<Props>> {
   view: View<Props>;
   bind: Bind;
   hooks?: Hooks<Props>;
-  useUnitConfig?: UseUnitConifg;
+  useUnitConfig?: UseUnitConfig;
 }
 
 export function reflectCreateFactory(context: Context) {
@@ -25,11 +33,11 @@ export function reflectCreateFactory(context: Context) {
 export function reflectFactory(context: Context) {
   return function reflect<Props, Bind extends BindProps<Props> = BindProps<Props>>(
     config: ReflectConfig<Props, Bind>,
-  ): React.ExoticComponent<PropsWithoutRef<Props> & RefAttributes<unknown>> {
+  ): ExoticComponent<PropsWithoutRef<Props> & RefAttributes<unknown>> {
     const { stores, events, data, functions } = sortProps(config.bind);
     const hooks = sortProps(config.hooks || {});
 
-    return React.forwardRef((props: Props, ref) => {
+    return forwardRef((props: Props, ref) => {
       const storeProps = context.useUnit(stores, config.useUnitConfig);
       const eventsProps = context.useUnit(events as any, config.useUnitConfig);
       const functionProps = useBoundFunctions(functions);
@@ -52,7 +60,7 @@ export function reflectFactory(context: Context) {
       const eventsHooks = context.useUnit(hooks.events as any, config.useUnitConfig);
       const functionsHooks = useBoundFunctions(hooks.functions);
 
-      React.useEffect(() => {
+      useEffect(() => {
         const hooks: Hooks<Props> = Object.assign({}, functionsHooks, eventsHooks);
 
         if (hooks.mounted) {
@@ -66,7 +74,7 @@ export function reflectFactory(context: Context) {
         };
       }, [eventsHooks, functionsHooks]);
 
-      return React.createElement(config.view as any, elementProps as any);
+      return createElement(config.view as any, elementProps as any);
     });
   };
 }
@@ -99,7 +107,7 @@ function sortProps<T extends object>(props: T) {
 function useBoundFunctions(functions: Record<string, Function>) {
   const scope = useProvidedScope();
 
-  return React.useMemo(() => {
+  return useMemo(() => {
     const boundFunctions: Record<string, Function> = {};
 
     for (const key in functions) {
