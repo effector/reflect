@@ -6,11 +6,11 @@ import { expectType } from 'tsd';
 
 // basic variant usage
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;
-  const DateTime: React.FC<{
+  const DateTime: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;
@@ -30,16 +30,16 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(VariableInput);
+  expectType<FC>(VariableInput);
 }
 
 // variant catches incompatible props between cases
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (event: { target: { value: string } }) => void;
   }> = () => null;
-  const DateTime: React.FC<{
+  const DateTime: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;
@@ -60,7 +60,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(VariableInput);
+  expectType<FC>(VariableInput);
 }
 
 // variant allows not to set every possble case
@@ -72,9 +72,9 @@ import { expectType } from 'tsd';
     };
   };
 
-  const HomePage: React.FC<PageProps> = () => null;
-  const FaqPage: React.FC<PageProps> = () => null;
-  const NotFoundPage: React.FC<PageProps> = () => null;
+  const HomePage: FC<PageProps> = () => null;
+  const FaqPage: FC<PageProps> = () => null;
+  const NotFoundPage: FC<PageProps> = () => null;
   const $page = createStore<'home' | 'faq' | 'profile' | 'products'>('home');
   const $pageContext = $page.map((route) => ({ route }));
 
@@ -88,7 +88,7 @@ import { expectType } from 'tsd';
     default: NotFoundPage,
   });
 
-  expectType<React.FC>(CurrentPage);
+  expectType<FC>(CurrentPage);
 }
 
 // variant warns about wrong cases
@@ -99,9 +99,9 @@ import { expectType } from 'tsd';
     };
   };
 
-  const HomePage: React.FC<PageProps> = () => null;
-  const FaqPage: React.FC<PageProps> = () => null;
-  const NotFoundPage: React.FC<PageProps> = () => null;
+  const HomePage: FC<PageProps> = () => null;
+  const FaqPage: FC<PageProps> = () => null;
+  const NotFoundPage: FC<PageProps> = () => null;
   const $page = createStore<'home' | 'profile' | 'products'>('home');
   const $pageContext = $page.map((route) => ({ route }));
 
@@ -116,7 +116,7 @@ import { expectType } from 'tsd';
     default: NotFoundPage,
   });
 
-  expectType<React.FC>(CurrentPage);
+  expectType<FC>(CurrentPage);
 }
 
 // overload for boolean source
@@ -129,8 +129,8 @@ import { expectType } from 'tsd';
 
   const $ctx = createStore({ route: 'home' });
 
-  const HomePage: React.FC<PageProps> = () => null;
-  const FallbackPage: React.FC<PageProps> = () => null;
+  const HomePage: FC<PageProps> = () => null;
+  const FallbackPage: FC<PageProps> = () => null;
   const $enabled = createStore(true);
 
   const CurrentPageThenElse = variant({
@@ -139,14 +139,14 @@ import { expectType } from 'tsd';
     else: FallbackPage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPageThenElse);
+  expectType<FC>(CurrentPageThenElse);
 
   const CurrentPageOnlyThen = variant({
     if: $enabled,
     then: HomePage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPageOnlyThen);
+  expectType<FC>(CurrentPageOnlyThen);
 }
 
 // supports nesting

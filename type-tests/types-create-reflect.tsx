@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createReflect } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React from 'react';
+import { FC } from 'react';
 import { expectType } from 'tsd';
 
 // basic createReflect
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -22,5 +21,5 @@ import { expectType } from 'tsd';
     color: 'red',
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }

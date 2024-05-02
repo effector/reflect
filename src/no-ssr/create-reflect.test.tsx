@@ -2,8 +2,7 @@ import { createReflect } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEffect, createEvent, createStore, restore } from 'effector';
-import React, { FC, InputHTMLAttributes } from 'react';
-import { act } from 'react-dom/test-utils';
+import React, { act, FC, InputHTMLAttributes } from 'react';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -150,7 +149,9 @@ describe('hooks', () => {
   });
 
   describe('unmounted', () => {
-    const changeVisible = createEffect<boolean, void>({ handler: () => {} });
+    const changeVisible = createEffect<boolean, void>({
+      handler: () => {},
+    });
     const $visible = restore(
       changeVisible.finally.map(({ params }) => params),
       true,

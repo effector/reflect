@@ -1,11 +1,10 @@
 import { list } from '@effector/reflect';
 import { render } from '@testing-library/react';
 import { allSettled, createEffect, createEvent, createStore, fork } from 'effector';
-import { Provider, useStore } from 'effector-react';
-import React, { FC, memo } from 'react';
-import { act } from 'react-dom/test-utils';
+import { Provider, useUnit } from 'effector-react';
+import React, { act, FC, memo, PropsWithChildren } from 'react';
 
-const List: FC = (props) => {
+const List: FC<PropsWithChildren> = (props) => {
   return <ul>{props.children}</ul>;
 };
 
@@ -383,7 +382,7 @@ test('reflect-list: getKey option', async () => {
   const PlainMemberList = () => {
     return (
       <ul data-testid="plain">
-        {useStore($members).map((props) => (
+        {useUnit($members).map((props) => (
           <PlainMember key={props.id} id={props.id} name={props.name} />
         ))}
       </ul>
@@ -395,7 +394,9 @@ test('reflect-list: getKey option', async () => {
     fn(props);
     return <Member id={props.id} name={props.name} />;
   };
-  const ReflectList: FC = (props) => <ul data-testid="reflect">{props.children}</ul>;
+  const ReflectList: FC<PropsWithChildren> = (props) => (
+    <ul data-testid="reflect">{props.children}</ul>
+  );
   const Members = list({
     source: $members,
     view: ReflectMember,

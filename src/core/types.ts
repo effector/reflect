@@ -1,6 +1,7 @@
-import { Effect, EventCallable, Store } from 'effector';
+import { Effect, EventCallable, StoreWritable } from 'effector';
 import { useList, useUnit } from 'effector-react';
 import { ComponentType } from 'react';
+
 
 /**
  * This is the internal typings - for the library internals, where we do not really care about real-world user data.
@@ -17,7 +18,7 @@ export interface Context {
 export type View<T> = ComponentType<T>;
 
 export type BindProps<Props> = {
-  [K in keyof Props]: Props[K] | Store<Props[K]> | EventCallable<void>;
+  [K in keyof Props]: Props[K] | StoreWritable<Props[K]> | EventCallable<void>;
 };
 
 export type Hook<Props> =
@@ -30,4 +31,4 @@ export type Hooks<Props> = {
   unmounted?: Hook<Props>;
 };
 
-export type UseUnitConifg = Parameters<typeof useUnit>[1];
+export type UseUnitConfig = Parameters<typeof useUnit>[1];
