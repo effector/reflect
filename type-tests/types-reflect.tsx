@@ -210,6 +210,26 @@ import { expectType } from 'tsd';
   expectType<React.FC>(ReflectedButton);
 }
 
+// reflect should allow passing Event<void> as callback to optional event handlers
+{
+  const Button: React.FC<{
+    onOptional?: React.EventHandler<React.MouseEvent<HTMLButtonElement>>;
+    onNull: React.MouseEventHandler<HTMLButtonElement> | null;
+  }> = () => null;
+
+  const event = createEvent<void>();
+
+  const ReflectedButton = reflect({
+    view: Button,
+    bind: {
+      onOptional: event,
+      onNull: event,
+    },
+  });
+
+  expectType<React.FC>(ReflectedButton);
+}
+
 // reflect should not allow binding ref
 {
   const Text = React.forwardRef(
