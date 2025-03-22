@@ -10,15 +10,6 @@ const config: DocsThemeConfig = {
   docsRepositoryBase: 'https://github.com/effector/reflect/blob/master/docs',
   darkMode: true,
   primaryHue: 35,
-  banner: {
-    dismissible: true,
-    key: 'reflect v9 announce',
-    text: (
-      <a href="https://github.com/effector/reflect/issues/44" target="_blank">
-        <b>@effector/reflect</b> v9 will be released soon! Check the updates →
-      </a>
-    ),
-  },
   navbar: {
     // extraContent: <>Link to Effector Docs</>,
   },
