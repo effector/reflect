@@ -1,12 +1,23 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect } from '@effector/reflect';
 import { createEvent, createStore } from 'effector';
-import React, { ComponentType, FC, PropsWithChildren, ReactNode } from 'react';
+import React, {
+  type ComponentType,
+  createRef,
+  type EventHandler,
+  type FC,
+  type ForwardedRef,
+  forwardRef,
+  type MouseEvent,
+  type PropsWithChildren,
+  type ReactNode,
+  useRef,
+} from 'react';
 import { expectType } from 'tsd';
 
 // basic reflect
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -23,12 +34,12 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }
 
-// reflect allows infer handlers for event.prepend
+// reflect allows to infer handlers for event.prepend
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (event: { target: { value: string } }) => void;
   }> = () => null;
@@ -47,12 +58,12 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }
 
 // reflect should not allow wrong props
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -70,12 +81,12 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }
 
 // reflect should not allow wrong props in final types
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -91,7 +102,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  const App: React.FC = () => {
+  const App: FC = () => {
     return (
       <ReflectedInput
         // @ts-expect-error
@@ -99,12 +110,12 @@ import { expectType } from 'tsd';
       />
     );
   };
-  expectType<React.FC>(App);
+  expectType<FC>(App);
 }
 
 // reflect should allow not-to pass required props - as they can be added later in react
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -120,22 +131,22 @@ import { expectType } from 'tsd';
     },
   });
 
-  const App: React.FC = () => {
+  const App: FC = () => {
     // missing prop must still be required in react
     // @ts-expect-error
     return <ReflectedInput />;
   };
 
-  const AppFixed: React.FC = () => {
+  const AppFixed: FC = () => {
     return <ReflectedInput color="red" />;
   };
-  expectType<React.FC>(App);
-  expectType<React.FC>(AppFixed);
+  expectType<FC>(App);
+  expectType<FC>(AppFixed);
 }
 
 // reflect should make "binded" props optional - so it is allowed to overwrite them in react anyway
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -151,20 +162,20 @@ import { expectType } from 'tsd';
     },
   });
 
-  const App: React.FC = () => {
+  const App: FC = () => {
     return <ReflectedInput value="kek" color="red" />;
   };
 
-  const AppFixed: React.FC = () => {
+  const AppFixed: FC = () => {
     return <ReflectedInput color="red" />;
   };
-  expectType<React.FC>(App);
-  expectType<React.FC>(AppFixed);
+  expectType<FC>(App);
+  expectType<FC>(AppFixed);
 }
 
 // reflect should not allow to override "binded" props with wrong types
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
     color: 'red';
@@ -181,7 +192,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  const App: React.FC = () => {
+  const App: FC = () => {
     return (
       <ReflectedInput
         // @ts-expect-error
@@ -189,13 +200,13 @@ import { expectType } from 'tsd';
       />
     );
   };
-  expectType<React.FC>(App);
+  expectType<FC>(App);
 }
 
 // reflect should allow to pass EventCallable<void> as click event handler
 {
-  const Button: React.FC<{
-    onClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>>;
+  const Button: FC<{
+    onClick: EventHandler<MouseEvent<HTMLButtonElement>>;
   }> = () => null;
 
   const reactOnClick = createEvent();
@@ -207,7 +218,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(ReflectedButton);
+  expectType<FC>(ReflectedButton);
 }
 
 // reflect should allow passing Event<void> as callback to optional event handlers
@@ -232,26 +243,26 @@ import { expectType } from 'tsd';
 
 // reflect should not allow binding ref
 {
-  const Text = React.forwardRef(
-    (_: { value: string }, ref: React.ForwardedRef<HTMLSpanElement>) => null,
+  const Text = forwardRef(
+    (_: { value: string }, ref: ForwardedRef<HTMLSpanElement>) => null,
   );
 
   const ReflectedText = reflect({
     view: Text,
     bind: {
       // @ts-expect-error
-      ref: React.createRef<HTMLSpanElement>(),
+      ref: createRef<HTMLSpanElement>(),
     },
   });
 
-  expectType<React.VFC>(ReflectedText);
+  expectType<FC>(ReflectedText);
 }
 
 // reflect should pass ref through
 {
   const $value = createStore<string>('');
-  const Text = React.forwardRef(
-    (_: { value: string }, ref: React.ForwardedRef<HTMLSpanElement>) => null,
+  const Text = forwardRef(
+    (_: { value: string }, ref: ForwardedRef<HTMLSpanElement>) => null,
   );
 
   const ReflectedText = reflect({
@@ -259,18 +270,18 @@ import { expectType } from 'tsd';
     bind: { value: $value },
   });
 
-  const App: React.FC = () => {
-    const ref = React.useRef(null);
+  const App: FC = () => {
+    const ref = useRef(null);
 
     return <ReflectedText ref={ref} />;
   };
 
-  expectType<React.FC>(App);
+  expectType<FC>(App);
 }
 
 // reflect should allow to pass any callback
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;
@@ -287,12 +298,12 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }
 
 // should allow store with a function as a callback value
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;
@@ -306,7 +317,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }
 
 function localize<T extends 'b'>(value: T): { lol: boolean };
@@ -317,7 +328,7 @@ function localize(value: string): unknown {
 
 // should allow store with generics
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: typeof localize;
   }> = () => null;
@@ -331,12 +342,12 @@ function localize(value: string): unknown {
     },
   });
 
-  expectType<React.FC>(ReflectedInput);
+  expectType<FC>(ReflectedInput);
 }
 
 // should support useUnit configuration
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;
@@ -359,7 +370,7 @@ function localize(value: string): unknown {
 
 // should not support invalud useUnit configuration
 {
-  const Input: React.FC<{
+  const Input: FC<{
     value: string;
     onChange: (newValue: string) => void;
   }> = () => null;

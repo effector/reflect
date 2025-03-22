@@ -10,8 +10,7 @@ import {
   restore,
 } from 'effector';
 import { Provider } from 'effector-react';
-import React, { ChangeEvent, FC, InputHTMLAttributes } from 'react';
-import { act } from 'react-dom/test-utils';
+import React, { act, ChangeEvent, FC, InputHTMLAttributes } from 'react';
 
 // Example1 (InputCustom)
 const InputCustom: FC<{
@@ -42,7 +41,7 @@ test('InputCustom', async () => {
   const container = render(<Name testId="name" />);
 
   expect($name.getState()).toBe('');
-  await userEvent.type(container.getByTestId('name'), 'Bob');
+  userEvent.type(container.getByTestId('name'), 'Bob');
   expect($name.getState()).toBe('Bob');
 
   const inputName = container.container.firstChild as HTMLInputElement;
@@ -63,7 +62,7 @@ test('InputCustom [replace value]', async () => {
   const container = render(<Name testId="name" value="Alise" />);
 
   expect($name.getState()).toBe('');
-  await userEvent.type(container.getByTestId('name'), 'Bob');
+  userEvent.type(container.getByTestId('name'), 'Bob');
   expect($name.getState()).toBe('Aliseb');
 
   const inputName = container.container.firstChild as HTMLInputElement;
@@ -110,11 +109,11 @@ test('InputBase', async () => {
   );
 
   expect($name.getState()).toBe('');
-  await userEvent.type(container.getByTestId('name'), 'Bob');
+  userEvent.type(container.getByTestId('name'), 'Bob');
   expect($name.getState()).toBe('Bob');
 
   expect($age.getState()).toBe(0);
-  await userEvent.type(container.getByTestId('age'), '25');
+  userEvent.type(container.getByTestId('age'), '25');
   expect($age.getState()).toBe(25);
 
   const inputName = container.getByTestId('name') as HTMLInputElement;
@@ -146,7 +145,7 @@ test('component inside', async () => {
   const container = render(<Name />);
 
   expect($name.getState()).toBe('');
-  await userEvent.type(container.getByTestId('name'), 'Bob');
+  userEvent.type(container.getByTestId('name'), 'Bob');
   expect($name.getState()).toBe('Bob');
 
   const inputName = container.getByTestId('name') as HTMLInputElement;
@@ -195,7 +194,7 @@ describe('plain callbacks with scopeBind under the hood', () => {
 
     render(<Name />);
 
-    await act(() => {
+    act(() => {
       sendRender('Bob');
     });
 
@@ -235,7 +234,7 @@ describe('plain callbacks with scopeBind under the hood', () => {
       </Provider>,
     );
 
-    await act(() => {
+    act(() => {
       sendRender('Bob');
     });
 
@@ -285,7 +284,7 @@ describe('plain callbacks with scopeBind under the hood', () => {
       </Provider>,
     );
 
-    await act(() => {
+    act(() => {
       sendRender('Bob');
     });
 
@@ -587,7 +586,7 @@ describe('fromTag helper', () => {
 
     expect((body.container.firstChild as any).type).toBe('text');
 
-    await userEvent.type(body.getByTestId('test-input'), 'bob');
+    userEvent.type(body.getByTestId('test-input'), 'bob');
 
     expect(scopeText.getState($fromHandler).target.value).toBe('bob');
 

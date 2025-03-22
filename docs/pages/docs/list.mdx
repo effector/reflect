@@ -7,7 +7,7 @@ import { list } from '@effector/reflect';
 ```tsx
 const Items: React.FC = list({
   view: React.FC<Props>,
-  source: Store<Item[]>,
+  source: StoreWritable<Item[]>,
   bind: {
     // regular reflect's bind, for list item view
   },
