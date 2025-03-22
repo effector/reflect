@@ -18,23 +18,21 @@ type Hooks<Props> = {
     | ((props: Props) => unknown);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type VoidCallback<T> = T extends (...args: any[]) => infer R ? () => R : never;
+
 /**
  * `bind` object type:
  * prop key -> store (unwrapped to reactive subscription) or any other value (used as is)
- *
- * Also handles some edge-cases like enforcing type inference for inlined callbacks
  */
 type BindFromProps<Props> = {
   [K in keyof Props]?: K extends UnbindableProps
     ? never
-    : Props[K] extends (...args: any[]) => any
-    ? // To force TS infer types for any provided callback
-      | ((...args: Parameters<Props[K]>) => ReturnType<Props[K]>)
-        // Edge-case: allow to pass an event listener without any parameters (e.g. onClick: () => ...)
-        | (() => ReturnType<Props[K]>)
-        // Edge-case: allow to pass a Store, which contains a function
+    :
         | Store<Props[K]>
-    : Store<Props[K]> | Props[K];
+        | Props[K]
+        // case: allow Event<void> for callbacks with arbitrary arguments
+        | VoidCallback<Props[K]>;
 };
 
 /**
