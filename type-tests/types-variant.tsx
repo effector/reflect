@@ -3,7 +3,7 @@ import { reflect, variant } from '@effector/reflect';
 import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
 import React, { FC, PropsWithChildren, ReactNode } from 'react';
-import { expectType } from 'tsd';
+import { expectNotType, expectType } from 'tsd';
 
 // basic variant usage
 {
@@ -251,27 +251,26 @@ import { expectType } from 'tsd';
   };
 }
 
-// Edge-case: Mantine Button with weird polymorphic factory (failing)
+// Edge-case: Mantine Button with weird polymorphic factory (broken)
 //
-// This case is failing because Button has a weird polymorphic factory
-// that is not compatible with `variant` as of now
+// This case is broken because Button has a weird polymorphic factory
+// that is not compatible with `variant` as of now - it produces weird and broken types for resulting component
 // Test is left here for the future reference, in case if it will be possible to fix
 {
   const ReflectedVariant = variant({
     source: createStore<'button' | 'a'>('button'),
+    bind: {
+      size: 'xl',
+    },
     cases: {
-      // @ts-expect-error
       button: Button<'button'>,
-      // @ts-expect-error
       a: Button<'a'>,
     },
   });
 
   const IfElseVariant = variant({
     if: createStore(true),
-    // @ts-expect-error
     then: Button<'button'>,
-    // @ts-expect-error
     else: Button<'a'>,
   });
 }

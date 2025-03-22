@@ -490,6 +490,19 @@ function localize(value: string): unknown {
     view: Button<'button'>,
     bind: {
       children: 'foo',
+      size: 'md',
+      onClick: (e) => {
+        expectType<number>(e.clientX);
+      },
+    },
+  });
+
+  const ReflectedManitneButtonBad = reflect({
+    view: Button<'button'>,
+    bind: {
+      children: 'foo',
+      // @ts-expect-error
+      size: 42,
       onClick: (e) => {
         expectType<number>(e.clientX);
       },

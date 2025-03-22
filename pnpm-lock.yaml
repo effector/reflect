@@ -120,7 +120,7 @@ importers:
         specifier: ^0.19.1
         version: 0.19.1
       typescript:
-        specifier: ^5.3.3
+        specifier: ^5.8.2
         version: 5.8.2
       uglify-js:
         specifier: ^3.17.4

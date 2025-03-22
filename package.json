@@ -92,7 +92,7 @@
     "rollup-plugin-typescript2": "^0.34.1",
     "svelte": "^3.55.1",
     "tsd": "^0.19.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.8.2",
     "uglify-js": "^3.17.4",
     "vite-tsconfig-paths": "^4.2.2",
     "vitest": "^1.0.4",
