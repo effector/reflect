@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect } from '@effector/reflect';
+import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
 import React, { ComponentType, FC, PropsWithChildren, ReactNode } from 'react';
 import { expectType } from 'tsd';
@@ -480,5 +481,16 @@ function localize(value: string): unknown {
       bar: 42,
     },
     hooks: { mounted, unmounted },
+  });
+}
+
+// Edge-case: Mantine Button weird types
+{
+  const ReflectedManitneButton = reflect({
+    view: Button,
+    bind: {
+      children: 'foo',
+      onClick: () => {},
+    },
   });
 }
