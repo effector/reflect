@@ -251,7 +251,7 @@ import { expectType } from 'tsd';
   };
 }
 
-// Edge-case: Mantine Button with weird polymorphic factory (broken)
+// Edge-case: Mantine Button with weird polymorphic factory (fails)
 //
 // This case is broken because Button has a weird polymorphic factory
 // that is not compatible with `variant` as of now - it produces weird and broken types for resulting component
@@ -264,6 +264,7 @@ import { expectType } from 'tsd';
     },
     cases: {
       button: Button<'button'>,
+      // @ts-expect-error
       a: Button<'a'>,
     },
   });
@@ -276,6 +277,7 @@ import { expectType } from 'tsd';
     },
     cases: {
       button: Button<'button'>,
+      // @ts-expect-error
       a: Button<'a'>,
     },
   });
@@ -283,6 +285,7 @@ import { expectType } from 'tsd';
   const IfElseVariant = variant({
     if: createStore(true),
     then: Button<'button'>,
+    // @ts-expect-error
     else: Button<'a'>,
   });
 }

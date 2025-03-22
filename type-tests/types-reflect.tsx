@@ -229,7 +229,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.VFC>(ReflectedText);
+  expectType<React.FC>(ReflectedText);
 }
 
 // reflect should pass ref through

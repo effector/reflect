@@ -1,3 +1,4 @@
+import react from '@vitejs/plugin-react';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
@@ -19,6 +20,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
   },
+  plugins: [react()],
   resolve: {
     alias: {
       '@effector/reflect/scope': resolve(__dirname, './dist/scope.mjs'),

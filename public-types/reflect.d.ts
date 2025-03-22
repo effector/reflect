@@ -5,8 +5,8 @@ import type {
   ComponentProps,
   ComponentType,
   FC,
+  JSX,
   PropsWithChildren,
-  ReactHTML,
 } from 'react';
 
 type UseUnitConfig = Parameters<typeof useUnit>[1];
@@ -239,11 +239,6 @@ export function variant<
 ): FC<FinalProps<Props, Bind>>;
 
 // fromTag types
-type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<
-  Parameters<ReactHTML[HtmlTag]>[0],
-  null | undefined
->;
-
 /**
  *
  * Simple helper to allow to use `reflect` with any valid html tag
@@ -264,6 +259,6 @@ type GetProps<HtmlTag extends keyof ReactHTML> = Exclude<
  * })
  * ```
  */
-export function fromTag<HtmlTag extends keyof ReactHTML>(
+export function fromTag<HtmlTag extends keyof JSX.IntrinsicElements>(
   htmlTag: HtmlTag,
-): FC<PropsWithChildren<GetProps<HtmlTag>>>;
+): (props: PropsWithChildren<JSX.IntrinsicElements[HtmlTag]>) => React.ReactNode;
