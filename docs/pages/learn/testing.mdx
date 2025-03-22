@@ -4,10 +4,6 @@ Since [effector-react 22.5.0](https://github.com/effector/effector/releases/tag/
 
 Just add `Provider` from `effector-react` to your app root, and you are good to go.
 
-For [SSR](https://effector.dev/docs/api/effector-react/useEvent) and `effector-react` before `2.5.0` release you will need to replace imports `@effector/reflect` -> `@effector/reflect/ssr`.
-
-Also for this case you need to use `event.prepend(params => params.something)` instead `(params) => event(params.something)` in `bind` - this way `reflect` can detect effector's events and properly bind them to the current [scope](https://effector.dev/docs/api/effector/scope)
-
 ```tsx
 // ./ui.tsx
 import React, { ChangeEvent, FC, MouseEvent, useCallback } from 'react';
@@ -49,7 +45,7 @@ const Name = reflect({
   view: Input,
   bind: {
     value: $name,
-    onChange: changeName.prepend((event) => event.target.value),
+    onChange: (event) => changeName(event.target.value),
   },
 });
 

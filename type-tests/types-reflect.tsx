@@ -35,30 +35,6 @@ import { expectType } from 'tsd';
   expectType<React.FC>(ReflectedInput);
 }
 
-// reflect allows infer handlers for event.prepend
-{
-  const Input: React.FC<{
-    value: string;
-    onChange: (event: { target: { value: string } }) => void;
-  }> = () => null;
-  const $value = createStore<string>('');
-  const changed = createEvent<string>();
-
-  const ReflectedInput = reflect({
-    view: Input,
-    bind: {
-      value: $value,
-      // here typescript should infer types correctly
-      onChange: changed.prepend((e) => {
-        expectType<string>(e.target.value);
-        return e.target.value;
-      }),
-    },
-  });
-
-  expectType<React.FC>(ReflectedInput);
-}
-
 // reflect should not allow wrong props
 {
   const Input: React.FC<{

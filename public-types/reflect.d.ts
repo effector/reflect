@@ -64,7 +64,7 @@ type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
  *  bind: {
  *   value: $name,
  *   placeholder: 'Name',
- *   onChange: changeName.prepend(inputChanged),
+ *   onChange: (event) => nameChanged(event.target.value),
  *  },
  * });
  * ```
@@ -100,7 +100,7 @@ export function reflect<
  * const Name = reflectInput({
  *   value: $name,
  *   placeholder: 'Name',
- *   onChange: changeName.prepend(inputChanged),
+ *   onChange: (event) => nameChanged(event.target.value),
  * });
  * ```
  */
