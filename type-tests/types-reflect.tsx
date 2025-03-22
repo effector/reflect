@@ -2,7 +2,15 @@
 import { reflect } from '@effector/reflect';
 import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
-import React, { ComponentType, FC, PropsWithChildren, ReactNode } from 'react';
+import React, {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ComponentType,
+  FC,
+  LabelHTMLAttributes,
+  PropsWithChildren,
+  ReactNode,
+} from 'react';
 import { expectType } from 'tsd';
 
 // basic reflect
@@ -542,4 +550,55 @@ function localize(value: string): unknown {
       expectType<number>(e.clientX);
     }}
   />;
+}
+
+// edge-case: polymorphic props
+{
+  interface CommonProps {
+    inline?: boolean;
+    progress?: boolean;
+    enabledOnProgress?: boolean;
+    floating?: boolean;
+    showSpinnerIcon?: boolean;
+    onBright?: boolean;
+  }
+  type HTMLButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+  interface ButtonButtonProps extends CommonProps, Omit<HTMLButtonProps, 'size'> {
+    tag?: 'button';
+    href?: never;
+  }
+  type HTMLAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+  interface AnchorButtonProps extends CommonProps, HTMLAnchorProps {
+    tag?: 'a';
+  }
+  type HTMLLabelProps = LabelHTMLAttributes<HTMLLabelElement>;
+  interface LabelButtonProps extends CommonProps, HTMLLabelProps {
+    tag?: 'label';
+    disabled?: boolean;
+  }
+  type ButtonProps = ButtonButtonProps | AnchorButtonProps | LabelButtonProps;
+
+  const TestButton = (props: ButtonProps) => {
+    return null;
+  };
+
+  const ReflectedTestButton1 = reflect({
+    view: TestButton,
+    bind: {
+      inline: true,
+      progress: true,
+      tag: 'a',
+      href: 'test',
+    },
+  });
+  const ReflectedTestButton2 = reflect({
+    view: TestButton,
+    // @ts-expect-error
+    bind: {
+      inline: true,
+      progress: true,
+      tag: 'button',
+      href: 'test',
+    },
+  });
 }
