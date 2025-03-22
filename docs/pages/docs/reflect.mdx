@@ -115,3 +115,23 @@ In most cases your callbacks will be synchronous and you will not need to do any
 #### Special case: Asynchronous callbacks
 
 Asynchronous callbacks are also allowed, but those should follow the rules of [Imperative Effect calls with Scope](https://effector.dev/en/api/effector/scope/) to be compatible.
+
+## TypeScript and Polymorphic Types Caveat
+
+Generally, reflect handles polymorphic props well.
+However, in some implementations, such as [Mantine UI](https://mantine.dev/guides/polymorphic/), it may not work as expected.
+
+In such cases, it is recommended to explicitly narrow the component type. For example:
+
+```ts
+  const ReflectedMantineButton = reflect({
+    view: MantineButton<'button'>, // <- notice explicit component type in the "<...>" brackets
+    bind: {
+      children: 'foo',
+      onClick: (e) => {
+        clicked(e.clientX);
+      },
+    },
+  });
+```
+
