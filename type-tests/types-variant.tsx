@@ -3,7 +3,7 @@ import { reflect, variant } from '@effector/reflect';
 import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
 import React, { FC, PropsWithChildren, ReactNode } from 'react';
-import { expectNotType, expectType } from 'tsd';
+import { expectType } from 'tsd';
 
 // basic variant usage
 {
