@@ -491,7 +491,7 @@ function localize(value: string): unknown {
     bind: {
       children: 'foo',
       onClick: (e) => {
-        e.target;
+        expectType<number>(e.clientX);
       },
     },
   });
@@ -499,7 +499,7 @@ function localize(value: string): unknown {
   <ReflectedManitneButton
     component="button"
     onClick={(e) => {
-      e.target;
+      expectType<number>(e.clientX);
     }}
   />;
 }
@@ -516,7 +516,7 @@ function localize(value: string): unknown {
       children: 'foo',
       // @ts-expect-error
       onClick: (e) => {
-        e.target;
+        expectType<number>(e.clientX);
       },
     },
   });
@@ -526,7 +526,7 @@ function localize(value: string): unknown {
     component="button"
     // @ts-expect-error
     onClick={(e) => {
-      e.target;
+      expectType<number>(e.clientX);
     }}
   />;
 }
