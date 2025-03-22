@@ -104,8 +104,12 @@ export function reflect<
  * });
  * ```
  */
-export function createReflect<Props, Bind extends BindFromProps<Props>>(
-  component: ComponentType<Props>,
+export function createReflect<
+  View extends ComponentType<any>,
+  Props extends ComponentProps<View>,
+  Bind extends BindFromProps<Props>,
+>(
+  component: View,
 ): (
   bind: Bind,
   features?: {
@@ -143,7 +147,8 @@ type ReflectedProps<Item, Bind> = Item & PropsifyBind<Bind>;
  * ```
  */
 export function list<
-  Props,
+  View extends ComponentType<any>,
+  Props extends ComponentProps<View>,
   Item,
   MapItem extends {
     [M in keyof Omit<Props, keyof Bind>]: (item: Item, index: number) => Props[M];
@@ -153,7 +158,7 @@ export function list<
   config: ReflectedProps<Item, Bind> extends Props
     ? {
         source: Store<Item[]>;
-        view: ComponentType<Props>;
+        view: View;
         bind?: Bind;
         mapItem?: MapItem;
         getKey?: (item: Item) => React.Key;
@@ -165,7 +170,7 @@ export function list<
       }
     : {
         source: Store<Item[]>;
-        view: ComponentType<Props>;
+        view: View;
         bind?: Bind;
         mapItem: MapItem;
         getKey?: (item: Item) => React.Key;
