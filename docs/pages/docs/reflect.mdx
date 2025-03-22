@@ -51,9 +51,6 @@ const $name = restore(changeName, '');
 const changeAge = createEvent<number>();
 const $age = restore(changeAge, 0);
 
-const inputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-  return event.currentTarget.value;
-};
 
 // Components
 const Name = reflect({
@@ -61,7 +58,7 @@ const Name = reflect({
   bind: {
     value: $name,
     placeholder: 'Name',
-    onChange: changeName.prepend(inputChanged),
+    onChange: (event) => changeName(event.currentTarget.value),
   },
 });
 
@@ -70,7 +67,7 @@ const Age = reflect({
   bind: {
     value: $age,
     placeholder: 'Age',
-    onChange: changeAge.prepend(parseInt).prepend(inputChanged),
+    onChange: (event) => changeAge(parseInt(event.currentTarget.value)),
   },
 });
 
