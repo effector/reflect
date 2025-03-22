@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createReflect } from '@effector/reflect';
+import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
 import React from 'react';
 import { expectType } from 'tsd';
@@ -23,4 +24,19 @@ import { expectType } from 'tsd';
   });
 
   expectType<React.FC>(ReflectedInput);
+}
+
+// Edge-case: Mantine Button with weird polymorphic factory
+{
+  const clicked = createEvent<number>();
+
+  const reflectButton = createReflect(Button<'button'>);
+
+  const ReflectedButton = reflectButton({
+    children: 'Click me',
+    color: 'red',
+    onClick: (e) => clicked(e.clientX),
+  });
+
+  <ReflectedButton component="button" />;
 }

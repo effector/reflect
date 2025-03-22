@@ -1,7 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect } from '@effector/reflect';
+import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
-import React, { ComponentType, FC, PropsWithChildren, ReactNode } from 'react';
+import React, {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ComponentType,
+  FC,
+  LabelHTMLAttributes,
+  PropsWithChildren,
+  ReactNode,
+} from 'react';
 import { expectType } from 'tsd';
 
 // basic reflect
@@ -480,5 +489,116 @@ function localize(value: string): unknown {
       bar: 42,
     },
     hooks: { mounted, unmounted },
+  });
+}
+
+// Edge-case: Mantine Button weird polymorphic factory
+{
+  const ReflectedManitneButton = reflect({
+    view: Button<'button'>,
+    bind: {
+      children: 'foo',
+      size: 'md',
+      onClick: (e) => {
+        expectType<number>(e.clientX);
+      },
+    },
+  });
+
+  const ReflectedManitneButtonBad = reflect({
+    view: Button<'button'>,
+    bind: {
+      children: 'foo',
+      // @ts-expect-error
+      size: 42,
+      onClick: (e) => {
+        expectType<number>(e.clientX);
+      },
+    },
+  });
+
+  <ReflectedManitneButton
+    component="button"
+    onClick={(e) => {
+      expectType<number>(e.clientX);
+    }}
+  />;
+}
+
+// Edge-case (BROKEN): Mantine Button weird polymorphic factory
+// without explicit type argument
+//
+// This test is failing - it is left here for future reference, in case if there is a way to fix it
+// If you use a Mantine polymorphic components or anything similiar - check test above for a currently working solution
+{
+  const ReflectedManitneButton = reflect({
+    view: Button,
+    bind: {
+      children: 'foo',
+      // @ts-expect-error
+      onClick: (e) => {
+        expectType<number>(e.clientX);
+      },
+    },
+  });
+
+  <ReflectedManitneButton
+    // @ts-expect-error
+    component="button"
+    // @ts-expect-error
+    onClick={(e) => {
+      expectType<number>(e.clientX);
+    }}
+  />;
+}
+
+// edge-case: polymorphic props
+{
+  interface CommonProps {
+    inline?: boolean;
+    progress?: boolean;
+    enabledOnProgress?: boolean;
+    floating?: boolean;
+    showSpinnerIcon?: boolean;
+    onBright?: boolean;
+  }
+  type HTMLButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+  interface ButtonButtonProps extends CommonProps, Omit<HTMLButtonProps, 'size'> {
+    tag?: 'button';
+    href?: never;
+  }
+  type HTMLAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+  interface AnchorButtonProps extends CommonProps, HTMLAnchorProps {
+    tag?: 'a';
+  }
+  type HTMLLabelProps = LabelHTMLAttributes<HTMLLabelElement>;
+  interface LabelButtonProps extends CommonProps, HTMLLabelProps {
+    tag?: 'label';
+    disabled?: boolean;
+  }
+  type ButtonProps = ButtonButtonProps | AnchorButtonProps | LabelButtonProps;
+
+  const TestButton = (props: ButtonProps) => {
+    return null;
+  };
+
+  const ReflectedTestButton1 = reflect({
+    view: TestButton,
+    bind: {
+      inline: true,
+      progress: true,
+      tag: 'a',
+      href: 'test',
+    },
+  });
+  const ReflectedTestButton2 = reflect({
+    view: TestButton,
+    // @ts-expect-error
+    bind: {
+      inline: true,
+      progress: true,
+      tag: 'button',
+      href: 'test',
+    },
   });
 }

@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { EventCallable, Show, Store } from 'effector';
 import type { useUnit } from 'effector-react';
-import type { ComponentType, FC, PropsWithChildren, ReactHTML } from 'react';
+import type {
+  ComponentProps,
+  ComponentType,
+  FC,
+  PropsWithChildren,
+  ReactHTML,
+} from 'react';
 
 type UseUnitConfig = Parameters<typeof useUnit>[1];
 
@@ -63,8 +69,12 @@ type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
  * });
  * ```
  */
-export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
-  view: ComponentType<Props>;
+export function reflect<
+  View extends ComponentType<any>,
+  Props extends ComponentProps<View>,
+  Bind extends BindFromProps<Props>,
+>(config: {
+  view: View;
   bind: Bind;
   hooks?: Hooks<Props>;
   /**
@@ -94,8 +104,12 @@ export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
  * });
  * ```
  */
-export function createReflect<Props, Bind extends BindFromProps<Props>>(
-  component: ComponentType<Props>,
+export function createReflect<
+  View extends ComponentType<any>,
+  Props extends ComponentProps<View>,
+  Bind extends BindFromProps<Props>,
+>(
+  component: View,
 ): (
   bind: Bind,
   features?: {
@@ -133,7 +147,8 @@ type ReflectedProps<Item, Bind> = Item & PropsifyBind<Bind>;
  * ```
  */
 export function list<
-  Props,
+  View extends ComponentType<any>,
+  Props extends ComponentProps<View>,
   Item,
   MapItem extends {
     [M in keyof Omit<Props, keyof Bind>]: (item: Item, index: number) => Props[M];
@@ -143,7 +158,7 @@ export function list<
   config: ReflectedProps<Item, Bind> extends Props
     ? {
         source: Store<Item[]>;
-        view: ComponentType<Props>;
+        view: View;
         bind?: Bind;
         mapItem?: MapItem;
         getKey?: (item: Item) => React.Key;
@@ -155,7 +170,7 @@ export function list<
       }
     : {
         source: Store<Item[]>;
-        view: ComponentType<Props>;
+        view: View;
         bind?: Bind;
         mapItem: MapItem;
         getKey?: (item: Item) => React.Key;

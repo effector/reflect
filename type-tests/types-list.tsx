@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { list } from '@effector/reflect';
+import { Button } from '@mantine/core';
 import { createEvent, createStore } from 'effector';
 import React from 'react';
 import { expectType } from 'tsd';
@@ -175,6 +176,22 @@ import { expectType } from 'tsd';
   const List = list({
     source: $items,
     view: Item,
+  });
+
+  expectType<React.FC>(List);
+}
+
+// Edge-case: Mantine Button with weird polymorphic factory
+{
+  const clicked = createEvent<number>();
+
+  const List = list({
+    source: createStore<string[]>([]),
+    view: Button<'button'>,
+    mapItem: {
+      children: (item) => item,
+      onClick: (_item) => (e) => clicked(e.clientX),
+    },
   });
 
   expectType<React.FC>(List);
