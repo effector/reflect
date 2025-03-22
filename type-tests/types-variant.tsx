@@ -268,6 +268,18 @@ import { expectType } from 'tsd';
     },
   });
 
+  const ReflectedVariantBad = variant({
+    source: createStore<'button' | 'a'>('button'),
+    bind: {
+      // @ts-expect-error
+      size: 52,
+    },
+    cases: {
+      button: Button<'button'>,
+      a: Button<'a'>,
+    },
+  });
+
   const IfElseVariant = variant({
     if: createStore(true),
     then: Button<'button'>,
