@@ -484,13 +484,49 @@ function localize(value: string): unknown {
   });
 }
 
-// Edge-case: Mantine Button weird types
+// Edge-case: Mantine Button weird polymorphic factory
+{
+  const ReflectedManitneButton = reflect({
+    view: Button<'button'>,
+    bind: {
+      children: 'foo',
+      onClick: (e) => {
+        e.target;
+      },
+    },
+  });
+
+  <ReflectedManitneButton
+    component="button"
+    onClick={(e) => {
+      e.target;
+    }}
+  />;
+}
+
+// Edge-case (BROKEN): Mantine Button weird polymorphic factory
+// without explicit type argument
+//
+// This test is failing - it is left here for future reference, in case if there is a way to fix it
+// If you use a Mantine polymorphic components or anything similiar - check test above for a currently working solution
 {
   const ReflectedManitneButton = reflect({
     view: Button,
     bind: {
       children: 'foo',
-      onClick: () => {},
+      // @ts-expect-error
+      onClick: (e) => {
+        e.target;
+      },
     },
   });
+
+  <ReflectedManitneButton
+    // @ts-expect-error
+    component="button"
+    // @ts-expect-error
+    onClick={(e) => {
+      e.target;
+    }}
+  />;
 }

@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { EventCallable, Show, Store } from 'effector';
 import type { useUnit } from 'effector-react';
-import type { ComponentType, FC, PropsWithChildren, ReactHTML } from 'react';
+import type {
+  ComponentProps,
+  ComponentType,
+  FC,
+  PropsWithChildren,
+  ReactHTML,
+} from 'react';
 
 type UseUnitConfig = Parameters<typeof useUnit>[1];
 
@@ -63,8 +69,12 @@ type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
  * });
  * ```
  */
-export function reflect<Props, Bind extends BindFromProps<Props>>(config: {
-  view: ComponentType<Props>;
+export function reflect<
+  View extends ComponentType<any>,
+  Props extends ComponentProps<View>,
+  Bind extends BindFromProps<Props>,
+>(config: {
+  view: View;
   bind: Bind;
   hooks?: Hooks<Props>;
   /**
