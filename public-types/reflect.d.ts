@@ -185,6 +185,22 @@ export function list<
 // variant types
 
 /**
+ * Computes final props type based on Props of the view component and Bind object for variant operator specifically
+ *
+ * Difference is important since in variant case Props is a union
+ *
+ * Props that are "taken" by Bind object are made **optional** in the final type,
+ * so it is possible to overwrite them in the component usage anyway
+ */
+type FinalPropsVariant<Props, Bind extends BindFromProps<Props>> = Show<
+  Props extends any
+    ? Omit<Props, keyof Bind> & {
+        [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+      }
+    : never
+>;
+
+/**
  * Operator to conditionally render a component based on the reactive `source` store value.
  *
  * @example
@@ -206,8 +222,9 @@ export function list<
  * ```
  */
 export function variant<
-  Props,
   CaseType extends string,
+  Cases extends Record<CaseType, ComponentType<any>>,
+  Props extends ComponentProps<Cases[CaseType]>,
   // It is ok here - it fixed bunch of type inference issues, when `bind` is not provided
   // but it is not clear why it works this way - Record<string, never> or any option other than `{}` doesn't work
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -216,7 +233,7 @@ export function variant<
   config:
     | {
         source: Store<CaseType>;
-        cases: Partial<Record<CaseType, ComponentType<Props>>>;
+        cases: Partial<Cases>;
         default?: ComponentType<Props>;
         bind?: Bind;
         hooks?: Hooks<Props>;
@@ -236,7 +253,7 @@ export function variant<
          */
         useUnitConfig?: UseUnitConfig;
       },
-): FC<FinalProps<Props, Bind>>;
+): FC<FinalPropsVariant<Props, Bind>>;
 
 // fromTag types
 /**

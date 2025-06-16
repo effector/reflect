@@ -31,10 +31,10 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(VariableInput);
+  <VariableInput />;
 }
 
-// variant catches incompatible props between cases
+// variant allows to pass incompatible props between cases - resulting component will have union of all props from all cases
 {
   const Input: React.FC<{
     value: string;
@@ -56,12 +56,38 @@ import { expectType } from 'tsd';
     },
     cases: {
       input: Input,
-      // @ts-expect-error
       datetime: DateTime,
     },
   });
 
-  expectType<React.FC>(VariableInput);
+  <VariableInput />;
+  <VariableInput value="test" />;
+  <VariableInput
+    value="test"
+    onChange={(event: { target: { value: string } }) => {
+      event.target.value;
+    }}
+  />;
+  <VariableInput
+    value="test"
+    onChange={() => {
+      // ok
+    }}
+  />;
+  <VariableInput
+    value="test"
+    onChange={(event: string) => {
+      event;
+    }}
+  />;
+  <VariableInput
+    // @ts-expect-error
+    value={42}
+    // @ts-expect-error
+    onChange={(event: number) => {
+      event;
+    }}
+  />;
 }
 
 // variant allows not to set every possble case
@@ -89,7 +115,10 @@ import { expectType } from 'tsd';
     default: NotFoundPage,
   });
 
-  expectType<React.FC>(CurrentPage);
+  <CurrentPage />;
+  <CurrentPage context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPage context="kek" />;
 }
 
 // variant warns about wrong cases
@@ -117,7 +146,10 @@ import { expectType } from 'tsd';
     default: NotFoundPage,
   });
 
-  expectType<React.FC>(CurrentPage);
+  <CurrentPage />;
+  <CurrentPage context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPage context="kek" />;
 }
 
 // overload for boolean source
@@ -140,14 +172,21 @@ import { expectType } from 'tsd';
     else: FallbackPage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPageThenElse);
+
+  <CurrentPageThenElse />;
+  <CurrentPageThenElse context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPageThenElse context="kek" />;
 
   const CurrentPageOnlyThen = variant({
     if: $enabled,
     then: HomePage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPageOnlyThen);
+  <CurrentPageOnlyThen />;
+  <CurrentPageOnlyThen context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPageOnlyThen context="kek" />;
 }
 
 // supports nesting
@@ -169,6 +208,8 @@ import { expectType } from 'tsd';
       }),
     },
   });
+
+  <NestedVariant />;
 }
 
 // allows variants of compatible types
@@ -188,6 +229,10 @@ import { expectType } from 'tsd';
     }),
     else: Loader,
   });
+
+  <View test="test" />;
+  // @ts-expect-error
+  <View test={42} />;
 }
 
 // Issue #81 reproduce 1
@@ -264,7 +309,6 @@ import { expectType } from 'tsd';
     },
     cases: {
       button: Button<'button'>,
-      // @ts-expect-error
       a: Button<'a'>,
     },
   });
@@ -277,10 +321,14 @@ import { expectType } from 'tsd';
     },
     cases: {
       button: Button<'button'>,
-      // @ts-expect-error
       a: Button<'a'>,
     },
   });
+
+  <ReflectedVariantBad />;
+  <ReflectedVariantBad size="xl" />;
+  // @ts-expect-error
+  <ReflectedVariantBad size={52} />;
 
   const IfElseVariant = variant({
     if: createStore(true),
@@ -288,4 +336,52 @@ import { expectType } from 'tsd';
     // @ts-expect-error
     else: Button<'a'>,
   });
+
+  <IfElseVariant />;
+  <IfElseVariant size="xl" />;
+  // @ts-expect-error
+  <IfElseVariant size={52} />;
+}
+
+// variant should allow not-to pass required props - as they can be added later in react
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+    color: 'red';
+  }> = () => null;
+  const $variants = createStore<'input' | 'fallback'>('input');
+  const Fallback: React.FC<{ kek?: string }> = () => null;
+  const $value = createStore<string>('');
+  const changed = createEvent<string>();
+
+  const InputBase = reflect({
+    view: Input,
+    bind: {
+      value: $value,
+      onChange: changed,
+    },
+  });
+
+  const ReflectedInput = variant({
+    source: $variants,
+    cases: {
+      input: InputBase,
+      fallback: Fallback,
+    },
+  });
+
+  const App: React.FC = () => {
+    // missing prop must still be required in react
+    // but in this case it is not required, as props are conditional union
+    return <ReflectedInput />;
+  };
+
+  <ReflectedInput kek="kek" />;
+
+  const AppFixed: React.FC = () => {
+    return <ReflectedInput color="red" />;
+  };
+  expectType<React.FC>(App);
+  expectType<React.FC>(AppFixed);
 }
