@@ -206,8 +206,9 @@ export function list<
  * ```
  */
 export function variant<
-  Props,
   CaseType extends string,
+  Cases extends Record<CaseType, ComponentType<any>>,
+  Props extends ComponentProps<Cases[CaseType]>,
   // It is ok here - it fixed bunch of type inference issues, when `bind` is not provided
   // but it is not clear why it works this way - Record<string, never> or any option other than `{}` doesn't work
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -216,7 +217,7 @@ export function variant<
   config:
     | {
         source: Store<CaseType>;
-        cases: Partial<Record<CaseType, ComponentType<Props>>>;
+        cases: Partial<Cases>;
         default?: ComponentType<Props>;
         bind?: Bind;
         hooks?: Hooks<Props>;

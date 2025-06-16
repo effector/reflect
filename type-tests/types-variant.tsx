@@ -34,7 +34,7 @@ import { expectType } from 'tsd';
   expectType<React.FC>(VariableInput);
 }
 
-// variant catches incompatible props between cases
+// variant allows to pass incompatible props between cases - resulting component will have union of all props from all cases
 {
   const Input: React.FC<{
     value: string;
@@ -56,7 +56,6 @@ import { expectType } from 'tsd';
     },
     cases: {
       input: Input,
-      // @ts-expect-error
       datetime: DateTime,
     },
   });
@@ -264,7 +263,6 @@ import { expectType } from 'tsd';
     },
     cases: {
       button: Button<'button'>,
-      // @ts-expect-error
       a: Button<'a'>,
     },
   });
@@ -277,7 +275,6 @@ import { expectType } from 'tsd';
     },
     cases: {
       button: Button<'button'>,
-      // @ts-expect-error
       a: Button<'a'>,
     },
   });
