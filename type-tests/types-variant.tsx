@@ -61,6 +61,33 @@ import { expectType } from 'tsd';
   });
 
   <VariableInput />;
+  <VariableInput value="test" />;
+  <VariableInput
+    value="test"
+    onChange={(event: { target: { value: string } }) => {
+      event.target.value;
+    }}
+  />;
+  <VariableInput
+    value="test"
+    onChange={() => {
+      // ok
+    }}
+  />;
+  <VariableInput
+    value="test"
+    onChange={(event: string) => {
+      event;
+    }}
+  />;
+  <VariableInput
+    // @ts-expect-error
+    value={42}
+    // @ts-expect-error
+    onChange={(event: number) => {
+      event;
+    }}
+  />;
 }
 
 // variant allows not to set every possble case
@@ -89,6 +116,9 @@ import { expectType } from 'tsd';
   });
 
   <CurrentPage />;
+  <CurrentPage context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPage context="kek" />;
 }
 
 // variant warns about wrong cases
@@ -117,6 +147,9 @@ import { expectType } from 'tsd';
   });
 
   <CurrentPage />;
+  <CurrentPage context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPage context="kek" />;
 }
 
 // overload for boolean source
@@ -141,6 +174,9 @@ import { expectType } from 'tsd';
   });
 
   <CurrentPageThenElse />;
+  <CurrentPageThenElse context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPageThenElse context="kek" />;
 
   const CurrentPageOnlyThen = variant({
     if: $enabled,
@@ -148,6 +184,9 @@ import { expectType } from 'tsd';
     bind: { context: $ctx },
   });
   <CurrentPageOnlyThen />;
+  <CurrentPageOnlyThen context={{ route: 'home' }} />;
+  // @ts-expect-error
+  <CurrentPageOnlyThen context="kek" />;
 }
 
 // supports nesting
@@ -169,6 +208,8 @@ import { expectType } from 'tsd';
       }),
     },
   });
+
+  <NestedVariant />;
 }
 
 // allows variants of compatible types
@@ -188,6 +229,10 @@ import { expectType } from 'tsd';
     }),
     else: Loader,
   });
+
+  <View test="test" />;
+  // @ts-expect-error
+  <View test={42} />;
 }
 
 // Issue #81 reproduce 1
@@ -280,12 +325,22 @@ import { expectType } from 'tsd';
     },
   });
 
+  <ReflectedVariantBad />;
+  <ReflectedVariantBad size="xl" />;
+  // @ts-expect-error
+  <ReflectedVariantBad size={52} />;
+
   const IfElseVariant = variant({
     if: createStore(true),
     then: Button<'button'>,
     // @ts-expect-error
     else: Button<'a'>,
   });
+
+  <IfElseVariant />;
+  <IfElseVariant size="xl" />;
+  // @ts-expect-error
+  <IfElseVariant size={52} />;
 }
 
 // variant should allow not-to pass required props - as they can be added later in react
