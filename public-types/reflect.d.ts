@@ -185,6 +185,22 @@ export function list<
 // variant types
 
 /**
+ * Computes final props type based on Props of the view component and Bind object for variant operator specifically
+ *
+ * Difference is important since in variant case Props is a union
+ *
+ * Props that are "taken" by Bind object are made **optional** in the final type,
+ * so it is possible to overwrite them in the component usage anyway
+ */
+type FinalPropsVariant<Props, Bind extends BindFromProps<Props>> = Show<
+  Props extends any
+    ? Omit<Props, keyof Bind> & {
+        [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+      }
+    : never
+>;
+
+/**
  * Operator to conditionally render a component based on the reactive `source` store value.
  *
  * @example
@@ -237,7 +253,7 @@ export function variant<
          */
         useUnitConfig?: UseUnitConfig;
       },
-): FC<FinalProps<Props, Bind>>;
+): FC<FinalPropsVariant<Props, Bind>>;
 
 // fromTag types
 /**

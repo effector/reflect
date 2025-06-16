@@ -31,7 +31,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(VariableInput);
+  <VariableInput />;
 }
 
 // variant allows to pass incompatible props between cases - resulting component will have union of all props from all cases
@@ -60,7 +60,7 @@ import { expectType } from 'tsd';
     },
   });
 
-  expectType<React.FC>(VariableInput);
+  <VariableInput />;
 }
 
 // variant allows not to set every possble case
@@ -88,7 +88,7 @@ import { expectType } from 'tsd';
     default: NotFoundPage,
   });
 
-  expectType<React.FC>(CurrentPage);
+  <CurrentPage />;
 }
 
 // variant warns about wrong cases
@@ -116,7 +116,7 @@ import { expectType } from 'tsd';
     default: NotFoundPage,
   });
 
-  expectType<React.FC>(CurrentPage);
+  <CurrentPage />;
 }
 
 // overload for boolean source
@@ -139,14 +139,15 @@ import { expectType } from 'tsd';
     else: FallbackPage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPageThenElse);
+
+  <CurrentPageThenElse />;
 
   const CurrentPageOnlyThen = variant({
     if: $enabled,
     then: HomePage,
     bind: { context: $ctx },
   });
-  expectType<React.FC>(CurrentPageOnlyThen);
+  <CurrentPageOnlyThen />;
 }
 
 // supports nesting
@@ -285,4 +286,47 @@ import { expectType } from 'tsd';
     // @ts-expect-error
     else: Button<'a'>,
   });
+}
+
+// variant should allow not-to pass required props - as they can be added later in react
+{
+  const Input: React.FC<{
+    value: string;
+    onChange: (newValue: string) => void;
+    color: 'red';
+  }> = () => null;
+  const $variants = createStore<'input' | 'fallback'>('input');
+  const Fallback: React.FC<{ kek?: string }> = () => null;
+  const $value = createStore<string>('');
+  const changed = createEvent<string>();
+
+  const InputBase = reflect({
+    view: Input,
+    bind: {
+      value: $value,
+      onChange: changed,
+    },
+  });
+
+  const ReflectedInput = variant({
+    source: $variants,
+    cases: {
+      input: InputBase,
+      fallback: Fallback,
+    },
+  });
+
+  const App: React.FC = () => {
+    // missing prop must still be required in react
+    // but in this case it is not required, as props are conditional union
+    return <ReflectedInput />;
+  };
+
+  <ReflectedInput kek="kek" />;
+
+  const AppFixed: React.FC = () => {
+    return <ReflectedInput color="red" />;
+  };
+  expectType<React.FC>(App);
+  expectType<React.FC>(AppFixed);
 }
