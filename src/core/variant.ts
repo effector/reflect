@@ -53,9 +53,14 @@ export function variantFactory(context: Context) {
     }
 
     function View(props: Props) {
-      const nameOfCaseRaw = context.useUnit($case, config.useUnitConfig);
+      const nameOfCaseRaw = context.useUnit(
+        $case as Store<string | boolean>,
+        config.useUnitConfig,
+      );
       const nameOfCase = (
-        'if' in config ? ifToVariant(nameOfCaseRaw as any) : nameOfCaseRaw
+        typeof nameOfCaseRaw === 'string'
+          ? nameOfCaseRaw
+          : booleanToVariant(nameOfCaseRaw as boolean)
       ) as Variant;
       const Component = cases[nameOfCase] ?? def;
 
@@ -73,6 +78,6 @@ export function variantFactory(context: Context) {
   };
 }
 
-function ifToVariant(value: boolean): 'then' | 'else' {
+function booleanToVariant(value: boolean): 'then' | 'else' {
   return value ? 'then' : 'else';
 }
