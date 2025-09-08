@@ -60,7 +60,7 @@ export function variantFactory(context: Context) {
       const nameOfCase = (
         typeof nameOfCaseRaw === 'string'
           ? nameOfCaseRaw
-          : booleanToVariant(nameOfCaseRaw as boolean)
+          : booleanToVariant(nameOfCaseRaw)
       ) as Variant;
       const Component = cases[nameOfCase] ?? def;
 
