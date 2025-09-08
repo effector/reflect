@@ -32,13 +32,13 @@ export function variantFactory(context: Context) {
           useUnitConfig?: UseUnitConifg;
         },
   ): (p: Props) => React.ReactNode {
-    let $case: Store<Variant>;
+    let $case: Store<Variant | boolean>;
     let cases: Record<Variant, View<Props>>;
     let def: View<Props>;
 
     // Shortcut for Store<boolean>
     if ('if' in config) {
-      $case = config.if as any;
+      $case = config.if;
       cases = {
         then: config.then,
         else: config.else,
@@ -53,10 +53,7 @@ export function variantFactory(context: Context) {
     }
 
     function View(props: Props) {
-      const nameOfCaseRaw = context.useUnit(
-        $case as Store<string | boolean>,
-        config.useUnitConfig,
-      );
+      const nameOfCaseRaw = context.useUnit($case, config.useUnitConfig);
       const nameOfCase = (
         typeof nameOfCaseRaw === 'string'
           ? nameOfCaseRaw
