@@ -96,7 +96,7 @@
     "uglify-js": "^3.19.3",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.1",
-    "zx": "^7.2.3"
+    "zx": "^8.8.5"
   },
   "peerDependencies": {
     "effector": "^23.1.0",
