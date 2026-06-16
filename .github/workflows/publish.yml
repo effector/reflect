@@ -49,6 +49,9 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Verify npm auth
+        run: npm whoami
+
       - name: Check for NEXT tag
         id: next
         uses: actions-ecosystem/action-regex-match@v2
