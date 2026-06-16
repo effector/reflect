@@ -66,14 +66,14 @@ jobs:
       - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with NEXT tag
         if: ${{ steps.next.outputs.match != '' }}
         working-directory: './dist/'
-        run: npm publish --tag next
+        run: npm publish --tag next --access public
 
       - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with RC tag
         if: ${{ steps.rc.outputs.match != '' }}
         working-directory: './dist/'
-        run: npm publish --tag rc
+        run: npm publish --tag rc --access public
 
       - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} to latest
         if: ${{ steps.next.outputs.match == '' && steps.rc.outputs.match == '' }}
         working-directory: './dist/'
-        run: npm publish
+        run: npm publish --access public
