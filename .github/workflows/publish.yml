@@ -4,24 +4,24 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
 jobs:
-  publish-to-npm:
+  publish:
     runs-on: ubuntu-22.04
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js 24.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: 24.x
-          cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
@@ -35,50 +35,17 @@ jobs:
         env:
           CI: true
 
-      - name: Extract version
-        id: version
-        uses: olegtarasov/get-tag@v2.1
-        with:
-          tagRegex: 'v(.*)'
-
-      - name: Set version from release
-        uses: reedyuk/npm-version@1.1.1
-        with:
-          version: ${{ steps.version.outputs.tag }}
-          package: 'dist/'
-          git-tag-version: false
-
-      - name: Check for NEXT tag
-        id: next
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ steps.version.outputs.tag }}
-          regex: '-next'
-
-      - name: Check for RC tag
-        id: rc
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ steps.version.outputs.tag }}
-          regex: '-rc'
-
-      - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with NEXT tag
-        if: ${{ steps.next.outputs.match != '' }}
+      - name: Publish to NPM
         working-directory: './dist/'
-        run: npm publish --tag next --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with RC tag
-        if: ${{ steps.rc.outputs.match != '' }}
-        working-directory: './dist/'
-        run: npm publish --tag rc --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} to latest
-        if: ${{ steps.next.outputs.match == '' && steps.rc.outputs.match == '' }}
-        working-directory: './dist/'
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Определяем тег на основе версии
+          TAG="latest"
+          VERSION=${{ github.ref_name }}
+          if [[ "$VERSION" == *"next"* ]]; then
+            TAG="next"
+          elif [[ "$VERSION" == *"rc"* ]]; then
+            TAG="rc"
+          fi
+          
+          # Публикуем (provenance добавится автоматически)
+          npm publish --tag $TAG --access public
