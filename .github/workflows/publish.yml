@@ -7,6 +7,9 @@ on:
 jobs:
   publish-to-npm:
     runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -14,11 +17,12 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
 
-      - name: Use Node.js 18.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 24.x
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -44,14 +48,6 @@ jobs:
           package: 'dist/'
           git-tag-version: false
 
-      - name: Create NPM config
-        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Verify npm auth
-        run: npm whoami
-
       - name: Check for NEXT tag
         id: next
         uses: actions-ecosystem/action-regex-match@v2
@@ -69,14 +65,20 @@ jobs:
       - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with NEXT tag
         if: ${{ steps.next.outputs.match != '' }}
         working-directory: './dist/'
-        run: npm publish --tag next --access public
+        run: npm publish --tag next --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} with RC tag
         if: ${{ steps.rc.outputs.match != '' }}
         working-directory: './dist/'
-        run: npm publish --tag rc --access public
+        run: npm publish --tag rc --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @effector/reflect@${{ steps.version.outputs.tag }} to latest
         if: ${{ steps.next.outputs.match == '' && steps.rc.outputs.match == '' }}
         working-directory: './dist/'
-        run: npm publish --access public
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
