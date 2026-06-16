@@ -38,14 +38,18 @@ jobs:
       - name: Publish to NPM
         working-directory: './dist/'
         run: |
-          # Определяем тег на основе версии
-          TAG="latest"
           VERSION=${{ github.ref_name }}
+          CLEAN_VERSION=${VERSION#v}
+          
+          # Sync version with release tag
+          npm version $CLEAN_VERSION --no-git-tag-version
+          
+          # Determine dist-tag
+          TAG="latest"
           if [[ "$VERSION" == *"next"* ]]; then
             TAG="next"
           elif [[ "$VERSION" == *"rc"* ]]; then
             TAG="rc"
           fi
           
-          # Публикуем (provenance добавится автоматически)
           npm publish --tag $TAG --access public
