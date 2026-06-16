@@ -73,6 +73,7 @@
     "@types/jest": "^26.0.24",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
     "babel-jest": "^29.7.0",
     "babel-plugin-module-resolver": "^4.1.0",
     "effector": "^23.3.0",
@@ -102,8 +103,5 @@
     "effector": "^23.1.0",
     "effector-react": "^23.1.0",
     "react": ">=16.8.0 <20.0.0"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "^4.3.4"
   }
 }
