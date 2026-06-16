@@ -11,48 +11,32 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-22.04
+    environment: production
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Use Node.js 24.x
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.x
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Run tests
-        run: pnpm test
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test
         env:
           CI: true
+
+      - name: Force upgrade npm to latest
+        run: npm install -g npm@latest
 
       - name: Publish to NPM
         working-directory: './dist/'
         run: |
           VERSION=${{ github.ref_name }}
           CLEAN_VERSION=${VERSION#v}
-          
-          # Sync version with release tag
           npm version $CLEAN_VERSION --no-git-tag-version
-          
-          # Determine dist-tag
+
           TAG="latest"
-          if [[ "$VERSION" == *"next"* ]]; then
-            TAG="next"
-          elif [[ "$VERSION" == *"rc"* ]]; then
-            TAG="rc"
-          fi
-          
+          [[ "$VERSION" == *"next"* ]] && TAG="next"
+          [[ "$VERSION" == *"rc"* ]] && TAG="rc"
+
           npm publish --tag $TAG --access public
-        env:
-          # for OIDC:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-          NPM_CONFIG_PROVENANCE: true

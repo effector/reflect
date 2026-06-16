@@ -26,12 +26,27 @@ for (const config of configs) {
 }
 
 await measure(`package.json → ./dist/package.json`, `created in`, async () => {
-  const Package = JSON.parse(
+  const Existing = JSON.parse(
     await fs.readFile('./package.json', { encoding: 'utf-8' }),
   );
-  delete Package.devDependencies;
-  delete Package.scripts;
-  await fs.writeFile('./dist/package.json', JSON.stringify(Package), {
+  const Dist = {
+    name: Existing.name,
+    version: Existing.version,
+    repository: Existing.repository,
+    description: Existing.description,
+    maintainers: Existing.maintainers,
+    license: Existing.license,
+    publishConfig: Existing.publishConfig,
+    export: Existing.export,
+    main: Existing.main,
+    module: Existing.module,
+    typings: Existing.typings,
+    type: Existing.type,
+    files: Existing.files,
+    peerDependencies: Existing.peerDependencies,
+  };
+
+  await fs.writeFile('./dist/package.json', JSON.stringify(Dist, null, 2), {
     encoding: 'utf-8',
   });
 });

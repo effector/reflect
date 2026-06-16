@@ -1,7 +1,10 @@
 {
   "name": "@effector/reflect",
   "version": "0.0.0-real-version-will-be-set-on-ci",
-  "repository": "effector/reflect",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/effector/reflect.git"
+  },
   "description": "☄️ Attach effector stores to react components without hooks",
   "maintainers": [
     "Sergey Sova <mail@sergeysova.com> (https://sova.dev)",
@@ -31,7 +34,6 @@
   "typings": "index.d.ts",
   "files": [
     "Readme.md",
-    "core",
     "index.d.ts",
     "ssr.d.ts",
     "scope.d.ts",
@@ -80,6 +82,7 @@
     "effector-react": "^23.3.0",
     "eslint": "^8.57.1",
     "eslint-kit": "^6.12.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "fs-extra": "^9.1.0",
     "husky": "^8.0.3",
     "jsdom": "^23.2.0",
@@ -103,5 +106,11 @@
     "effector": "^23.1.0",
     "effector-react": "^23.1.0",
     "react": ">=16.8.0 <20.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "core-js-pure",
+      "esbuild"
+    ]
   }
 }
