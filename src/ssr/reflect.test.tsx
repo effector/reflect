@@ -259,3 +259,37 @@ test('use only event for bind', async () => {
   expect(name.value).toBe('');
   expect(age.value).toBe('');
 });
+
+test('mapProps derives a prop from a scoped store and props', async () => {
+  const app = createDomain();
+
+  const setName = app.createEvent<string>();
+  const $name = restore(setName, 'Bob');
+
+  const Greeting: FC<{ testId: string; label: string }> = (props) => {
+    return <span data-testid={props.testId}>{props.label}</span>;
+  };
+
+  const Hello = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $name,
+        fn: (name, props: { greeting: string }) => `${props.greeting}, ${name}!`,
+      },
+    },
+  });
+
+  const scope = fork(app, { values: [[$name, 'Alice']] });
+
+  const container = render(
+    <Provider value={scope}>
+      <Hello testId="hello" greeting="Hi" />
+    </Provider>,
+  );
+
+  expect(container.getByTestId('hello').textContent).toBe('Hi, Alice!');
+  // global store is untouched
+  expect($name.getState()).toBe('Bob');
+});

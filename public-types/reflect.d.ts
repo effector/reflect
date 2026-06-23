@@ -42,14 +42,42 @@ type BindFromProps<Props> = {
 };
 
 /**
- * Computes final props type based on Props of the view component and Bind object.
+ * `mapProps` object type:
+ * prop key -> a derived prop computed from a store value and the component's props.
  *
- * Props that are "taken" by Bind object are made **optional** in the final type,
+ * Use it to combine a store state with the incoming props to produce a prop for the `view`.
+ *
+ * `Keys` is captured from the actual config to know which props become overridable in the
+ * final type. The `value` of `fn` is intentionally loose (`any`) - annotate it if needed -
+ * while `props` is contextually typed as the view's `Props`.
+ */
+type MapPropsFromProps<
+  Props,
+  Keys extends Exclude<keyof Props, UnbindableProps> = Exclude<
+    keyof Props,
+    UnbindableProps
+  >,
+> = {
+  [K in Keys]: {
+    source: Store<any>;
+    fn: (value: any, props: Props) => Props[K];
+  };
+};
+
+/**
+ * Computes final props type based on Props of the view component, Bind object and the keys
+ * derived via `mapProps`.
+ *
+ * Props that are "taken" by the Bind object or `mapProps` are made **optional** in the final type,
  * so it is possible to overwrite them in the component usage anyway
  */
-type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
-  Omit<Props, keyof Bind> & {
-    [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+type FinalProps<
+  Props,
+  Bind extends BindFromProps<Props>,
+  MapKeys extends keyof Props,
+> = Show<
+  Omit<Props, keyof Bind | MapKeys> & {
+    [K in Extract<keyof Bind, keyof Props> | MapKeys]?: Props[K];
   }
 >;
 
@@ -66,6 +94,9 @@ type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
  *   placeholder: 'Name',
  *   onChange: (event) => nameChanged(event.target.value),
  *  },
+ *  mapProps: {
+ *   label: { source: $user, fn: (user, props) => `${props.title} ${user.name}` },
+ *  },
  * });
  * ```
  */
@@ -73,15 +104,20 @@ export function reflect<
   View extends ComponentType<any>,
   Props extends ComponentProps<View>,
   Bind extends BindFromProps<Props>,
+  MapKeys extends Exclude<keyof Props, UnbindableProps> = never,
 >(config: {
   view: View;
   bind: Bind;
+  /**
+   * Derives props for the `view` from a store value combined with the component's props.
+   */
+  mapProps?: MapPropsFromProps<Props, MapKeys>;
   hooks?: Hooks<Props>;
   /**
    * This configuration is passed directly to `useUnit`'s hook second argument.
    */
   useUnitConfig?: UseUnitConfig;
-}): FC<FinalProps<Props, Bind>>;
+}): FC<FinalProps<Props, Bind, MapKeys>>;
 
 // Note: FC is used as a return type, because tests on a real Next.js project showed,
 // that if theoretically better option like (props: ...) => React.ReactNode is used,
@@ -108,18 +144,23 @@ export function createReflect<
   View extends ComponentType<any>,
   Props extends ComponentProps<View>,
   Bind extends BindFromProps<Props>,
+  MapKeys extends Exclude<keyof Props, UnbindableProps> = never,
 >(
   component: View,
 ): (
   bind: Bind,
   features?: {
+    /**
+     * Derives props for the `view` from a store value combined with the component's props.
+     */
+    mapProps?: MapPropsFromProps<Props, MapKeys>;
     hooks?: Hooks<Props>;
     /**
      * This configuration is passed directly to `useUnit`'s hook second argument.
      */
     useUnitConfig?: UseUnitConfig;
   },
-) => FC<FinalProps<Props, Bind>>;
+) => FC<FinalProps<Props, Bind, MapKeys>>;
 
 // list types
 type PropsifyBind<Bind> = {
@@ -161,6 +202,7 @@ export function list<
         view: View;
         bind?: Bind;
         mapItem?: MapItem;
+        mapProps?: MapPropsFromProps<Props>;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks<Props>;
         /**
@@ -173,6 +215,7 @@ export function list<
         view: View;
         bind?: Bind;
         mapItem: MapItem;
+        mapProps?: MapPropsFromProps<Props>;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks<Props>;
         /**
@@ -192,10 +235,14 @@ export function list<
  * Props that are "taken" by Bind object are made **optional** in the final type,
  * so it is possible to overwrite them in the component usage anyway
  */
-type FinalPropsVariant<Props, Bind extends BindFromProps<Props>> = Show<
+type FinalPropsVariant<
+  Props,
+  Bind extends BindFromProps<Props>,
+  MapKeys extends keyof Props,
+> = Show<
   Props extends any
-    ? Omit<Props, keyof Bind> & {
-        [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+    ? Omit<Props, keyof Bind | MapKeys> & {
+        [K in Extract<keyof Bind, keyof Props> | MapKeys]?: Props[K];
       }
     : never
 >;
@@ -229,6 +276,7 @@ export function variant<
   // but it is not clear why it works this way - Record<string, never> or any option other than `{}` doesn't work
   // eslint-disable-next-line @typescript-eslint/ban-types
   Bind extends BindFromProps<Props> = {},
+  MapKeys extends Exclude<keyof Props, UnbindableProps> = never,
 >(
   config:
     | {
@@ -236,6 +284,7 @@ export function variant<
         cases: Partial<Cases>;
         default?: ComponentType<Props>;
         bind?: Bind;
+        mapProps?: MapPropsFromProps<Props, MapKeys>;
         hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
@@ -247,13 +296,14 @@ export function variant<
         then: ComponentType<Props>;
         else?: ComponentType<Props>;
         bind?: Bind;
+        mapProps?: MapPropsFromProps<Props, MapKeys>;
         hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
          */
         useUnitConfig?: UseUnitConfig;
       },
-): FC<FinalPropsVariant<Props, Bind>>;
+): FC<FinalPropsVariant<Props, Bind, MapKeys>>;
 
 // fromTag types
 /**

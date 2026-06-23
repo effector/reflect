@@ -2,11 +2,19 @@ import { Effect, Event, is, scopeBind, Store } from 'effector';
 import { useProvidedScope } from 'effector-react';
 import React, { PropsWithoutRef, RefAttributes } from 'react';
 
-import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
+import {
+  BindProps,
+  Context,
+  Hooks,
+  MapPropsConfig,
+  UseUnitConifg,
+  View,
+} from './types';
 
 export interface ReflectConfig<Props, Bind extends BindProps<Props>> {
   view: View<Props>;
   bind: Bind;
+  mapProps?: MapPropsConfig<Props>;
   hooks?: Hooks<Props>;
   useUnitConfig?: UseUnitConifg;
 }
@@ -17,7 +25,10 @@ export function reflectCreateFactory(context: Context) {
   return function createReflect<Props>(view: View<Props>) {
     return <Bind extends BindProps<Props> = BindProps<Props>>(
       bind: Bind,
-      params?: Pick<ReflectConfig<Props, Bind>, 'hooks' | 'useUnitConfig'>,
+      params?: Pick<
+        ReflectConfig<Props, Bind>,
+        'hooks' | 'useUnitConfig' | 'mapProps'
+      >,
     ) => reflect<Props, Bind>({ view, bind, ...params });
   };
 }
@@ -29,15 +40,47 @@ export function reflectFactory(context: Context) {
     const { stores, events, data, functions } = sortProps(config.bind);
     const hooks = sortProps(config.hooks || {});
 
+    const mapProps = config.mapProps ?? {};
+    const mapPropsKeys = Object.keys(mapProps);
+    const mapPropsSources: Record<string, Store<unknown>> = {};
+    for (const key of mapPropsKeys) {
+      mapPropsSources[key] = (mapProps as any)[key].source;
+    }
+
     return React.forwardRef((props: Props, ref) => {
       const storeProps = context.useUnit(stores, config.useUnitConfig);
       const eventsProps = context.useUnit(events as any, config.useUnitConfig);
       const functionProps = useBoundFunctions(functions);
+      const mapPropsValues = context.useUnit(
+        mapPropsSources as any,
+        config.useUnitConfig,
+      );
 
       const finalProps: any = {};
 
       if (ref) {
         finalProps.ref = ref;
+      }
+
+      const mappedProps: Record<string, unknown> = {};
+      if (mapPropsKeys.length > 0) {
+        // props passed to the `fn` should already include the bound values,
+        // so it is possible to derive a prop from both a store and other props
+        const propsForFn = Object.assign(
+          {},
+          storeProps,
+          eventsProps,
+          data,
+          functionProps,
+          props,
+        );
+
+        for (const key of mapPropsKeys) {
+          mappedProps[key] = (mapProps as any)[key].fn(
+            (mapPropsValues as any)[key],
+            propsForFn,
+          );
+        }
       }
 
       const elementProps: Props = Object.assign(
@@ -46,6 +89,7 @@ export function reflectFactory(context: Context) {
         eventsProps,
         data,
         functionProps,
+        mappedProps,
         props,
       );
 

@@ -578,3 +578,82 @@ function localize(value: string): unknown {
     },
   });
 }
+
+// mapProps: derives a prop from a store value combined with props
+{
+  const Greeting: React.FC<{
+    label: string;
+    greeting: string;
+  }> = () => null;
+  const $name = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $name,
+        // `props` is contextually typed as the view's Props
+        fn: (name, props) => `${props.greeting} ${name}`,
+      },
+    },
+  });
+
+  // `greeting` is still required, `label` is made optional by mapProps
+  const App: React.FC = () => {
+    return <ReflectedGreeting greeting="Hi" />;
+  };
+  expectType<React.FC>(App);
+
+  // the derived prop can still be overridden at the usage site
+  const AppOverride: React.FC = () => {
+    return <ReflectedGreeting greeting="Hi" label="overridden" />;
+  };
+  expectType<React.FC>(AppOverride);
+}
+
+// mapProps: fn return type must match the prop type
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $count = createStore<number>(0);
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $count,
+        // @ts-expect-error - number is not assignable to the string `label` prop
+        fn: () => 42,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting />;
+  expectType<React.FC>(App);
+}
+
+// mapProps: should not allow keys that are not props of the view
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $name = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      // @ts-expect-error - `unknownProp` is not a prop of the view
+      unknownProp: {
+        source: $name,
+        fn: (value: string) => value,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting label="x" />;
+  expectType<React.FC>(App);
+}

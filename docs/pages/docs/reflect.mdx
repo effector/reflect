@@ -18,6 +18,7 @@ Static method to create a component bound to effector stores and events as store
 
 1. `view` — A react component that should be used to bind to
 1. `bind` — Object of effector stores, events or any value
+1. `mapProps` — Optional object of derived props. Each entry computes a prop for the `view` from a store value combined with the component's own props.
 1. [`hooks`](/docs/hooks) — Optional object `{ mounted, unmounted }` to handle when component is mounted or unmounted.
 1. `useUnitConfig` - Optional configuration object, which is passed directly to the second argument of `useUnit` from `effector-react`.
 
@@ -80,6 +81,52 @@ export const User: FC = () => {
   );
 };
 ```
+
+## Deriving props with `mapProps`
+
+Sometimes a prop is not just a store value or a plain value, but a combination of a store's
+state **and** the props passed to the component. For these cases use `mapProps`.
+
+Each entry is `{ source, fn }`:
+
+- `source` — a store (use `combine(...)` to derive from several stores) the value is read from reactively;
+- `fn` — `(value, props) => derivedProp`, where `value` is the `source` store value and `props` are the component's own props.
+
+```tsx
+import { reflect } from '@effector/reflect';
+import { createStore } from 'effector';
+import React, { FC } from 'react';
+
+type GreetingProps = {
+  title: string;
+  label: string;
+};
+
+const Greeting: FC<GreetingProps> = ({ label }) => <span>{label}</span>;
+
+const $user = createStore({ name: 'Bob' });
+
+const Hello = reflect({
+  view: Greeting,
+  bind: {},
+  mapProps: {
+    // `label` is derived from the `$user` store and the incoming `title` prop
+    label: {
+      source: $user,
+      fn: (user, props) => `${props.title} ${user.name}`,
+    },
+  },
+});
+
+// usage: `label` becomes optional, since it is derived
+export const App: FC = () => <Hello title="Hello," />;
+```
+
+The component re-renders only when the `source` store changes. A prop computed via `mapProps`
+is made **optional** in the resulting component's type and can still be overridden explicitly at
+the usage site (an explicitly passed prop wins over the derived value).
+
+> Note: like `bind`, the `mapProps` field is supported by all Reflect operators — `reflect`, `createReflect`, `variant` and `list`.
 
 ### Fork API auto-compatibility
 

@@ -2,7 +2,14 @@ import { Store } from 'effector';
 import React from 'react';
 
 import { reflectFactory } from './reflect';
-import { BindProps, Context, Hooks, UseUnitConifg, View } from './types';
+import {
+  BindProps,
+  Context,
+  Hooks,
+  MapPropsConfig,
+  UseUnitConifg,
+  View,
+} from './types';
 
 const Default = () => null;
 
@@ -21,6 +28,7 @@ export function variantFactory(context: Context) {
           cases: Record<Variant, View<Props>>;
           hooks?: Hooks<Props>;
           default?: View<Props>;
+          mapProps?: MapPropsConfig<Props>;
           useUnitConfig?: UseUnitConifg;
         }
       | {
@@ -29,6 +37,7 @@ export function variantFactory(context: Context) {
           else?: View<Props>;
           hooks?: Hooks<Props>;
           bind?: Bind;
+          mapProps?: MapPropsConfig<Props>;
           useUnitConfig?: UseUnitConifg;
         },
   ): (p: Props) => React.ReactNode {
@@ -70,6 +79,7 @@ export function variantFactory(context: Context) {
       bind,
       view: View,
       hooks: config.hooks,
+      mapProps: config.mapProps,
       useUnitConfig: config.useUnitConfig,
     }) as unknown as (p: Props) => React.ReactNode;
   };
