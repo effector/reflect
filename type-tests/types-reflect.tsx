@@ -579,22 +579,23 @@ function localize(value: string): unknown {
   });
 }
 
-// mapProps: derives a prop from a store value combined with props
+// mapProps: derives a prop from a store value combined with props,
+// `value` is inferred from `source`, `props` is the view's props
 {
   const Greeting: React.FC<{
     label: string;
     greeting: string;
   }> = () => null;
-  const $name = createStore<string>('');
+  const $user = createStore<{ name: string }>({ name: '' });
 
   const ReflectedGreeting = reflect({
     view: Greeting,
     bind: {},
     mapProps: {
       label: {
-        source: $name,
-        // `props` is contextually typed as the view's Props
-        fn: (name, props) => `${props.greeting} ${name}`,
+        source: $user,
+        // `user` is inferred as { name: string }, `props` as the view's Props
+        fn: (user, props) => `${props.greeting} ${user.name}`,
       },
     },
   });
@@ -612,6 +613,26 @@ function localize(value: string): unknown {
   expectType<React.FC>(AppOverride);
 }
 
+// mapProps: `value` is inferred from `source` - accessing a missing field errors
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $user = createStore<{ name: string }>({ name: '' });
+
+  reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $user,
+        // @ts-expect-error - `nope` does not exist on the inferred source value
+        fn: (user) => `${user.nope}`,
+      },
+    },
+  });
+}
+
 // mapProps: fn return type must match the prop type
 {
   const Greeting: React.FC<{
@@ -626,7 +647,7 @@ function localize(value: string): unknown {
       label: {
         source: $count,
         // @ts-expect-error - number is not assignable to the string `label` prop
-        fn: () => 42,
+        fn: (count) => count,
       },
     },
   });
@@ -635,7 +656,7 @@ function localize(value: string): unknown {
   expectType<React.FC>(App);
 }
 
-// mapProps: should not allow keys that are not props of the view
+// mapProps: a key that is not a prop of the view makes fn's return type `never`
 {
   const Greeting: React.FC<{
     label: string;
@@ -646,10 +667,10 @@ function localize(value: string): unknown {
     view: Greeting,
     bind: {},
     mapProps: {
-      // @ts-expect-error - `unknownProp` is not a prop of the view
       unknownProp: {
         source: $name,
-        fn: (value: string) => value,
+        // @ts-expect-error - `unknownProp` is not a prop, so the return type is `never`
+        fn: (value) => value,
       },
     },
   });
