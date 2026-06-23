@@ -647,6 +647,50 @@ describe('mapProps', () => {
     const container = render(<Hello testId="hello" label="overridden" />);
     expect(container.getByTestId('hello').textContent).toBe('overridden');
   });
+
+  test('combines an object of stores as source', async () => {
+    const setName = createEvent<string>();
+    const $name = restore(setName, 'Bob');
+    const $count = createStore(2);
+
+    const Hello = reflect({
+      view: Greeting,
+      bind: {},
+      mapProps: {
+        label: {
+          source: { name: $name, count: $count },
+          fn: (s) => `${s.name} (${s.count})`,
+        },
+      },
+    });
+
+    const container = render(<Hello testId="hello" greeting="" />);
+    expect(container.getByTestId('hello').textContent).toBe('Bob (2)');
+
+    await act(async () => {
+      setName('Alice');
+    });
+    expect(container.getByTestId('hello').textContent).toBe('Alice (2)');
+  });
+
+  test('combines an array of stores as source', () => {
+    const $a = createStore('a');
+    const $b = createStore('b');
+
+    const Hello = reflect({
+      view: Greeting,
+      bind: {},
+      mapProps: {
+        label: {
+          source: [$a, $b],
+          fn: ([a, b]) => `${a}-${b}`,
+        },
+      },
+    });
+
+    const container = render(<Hello testId="hello" greeting="" />);
+    expect(container.getByTestId('hello').textContent).toBe('a-b');
+  });
 });
 
 describe('useUnitConfig', () => {

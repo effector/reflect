@@ -678,3 +678,72 @@ function localize(value: string): unknown {
   const App: React.FC = () => <ReflectedGreeting label="x" />;
   expectType<React.FC>(App);
 }
+
+// mapProps: `source` can be an object of stores - value is the resolved shape
+{
+  const Greeting: React.FC<{
+    label: string;
+    currency: string;
+  }> = () => null;
+  const $cart = createStore<{ count: number }>({ count: 0 });
+  const $name = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: { cart: $cart, name: $name },
+        // value inferred as { cart: { count: number }; name: string }
+        fn: (s, props) => `${s.name}: ${s.cart.count} ${props.currency}`,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting currency="₽" />;
+  expectType<React.FC>(App);
+}
+
+// mapProps: object `source` - accessing a missing field errors
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $cart = createStore<{ count: number }>({ count: 0 });
+
+  reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: { cart: $cart },
+        // @ts-expect-error - `nope` is not in the resolved source shape
+        fn: (s) => `${s.nope}`,
+      },
+    },
+  });
+}
+
+// mapProps: `source` can be an array of stores - value is the resolved tuple
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $a = createStore<number>(0);
+  const $b = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: [$a, $b] as const,
+        // value inferred as [number, string]
+        fn: ([a, b]) => `${a} ${b}`,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting />;
+  expectType<React.FC>(App);
+}

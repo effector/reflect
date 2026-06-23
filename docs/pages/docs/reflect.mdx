@@ -89,8 +89,11 @@ state **and** the props passed to the component. For these cases use `mapProps`.
 
 Each entry is `{ source, fn }`:
 
-- `source` — a store (use `combine(...)` to derive from several stores) the value is read from reactively;
-- `fn` — `(value, props) => derivedProp`, where `value` is the `source` store value and `props` are the component's own props.
+- `source` — what the derived value is read from reactively. Like `combine` / `useUnit`, it can be:
+  - a single store — `value` is its state;
+  - an **object** of stores — `value` is the resolved object (`{ a: Store<A> }` → `{ a: A }`);
+  - an **array** of stores — `value` is the resolved tuple (`[Store<A>, Store<B>]` → `[A, B]`).
+- `fn` — `(value, props) => derivedProp`, where `value` is the resolved `source` value (its type is inferred — no annotation needed) and `props` are the component's own props.
 
 ```tsx
 import { reflect } from '@effector/reflect';
@@ -122,7 +125,23 @@ const Hello = reflect({
 export const App: FC = () => <Hello title="Hello," />;
 ```
 
-The component re-renders only when the `source` store changes. A prop computed via `mapProps`
+To derive from several stores at once, pass an object (or array) of stores as `source`:
+
+```tsx
+const Hello = reflect({
+  view: Greeting,
+  bind: {},
+  mapProps: {
+    label: {
+      source: { user: $user, count: $count },
+      // `s` is inferred as { user: { name: string }; count: number }
+      fn: (s, props) => `${props.title} ${s.user.name} (${s.count})`,
+    },
+  },
+});
+```
+
+The component re-renders only when the `source` changes. A prop computed via `mapProps`
 is made **optional** in the resulting component's type and can still be overridden explicitly at
 the usage site (an explicitly passed prop wins over the derived value).
 

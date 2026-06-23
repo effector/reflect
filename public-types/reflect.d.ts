@@ -44,21 +44,44 @@ type BindFromProps<Props> = {
 type StoreValue<S> = S extends Store<infer Value> ? Value : never;
 
 /**
+ * A `source` of a `mapProps` entry: a single store, or - like `combine` / `useUnit` - an object
+ * or array of stores that are combined into a single value.
+ */
+type SourceShape =
+  | Store<any>
+  | Record<string, Store<any>>
+  | ReadonlyArray<Store<any>>;
+
+/**
+ * The value `fn` receives for a given `source` shape:
+ * - `Store<V>` -> `V`
+ * - `[Store<A>, Store<B>]` -> `[A, B]`
+ * - `{ a: Store<A>; b: Store<B> }` -> `{ a: A; b: B }`
+ */
+type SourceValue<S> = S extends Store<infer V>
+  ? V
+  : S extends ReadonlyArray<Store<any>>
+  ? { -readonly [I in keyof S]: StoreValue<S[I]> }
+  : S extends Record<string, Store<any>>
+  ? { [K in keyof S]: StoreValue<S[K]> }
+  : never;
+
+/**
  * `mapProps` object type:
  * prop key -> a derived prop computed from a store value and the component's props.
  *
  * Use it to combine a store state with the incoming props to produce a prop for the `view`.
  *
- * `Sources` is a separate generic that captures the `source` store of every entry. Because the
- * stores are inferred independently of the `fn`s, `fn`'s `value` argument is inferred as the
- * `source` store value (no manual annotation needed), and `props` is the view's `Props`.
+ * `Sources` is a separate generic that captures the `source` of every entry. Because the
+ * sources are inferred independently of the `fn`s, `fn`'s `value` argument is inferred as the
+ * resolved source value (no manual annotation needed), and `props` is the view's `Props`.
  * `fn` must return the prop type - a key that is not a prop of the view resolves to `never`.
  */
-type MapPropsFromSources<Props, Sources extends Record<string, Store<any>>> = {
+type MapPropsFromSources<Props, Sources extends Record<string, SourceShape>> = {
   [K in keyof Sources]: {
     source: Sources[K];
     fn: (
-      value: StoreValue<Sources[K]>,
+      value: SourceValue<Sources[K]>,
       props: Props,
     ) => K extends keyof Props ? Props[K] : never;
   };
@@ -68,7 +91,7 @@ type MapPropsFromSources<Props, Sources extends Record<string, Store<any>>> = {
  * The keys of the view `Props` that are derived via `mapProps` - used to make them optional
  * in the resulting component type.
  */
-type MapKeysOf<Props, Sources extends Record<string, Store<any>>> = Extract<
+type MapKeysOf<Props, Sources extends Record<string, SourceShape>> = Extract<
   keyof Sources,
   keyof Props
 >;
@@ -114,7 +137,7 @@ export function reflect<
   Props extends ComponentProps<View>,
   Bind extends BindFromProps<Props>,
   // eslint-disable-next-line @typescript-eslint/ban-types
-  Sources extends Record<string, Store<any>> = {},
+  Sources extends Record<string, SourceShape> = {},
 >(config: {
   view: View;
   bind: Bind;
@@ -155,7 +178,7 @@ export function createReflect<
   Props extends ComponentProps<View>,
   Bind extends BindFromProps<Props>,
   // eslint-disable-next-line @typescript-eslint/ban-types
-  Sources extends Record<string, Store<any>> = {},
+  Sources extends Record<string, SourceShape> = {},
 >(
   component: View,
 ): (
@@ -207,7 +230,7 @@ export function list<
   },
   Bind extends BindFromProps<Props> = object,
   // eslint-disable-next-line @typescript-eslint/ban-types
-  Sources extends Record<string, Store<any>> = {},
+  Sources extends Record<string, SourceShape> = {},
 >(
   config: ReflectedProps<Item, Bind> extends Props
     ? {
@@ -290,7 +313,7 @@ export function variant<
   // eslint-disable-next-line @typescript-eslint/ban-types
   Bind extends BindFromProps<Props> = {},
   // eslint-disable-next-line @typescript-eslint/ban-types
-  Sources extends Record<string, Store<any>> = {},
+  Sources extends Record<string, SourceShape> = {},
 >(
   config:
     | {

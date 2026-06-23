@@ -1,4 +1,4 @@
-import { Effect, Event, is, scopeBind, Store } from 'effector';
+import { combine, Effect, Event, is, scopeBind, Store } from 'effector';
 import { useProvidedScope } from 'effector-react';
 import React, { PropsWithoutRef, RefAttributes } from 'react';
 
@@ -44,7 +44,10 @@ export function reflectFactory(context: Context) {
     const mapPropsKeys = Object.keys(mapProps);
     const mapPropsSources: Record<string, Store<unknown>> = {};
     for (const key of mapPropsKeys) {
-      mapPropsSources[key] = (mapProps as any)[key].source;
+      const source = (mapProps as any)[key].source;
+      // `source` can be a single store or - like `combine`/`useUnit` - an object
+      // or array of stores; normalize it to a single store once, at creation time.
+      mapPropsSources[key] = is.store(source) ? source : combine(source);
     }
 
     return React.forwardRef((props: Props, ref) => {
