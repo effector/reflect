@@ -95,6 +95,8 @@ Each entry is `{ source, fn }`:
   - an **array** of stores — `value` is the resolved tuple (`[Store<A>, Store<B>]` → `[A, B]`).
 - `fn` — `(value, props) => derivedProp`, where `value` is the resolved `source` value (its type is inferred — no annotation needed) and `props` are the component's own props.
 
+> Each key in `mapProps` must be a prop of the `view` — a typo'd or unknown key is a type error at the key itself. A key must not appear in both `bind` and `mapProps` — this is a type error. For best type inference, pass `source` as an inline literal; a variable typed as `Store<any>` will widen `fn`'s `value` argument to `any`.
+
 ```tsx
 import { reflect } from '@effector/reflect';
 import { createStore } from 'effector';
@@ -143,9 +145,10 @@ const Hello = reflect({
 
 The component re-renders only when the `source` changes. A prop computed via `mapProps`
 is made **optional** in the resulting component's type and can still be overridden explicitly at
-the usage site (an explicitly passed prop wins over the derived value).
+the usage site (an explicitly passed prop wins over the derived value — in that case `fn` is
+not invoked for the overridden key).
 
-> Note: like `bind`, the `mapProps` field is supported by all Reflect operators — `reflect`, `createReflect`, `variant` and `list`.
+> Note: like `bind`, the `mapProps` field is supported by all Reflect operators — `reflect`, `createReflect`, `variant` and `list`. In `list`, a key must not appear in both `mapItem` and `mapProps` — `mapItem` automatically omits keys that are derived via `mapProps`.
 
 ### Fork API auto-compatibility
 

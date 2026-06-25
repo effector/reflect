@@ -75,16 +75,23 @@ type SourceValue<S> = S extends Store<infer V>
  * `Sources` is a separate generic that captures the `source` of every entry. Because the
  * sources are inferred independently of the `fn`s, `fn`'s `value` argument is inferred as the
  * resolved source value (no manual annotation needed), and `props` is the view's `Props`.
- * `fn` must return the prop type - a key that is not a prop of the view resolves to `never`.
+ * Each key in `mapProps` must be a prop of the `view` - a typo'd or unknown key resolves its
+ * entry to `never`, so the object literal assigned to it is a type error at the key site.
+ * A key that is also present in `bind` resolves to `never` as well — a prop must not be
+ * both bound and derived.
  */
-type MapPropsFromSources<Props, Sources extends Record<string, SourceShape>> = {
-  [K in keyof Sources]: {
-    source: Sources[K];
-    fn: (
-      value: SourceValue<Sources[K]>,
-      props: Props,
-    ) => K extends keyof Props ? Props[K] : never;
-  };
+type MapPropsFromSources<Props, Bind, Sources extends Record<string, SourceShape>> = {
+  [K in keyof Sources]: K extends keyof Props
+    ? K extends keyof Bind
+      ? never
+      : {
+          source: Sources[K];
+          fn: (
+            value: SourceValue<Sources[K]>,
+            props: Props,
+          ) => Props[K & keyof Props];
+        }
+    : never;
 };
 
 /**
@@ -144,7 +151,7 @@ export function reflect<
   /**
    * Derives props for the `view` from a store value combined with the component's props.
    */
-  mapProps?: MapPropsFromSources<Props, Sources>;
+  mapProps?: MapPropsFromSources<Props, Bind, Sources>;
   hooks?: Hooks<Props>;
   /**
    * This configuration is passed directly to `useUnit`'s hook second argument.
@@ -187,7 +194,7 @@ export function createReflect<
     /**
      * Derives props for the `view` from a store value combined with the component's props.
      */
-    mapProps?: MapPropsFromSources<Props, Sources>;
+    mapProps?: MapPropsFromSources<Props, Bind, Sources>;
     hooks?: Hooks<Props>;
     /**
      * This configuration is passed directly to `useUnit`'s hook second argument.
@@ -226,7 +233,10 @@ export function list<
   Props extends ComponentProps<View>,
   Item,
   MapItem extends {
-    [M in keyof Omit<Props, keyof Bind>]: (item: Item, index: number) => Props[M];
+    [M in keyof Omit<Props, keyof Bind | keyof Sources>]: (
+      item: Item,
+      index: number,
+    ) => Props[M];
   },
   Bind extends BindFromProps<Props> = object,
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -238,7 +248,7 @@ export function list<
         view: View;
         bind?: Bind;
         mapItem?: MapItem;
-        mapProps?: MapPropsFromSources<Props, Sources>;
+        mapProps?: MapPropsFromSources<Props, Bind, Sources>;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks<Props>;
         /**
@@ -251,7 +261,7 @@ export function list<
         view: View;
         bind?: Bind;
         mapItem: MapItem;
-        mapProps?: MapPropsFromSources<Props, Sources>;
+        mapProps?: MapPropsFromSources<Props, Bind, Sources>;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks<Props>;
         /**
@@ -321,7 +331,7 @@ export function variant<
         cases: Partial<Cases>;
         default?: ComponentType<Props>;
         bind?: Bind;
-        mapProps?: MapPropsFromSources<Props, Sources>;
+        mapProps?: MapPropsFromSources<Props, Bind, Sources>;
         hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
@@ -333,7 +343,7 @@ export function variant<
         then: ComponentType<Props>;
         else?: ComponentType<Props>;
         bind?: Bind;
-        mapProps?: MapPropsFromSources<Props, Sources>;
+        mapProps?: MapPropsFromSources<Props, Bind, Sources>;
         hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.

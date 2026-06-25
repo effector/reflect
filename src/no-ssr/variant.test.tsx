@@ -2,7 +2,7 @@ import { variant } from '@effector/reflect';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createEvent, createStore, restore } from 'effector';
-import React from 'react';
+import React, { FC } from 'react';
 
 test('matches first', async () => {
   const changeValue = createEvent<string>();
@@ -321,5 +321,54 @@ describe('useUnitConfig', () => {
     }).toThrowErrorMatchingInlineSnapshot(
       `[Error: No scope found, consider adding <Provider> to app root]`,
     );
+  });
+});
+
+describe('mapProps', () => {
+  const Greeting: FC<{ testId: string; label: string }> = (props) => {
+    return <span data-testid={props.testId}>{props.label}</span>;
+  };
+
+  test('derives a prop in variant via mapProps', async () => {
+    const setName = createEvent<string>();
+    const $name = restore(setName, 'Bob');
+    const $type = createStore<'a' | 'b'>('a');
+
+    const Input = variant({
+      source: $type,
+      bind: {},
+      cases: { a: Greeting, b: Greeting },
+      mapProps: {
+        label: {
+          source: $name,
+          fn: (name, props: { greeting: string }) => `${props.greeting}, ${name}!`,
+        },
+      },
+    });
+
+    const container = render(<Input testId="hello" greeting="Hi" />);
+    expect(container.getByTestId('hello').textContent).toBe('Hi, Bob!');
+
+    await act(async () => {
+      setName('Alice');
+    });
+    expect(container.getByTestId('hello').textContent).toBe('Hi, Alice!');
+  });
+
+  test('explicitly passed prop wins over the derived one', () => {
+    const $name = createStore('Bob');
+    const $type = createStore<'a' | 'b'>('a');
+
+    const Input = variant({
+      source: $type,
+      bind: {},
+      cases: { a: Greeting, b: Greeting },
+      mapProps: {
+        label: { source: $name, fn: (name) => `Hello, ${name}!` },
+      },
+    });
+
+    const container = render(<Input testId="hello" label="overridden" />);
+    expect(container.getByTestId('hello').textContent).toBe('overridden');
   });
 });

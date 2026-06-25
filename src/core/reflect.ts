@@ -79,6 +79,9 @@ export function reflectFactory(context: Context) {
         );
 
         for (const key of mapPropsKeys) {
+          // an explicitly passed prop or a bound store wins over the derived one — skip fn
+          if (key in props) continue;
+          if (key in storeProps) continue;
           mappedProps[key] = (mapProps as any)[key].fn(
             (mapPropsValues as any)[key],
             propsForFn,

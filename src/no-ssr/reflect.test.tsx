@@ -630,22 +630,42 @@ describe('mapProps', () => {
     expect(container.getByTestId('hello').textContent).toBe('Hi, Alice!');
   });
 
-  test('explicitly passed prop wins over the derived one', () => {
+  test('explicitly passed prop wins over the derived one and fn is skipped', () => {
     const $name = createStore('Bob');
+    const fn = vi.fn((name: string) => `Hello, ${name}!`);
 
     const Hello = reflect({
       view: Greeting,
       bind: {},
       mapProps: {
-        label: {
-          source: $name,
-          fn: (name) => `Hello, ${name}!`,
-        },
+        label: { source: $name, fn },
       },
     });
 
     const container = render(<Hello testId="hello" label="overridden" />);
     expect(container.getByTestId('hello').textContent).toBe('overridden');
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  test('bound store wins over mapProps and fn is skipped', () => {
+    const $a = createStore('from-bind');
+    const $b = createStore('from-mapProps');
+    const fn = vi.fn((b: string) => b);
+
+    // The type-level fix (B1) makes this a type error — a key can't be in
+    // both bind and mapProps. We bypass it here to test the runtime skip,
+    // which is a defense-in-depth for JS users and type-bypass scenarios.
+    const Hello = reflect({
+      view: Greeting,
+      bind: { label: $a },
+      mapProps: {
+        label: { source: $b, fn },
+      },
+    } as any);
+
+    const container = render(<Hello testId="hello" />);
+    expect(container.getByTestId('hello').textContent).toBe('from-bind');
+    expect(fn).not.toHaveBeenCalled();
   });
 
   test('combines an object of stores as source', async () => {
