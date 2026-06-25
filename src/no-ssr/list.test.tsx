@@ -1,6 +1,13 @@
 import { list } from '@effector/reflect';
 import { render } from '@testing-library/react';
-import { allSettled, createEffect, createEvent, createStore, fork } from 'effector';
+import {
+  allSettled,
+  createEffect,
+  createEvent,
+  createStore,
+  fork,
+  restore,
+} from 'effector';
 import { Provider, useStore } from 'effector-react';
 import React, { FC, memo } from 'react';
 import { act } from 'react-dom/test-utils';
@@ -563,5 +570,46 @@ describe('useUnitConfig', () => {
     }).toThrowErrorMatchingInlineSnapshot(
       `[Error: No scope found, consider adding <Provider> to app root]`,
     );
+  });
+});
+
+describe('mapProps', () => {
+  const Item: FC<{ testId: string; label?: string }> = (props) => {
+    return <li data-testid={props.testId}>{props.label}</li>;
+  };
+
+  test('derives a prop in list via mapProps using mapItem output', async () => {
+    const setName = createEvent<string>();
+    const $name = restore(setName, 'Bob');
+    const $items = createStore([{ key: 'a' }, { key: 'b' }]);
+
+    const Items = list({
+      source: $items,
+      view: Item,
+      bind: {},
+      mapItem: {
+        testId: (item) => item.key,
+      },
+      mapProps: {
+        label: {
+          source: $name,
+          fn: (name, props: { testId: string }) => `${props.testId}-${name}`,
+        },
+      },
+    });
+
+    const container = render(
+      <ul>
+        <Items />
+      </ul>,
+    );
+    expect(container.getByTestId('a').textContent).toBe('a-Bob');
+    expect(container.getByTestId('b').textContent).toBe('b-Bob');
+
+    await act(async () => {
+      setName('Alice');
+    });
+    expect(container.getByTestId('a').textContent).toBe('a-Alice');
+    expect(container.getByTestId('b').textContent).toBe('b-Alice');
   });
 });

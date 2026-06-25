@@ -1,6 +1,6 @@
 import { list } from '@effector/reflect/scope';
 import { act, render } from '@testing-library/react';
-import { allSettled, createDomain, fork } from 'effector';
+import { allSettled, createDomain, fork, restore } from 'effector';
 import { Provider, useStore } from 'effector-react/scope';
 import React, { FC, memo } from 'react';
 
@@ -364,4 +364,44 @@ test('reflect-list: getKey option', async () => {
   expect(fn.mock.calls.map(([arg]) => arg)).toEqual(
     fn2.mock.calls.map(([arg]) => arg),
   );
+});
+
+test('mapProps derives a prop in list from a scoped store', async () => {
+  const app = createDomain();
+
+  const setName = app.createEvent<string>();
+  const $name = restore(setName, 'Bob');
+  const $items = app.createStore([{ key: 'a' }, { key: 'b' }]);
+
+  const Item: FC<{ testId: string; label?: string }> = (props) => {
+    return <li data-testid={props.testId}>{props.label}</li>;
+  };
+
+  const Items = list({
+    source: $items,
+    view: Item,
+    bind: {},
+    mapItem: { testId: (item: { key: string }) => item.key },
+    mapProps: {
+      label: {
+        source: $name,
+        fn: (name, props: { testId: string }) => `${props.testId}-${name}`,
+      },
+    },
+  });
+
+  const scope = fork(app, { values: [[$name, 'Alice']] });
+
+  const container = render(
+    <Provider value={scope}>
+      <ul>
+        <Items />
+      </ul>
+    </Provider>,
+  );
+
+  expect(container.getByTestId('a').textContent).toBe('a-Alice');
+  expect(container.getByTestId('b').textContent).toBe('b-Alice');
+  // global store is untouched
+  expect($name.getState()).toBe('Bob');
 });

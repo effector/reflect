@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { reflect } from '@effector/reflect';
 import { Button } from '@mantine/core';
-import { createEvent, createStore } from 'effector';
+import { createEvent, createStore, Store } from 'effector';
 import React, {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
@@ -656,7 +656,9 @@ function localize(value: string): unknown {
   expectType<React.FC>(App);
 }
 
-// mapProps: a key that is not a prop of the view makes fn's return type `never`
+// mapProps: a key that is not a prop of the view is a type error on the key
+// (under the stricter `Record<keyof Props, SourceShape>` constraint).
+// The `@ts-expect-error` sits on the key line, not on `fn`'s body.
 {
   const Greeting: React.FC<{
     label: string;
@@ -667,10 +669,10 @@ function localize(value: string): unknown {
     view: Greeting,
     bind: {},
     mapProps: {
+      // @ts-expect-error - `unknownProp` is not a prop of `Greeting`
       unknownProp: {
         source: $name,
-        // @ts-expect-error - `unknownProp` is not a prop, so the return type is `never`
-        fn: (value) => value,
+        fn: (value: any) => value,
       },
     },
   });
@@ -745,5 +747,98 @@ function localize(value: string): unknown {
   });
 
   const App: React.FC = () => <ReflectedGreeting />;
+  expectType<React.FC>(App);
+}
+
+// --- review #2: typo'd key errors on the key itself, not on fn's return --
+{
+  const Greeting: React.FC<{ label: string }> = () => null;
+  const $name = createStore<string>('');
+
+  reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      // @ts-expect-error - `labe` is not a prop of `Greeting`; error on the key
+      labe: { source: $name, fn: (name) => name },
+    },
+  });
+}
+
+// --- review #3: `source` passed as a variable ----------------------------
+
+// 3a: object source assigned to a const - `value` stays precisely typed
+{
+  const Greeting: React.FC<{ label: string; currency: string }> = () => null;
+  const $cart = createStore<{ count: number }>({ count: 0 });
+  const $name = createStore<string>('');
+
+  const src = { cart: $cart, name: $name };
+
+  const Reflected = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: src,
+        fn: (s, props) => `${s.name}: ${s.cart.count} ${props.currency}`,
+      },
+    },
+  });
+
+  const App: React.FC = () => <Reflected currency="₽" />;
+  expectType<React.FC>(App);
+}
+
+// 3b: source typed as `Store<any>` - `value` degrades to `any` (accepted TS limit)
+{
+  const Greeting: React.FC<{ label: string }> = () => null;
+  const $name = createStore<string>('');
+  const loose: Store<any> = $name;
+
+  reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: loose,
+        // `v` is `any` - no error, but no safety either
+        fn: (v) => v.unknownField.thatsNotChecked,
+      },
+    },
+  });
+}
+
+// --- review B1: a key in both `bind` and `mapProps` is a type error -------
+
+// B1 negative: same key in bind and mapProps — collision
+{
+  const V: React.FC<{ a: string; b: string }> = () => null;
+  const $a = createStore<string>('a');
+  const $b = createStore<string>('b');
+
+  reflect({
+    view: V,
+    bind: { a: $a },
+    mapProps: {
+      // @ts-expect-error - `a` is in bind; collision with mapProps
+      a: { source: $b, fn: (b) => b },
+    },
+  });
+}
+
+// B1 positive: disjoint keys in bind and mapProps — compiles
+{
+  const V: React.FC<{ a: string; b: string }> = () => null;
+  const $a = createStore<string>('a');
+  const $b = createStore<string>('b');
+
+  const R = reflect({
+    view: V,
+    bind: { a: $a },
+    mapProps: { b: { source: $b, fn: (b) => b } },
+  });
+
+  const App: React.FC = () => <R />;
   expectType<React.FC>(App);
 }

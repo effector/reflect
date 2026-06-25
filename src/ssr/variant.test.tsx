@@ -1,9 +1,9 @@
 import { variant } from '@effector/reflect/scope';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { allSettled, createDomain, fork, restore } from 'effector';
+import { allSettled, createDomain, createStore, fork, restore } from 'effector';
 import { Provider } from 'effector-react/scope';
-import React from 'react';
+import React, { FC } from 'react';
 
 test('matches first', async () => {
   const app = createDomain();
@@ -239,3 +239,39 @@ function InputCustom3(props: {
     />
   );
 }
+
+test('mapProps derives a prop in variant from a scoped store', async () => {
+  const app = createDomain();
+
+  const setName = app.createEvent<string>();
+  const $name = restore(setName, 'Bob');
+  const $type = app.createStore<'a' | 'b'>('a');
+
+  const Greeting: FC<{ testId: string; label: string }> = (props) => {
+    return <span data-testid={props.testId}>{props.label}</span>;
+  };
+
+  const Input = variant({
+    source: $type,
+    bind: {},
+    cases: { a: Greeting, b: Greeting },
+    mapProps: {
+      label: {
+        source: $name,
+        fn: (name, props: { greeting: string }) => `${props.greeting}, ${name}!`,
+      },
+    },
+  });
+
+  const scope = fork(app, { values: [[$name, 'Alice']] });
+
+  const container = render(
+    <Provider value={scope}>
+      <Input testId="hello" greeting="Hi" />
+    </Provider>,
+  );
+
+  expect(container.getByTestId('hello').textContent).toBe('Hi, Alice!');
+  // global store is untouched
+  expect($name.getState()).toBe('Bob');
+});

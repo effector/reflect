@@ -196,3 +196,44 @@ import { expectType } from 'tsd';
 
   expectType<React.FC>(List);
 }
+
+// --- review B2: a key in both `mapItem` and `mapProps` is a type error -------
+// Note: this is caught for unannotated arrow functions. If the user explicitly
+// annotates the `item` parameter, TS's excess-property checking is bypassable
+// (known TS limitation with mapped-type `extends` constraints).
+
+// B2 negative: same key in mapItem and mapProps — collision
+{
+  const Item: React.FC<{ id: string; label?: string }> = () => null;
+  const $name = createStore<string>('');
+  const $items = createStore<{ id: string }[]>([{ id: 'a' }]);
+
+  list({
+    source: $items,
+    view: Item,
+    bind: {},
+    mapItem: {
+      id: (item) => item.id,
+      // @ts-expect-error - `label` is in mapProps; mapItem omits it
+      label: (item) => item.id,
+    },
+    mapProps: { label: { source: $name, fn: (n) => n } },
+  });
+}
+
+// B2 positive: disjoint keys in mapItem and mapProps — compiles
+{
+  const Item: React.FC<{ id: string; label?: string }> = () => null;
+  const $name = createStore<string>('');
+  const $items = createStore<{ id: string }[]>([{ id: 'a' }]);
+
+  const List = list({
+    source: $items,
+    view: Item,
+    bind: {},
+    mapItem: { id: (item) => item.id },
+    mapProps: { label: { source: $name, fn: (n) => n } },
+  });
+
+  expectType<React.FC>(List);
+}

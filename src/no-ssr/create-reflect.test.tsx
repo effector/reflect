@@ -229,3 +229,53 @@ describe('useUnitConfig', () => {
     );
   });
 });
+
+describe('mapProps', () => {
+  const Greeting: FC<{ testId: string; label: string }> = (props) => {
+    return <span data-testid={props.testId}>{props.label}</span>;
+  };
+  const greetingReflect = createReflect(Greeting);
+
+  test('derives a prop in createReflect via mapProps', async () => {
+    const setName = createEvent<string>();
+    const $name = restore(setName, 'Bob');
+
+    const Hello = greetingReflect(
+      {},
+      {
+        mapProps: {
+          label: {
+            source: $name,
+            fn: (name, props: { greeting: string }) => `${props.greeting}, ${name}!`,
+          },
+        },
+      },
+    );
+
+    const container = render(<Hello testId="hello" greeting="Hi" />);
+    expect(container.getByTestId('hello').textContent).toBe('Hi, Bob!');
+
+    await act(async () => {
+      setName('Alice');
+    });
+    expect(container.getByTestId('hello').textContent).toBe('Hi, Alice!');
+  });
+
+  test('explicitly passed prop wins over the derived one and fn is skipped', () => {
+    const $name = createStore('Bob');
+    const fn = vi.fn((name: string) => `Hello, ${name}!`);
+
+    const Hello = greetingReflect(
+      {},
+      {
+        mapProps: {
+          label: { source: $name, fn },
+        },
+      },
+    );
+
+    const container = render(<Hello testId="hello" label="overridden" />);
+    expect(container.getByTestId('hello').textContent).toBe('overridden');
+    expect(fn).not.toHaveBeenCalled();
+  });
+});
