@@ -20,6 +20,18 @@ export type BindProps<Props> = {
   [K in keyof Props]: Props[K] | Store<Props[K]> | EventCallable<void>;
 };
 
+export type MapPropsSource =
+  | Store<any>
+  | Record<string, Store<any>>
+  | ReadonlyArray<Store<any>>;
+
+export type MapPropsConfig<Props> = {
+  [K in keyof Props]?: {
+    source: MapPropsSource;
+    fn: (value: any, props: Props) => Props[K];
+  };
+};
+
 export type Hook<Props> =
   | ((props: Props) => any)
   | EventCallable<Props>

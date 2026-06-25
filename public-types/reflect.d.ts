@@ -41,15 +41,75 @@ type BindFromProps<Props> = {
         | VoidCallback<Props[K]>;
 };
 
+type StoreValue<S> = S extends Store<infer Value> ? Value : never;
+
 /**
- * Computes final props type based on Props of the view component and Bind object.
+ * A `source` of a `mapProps` entry: a single store, or - like `combine` / `useUnit` - an object
+ * or array of stores that are combined into a single value.
+ */
+type SourceShape =
+  | Store<any>
+  | Record<string, Store<any>>
+  | ReadonlyArray<Store<any>>;
+
+/**
+ * The value `fn` receives for a given `source` shape:
+ * - `Store<V>` -> `V`
+ * - `[Store<A>, Store<B>]` -> `[A, B]`
+ * - `{ a: Store<A>; b: Store<B> }` -> `{ a: A; b: B }`
+ */
+type SourceValue<S> = S extends Store<infer V>
+  ? V
+  : S extends ReadonlyArray<Store<any>>
+  ? { -readonly [I in keyof S]: StoreValue<S[I]> }
+  : S extends Record<string, Store<any>>
+  ? { [K in keyof S]: StoreValue<S[K]> }
+  : never;
+
+/**
+ * `mapProps` object type:
+ * prop key -> a derived prop computed from a store value and the component's props.
  *
- * Props that are "taken" by Bind object are made **optional** in the final type,
+ * Use it to combine a store state with the incoming props to produce a prop for the `view`.
+ *
+ * `Sources` is a separate generic that captures the `source` of every entry. Because the
+ * sources are inferred independently of the `fn`s, `fn`'s `value` argument is inferred as the
+ * resolved source value (no manual annotation needed), and `props` is the view's `Props`.
+ * `fn` must return the prop type - a key that is not a prop of the view resolves to `never`.
+ */
+type MapPropsFromSources<Props, Sources extends Record<string, SourceShape>> = {
+  [K in keyof Sources]: {
+    source: Sources[K];
+    fn: (
+      value: SourceValue<Sources[K]>,
+      props: Props,
+    ) => K extends keyof Props ? Props[K] : never;
+  };
+};
+
+/**
+ * The keys of the view `Props` that are derived via `mapProps` - used to make them optional
+ * in the resulting component type.
+ */
+type MapKeysOf<Props, Sources extends Record<string, SourceShape>> = Extract<
+  keyof Sources,
+  keyof Props
+>;
+
+/**
+ * Computes final props type based on Props of the view component, Bind object and the keys
+ * derived via `mapProps`.
+ *
+ * Props that are "taken" by the Bind object or `mapProps` are made **optional** in the final type,
  * so it is possible to overwrite them in the component usage anyway
  */
-type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
-  Omit<Props, keyof Bind> & {
-    [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+type FinalProps<
+  Props,
+  Bind extends BindFromProps<Props>,
+  MapKeys extends keyof Props,
+> = Show<
+  Omit<Props, keyof Bind | MapKeys> & {
+    [K in Extract<keyof Bind, keyof Props> | MapKeys]?: Props[K];
   }
 >;
 
@@ -66,6 +126,9 @@ type FinalProps<Props, Bind extends BindFromProps<Props>> = Show<
  *   placeholder: 'Name',
  *   onChange: (event) => nameChanged(event.target.value),
  *  },
+ *  mapProps: {
+ *   label: { source: $user, fn: (user, props) => `${props.title} ${user.name}` },
+ *  },
  * });
  * ```
  */
@@ -73,15 +136,21 @@ export function reflect<
   View extends ComponentType<any>,
   Props extends ComponentProps<View>,
   Bind extends BindFromProps<Props>,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  Sources extends Record<string, SourceShape> = {},
 >(config: {
   view: View;
   bind: Bind;
+  /**
+   * Derives props for the `view` from a store value combined with the component's props.
+   */
+  mapProps?: MapPropsFromSources<Props, Sources>;
   hooks?: Hooks<Props>;
   /**
    * This configuration is passed directly to `useUnit`'s hook second argument.
    */
   useUnitConfig?: UseUnitConfig;
-}): FC<FinalProps<Props, Bind>>;
+}): FC<FinalProps<Props, Bind, MapKeysOf<Props, Sources>>>;
 
 // Note: FC is used as a return type, because tests on a real Next.js project showed,
 // that if theoretically better option like (props: ...) => React.ReactNode is used,
@@ -108,18 +177,24 @@ export function createReflect<
   View extends ComponentType<any>,
   Props extends ComponentProps<View>,
   Bind extends BindFromProps<Props>,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  Sources extends Record<string, SourceShape> = {},
 >(
   component: View,
 ): (
   bind: Bind,
   features?: {
+    /**
+     * Derives props for the `view` from a store value combined with the component's props.
+     */
+    mapProps?: MapPropsFromSources<Props, Sources>;
     hooks?: Hooks<Props>;
     /**
      * This configuration is passed directly to `useUnit`'s hook second argument.
      */
     useUnitConfig?: UseUnitConfig;
   },
-) => FC<FinalProps<Props, Bind>>;
+) => FC<FinalProps<Props, Bind, MapKeysOf<Props, Sources>>>;
 
 // list types
 type PropsifyBind<Bind> = {
@@ -154,6 +229,8 @@ export function list<
     [M in keyof Omit<Props, keyof Bind>]: (item: Item, index: number) => Props[M];
   },
   Bind extends BindFromProps<Props> = object,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  Sources extends Record<string, SourceShape> = {},
 >(
   config: ReflectedProps<Item, Bind> extends Props
     ? {
@@ -161,6 +238,7 @@ export function list<
         view: View;
         bind?: Bind;
         mapItem?: MapItem;
+        mapProps?: MapPropsFromSources<Props, Sources>;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks<Props>;
         /**
@@ -173,6 +251,7 @@ export function list<
         view: View;
         bind?: Bind;
         mapItem: MapItem;
+        mapProps?: MapPropsFromSources<Props, Sources>;
         getKey?: (item: Item) => React.Key;
         hooks?: Hooks<Props>;
         /**
@@ -192,10 +271,14 @@ export function list<
  * Props that are "taken" by Bind object are made **optional** in the final type,
  * so it is possible to overwrite them in the component usage anyway
  */
-type FinalPropsVariant<Props, Bind extends BindFromProps<Props>> = Show<
+type FinalPropsVariant<
+  Props,
+  Bind extends BindFromProps<Props>,
+  MapKeys extends keyof Props,
+> = Show<
   Props extends any
-    ? Omit<Props, keyof Bind> & {
-        [K in Extract<keyof Bind, keyof Props>]?: Props[K];
+    ? Omit<Props, keyof Bind | MapKeys> & {
+        [K in Extract<keyof Bind, keyof Props> | MapKeys]?: Props[K];
       }
     : never
 >;
@@ -229,6 +312,8 @@ export function variant<
   // but it is not clear why it works this way - Record<string, never> or any option other than `{}` doesn't work
   // eslint-disable-next-line @typescript-eslint/ban-types
   Bind extends BindFromProps<Props> = {},
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  Sources extends Record<string, SourceShape> = {},
 >(
   config:
     | {
@@ -236,6 +321,7 @@ export function variant<
         cases: Partial<Cases>;
         default?: ComponentType<Props>;
         bind?: Bind;
+        mapProps?: MapPropsFromSources<Props, Sources>;
         hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
@@ -247,13 +333,14 @@ export function variant<
         then: ComponentType<Props>;
         else?: ComponentType<Props>;
         bind?: Bind;
+        mapProps?: MapPropsFromSources<Props, Sources>;
         hooks?: Hooks<Props>;
         /**
          * This configuration is passed directly to `useUnit`'s hook second argument.
          */
         useUnitConfig?: UseUnitConfig;
       },
-): FC<FinalPropsVariant<Props, Bind>>;
+): FC<FinalPropsVariant<Props, Bind, MapKeysOf<Props, Sources>>>;
 
 // fromTag types
 /**

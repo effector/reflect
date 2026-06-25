@@ -601,6 +601,98 @@ describe('fromTag helper', () => {
   });
 });
 
+describe('mapProps', () => {
+  const Greeting: FC<{ testId: string; label: string }> = (props) => {
+    return <span data-testid={props.testId}>{props.label}</span>;
+  };
+
+  test('derives a prop from a store value combined with props', async () => {
+    const setName = createEvent<string>();
+    const $name = restore(setName, 'Bob');
+
+    const Hello = reflect({
+      view: Greeting,
+      bind: {},
+      mapProps: {
+        label: {
+          source: $name,
+          fn: (name, props: { greeting: string }) => `${props.greeting}, ${name}!`,
+        },
+      },
+    });
+
+    const container = render(<Hello testId="hello" greeting="Hi" />);
+    expect(container.getByTestId('hello').textContent).toBe('Hi, Bob!');
+
+    await act(async () => {
+      setName('Alice');
+    });
+    expect(container.getByTestId('hello').textContent).toBe('Hi, Alice!');
+  });
+
+  test('explicitly passed prop wins over the derived one', () => {
+    const $name = createStore('Bob');
+
+    const Hello = reflect({
+      view: Greeting,
+      bind: {},
+      mapProps: {
+        label: {
+          source: $name,
+          fn: (name) => `Hello, ${name}!`,
+        },
+      },
+    });
+
+    const container = render(<Hello testId="hello" label="overridden" />);
+    expect(container.getByTestId('hello').textContent).toBe('overridden');
+  });
+
+  test('combines an object of stores as source', async () => {
+    const setName = createEvent<string>();
+    const $name = restore(setName, 'Bob');
+    const $count = createStore(2);
+
+    const Hello = reflect({
+      view: Greeting,
+      bind: {},
+      mapProps: {
+        label: {
+          source: { name: $name, count: $count },
+          fn: (s) => `${s.name} (${s.count})`,
+        },
+      },
+    });
+
+    const container = render(<Hello testId="hello" greeting="" />);
+    expect(container.getByTestId('hello').textContent).toBe('Bob (2)');
+
+    await act(async () => {
+      setName('Alice');
+    });
+    expect(container.getByTestId('hello').textContent).toBe('Alice (2)');
+  });
+
+  test('combines an array of stores as source', () => {
+    const $a = createStore('a');
+    const $b = createStore('b');
+
+    const Hello = reflect({
+      view: Greeting,
+      bind: {},
+      mapProps: {
+        label: {
+          source: [$a, $b],
+          fn: ([a, b]) => `${a}-${b}`,
+        },
+      },
+    });
+
+    const container = render(<Hello testId="hello" greeting="" />);
+    expect(container.getByTestId('hello').textContent).toBe('a-b');
+  });
+});
+
 describe('useUnitConfig', () => {
   test('useUnit config should be passed to underlying useUnit', () => {
     expect(() => {

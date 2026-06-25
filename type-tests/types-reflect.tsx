@@ -578,3 +578,172 @@ function localize(value: string): unknown {
     },
   });
 }
+
+// mapProps: derives a prop from a store value combined with props,
+// `value` is inferred from `source`, `props` is the view's props
+{
+  const Greeting: React.FC<{
+    label: string;
+    greeting: string;
+  }> = () => null;
+  const $user = createStore<{ name: string }>({ name: '' });
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $user,
+        // `user` is inferred as { name: string }, `props` as the view's Props
+        fn: (user, props) => `${props.greeting} ${user.name}`,
+      },
+    },
+  });
+
+  // `greeting` is still required, `label` is made optional by mapProps
+  const App: React.FC = () => {
+    return <ReflectedGreeting greeting="Hi" />;
+  };
+  expectType<React.FC>(App);
+
+  // the derived prop can still be overridden at the usage site
+  const AppOverride: React.FC = () => {
+    return <ReflectedGreeting greeting="Hi" label="overridden" />;
+  };
+  expectType<React.FC>(AppOverride);
+}
+
+// mapProps: `value` is inferred from `source` - accessing a missing field errors
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $user = createStore<{ name: string }>({ name: '' });
+
+  reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $user,
+        // @ts-expect-error - `nope` does not exist on the inferred source value
+        fn: (user) => `${user.nope}`,
+      },
+    },
+  });
+}
+
+// mapProps: fn return type must match the prop type
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $count = createStore<number>(0);
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: $count,
+        // @ts-expect-error - number is not assignable to the string `label` prop
+        fn: (count) => count,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting />;
+  expectType<React.FC>(App);
+}
+
+// mapProps: a key that is not a prop of the view makes fn's return type `never`
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $name = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      unknownProp: {
+        source: $name,
+        // @ts-expect-error - `unknownProp` is not a prop, so the return type is `never`
+        fn: (value) => value,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting label="x" />;
+  expectType<React.FC>(App);
+}
+
+// mapProps: `source` can be an object of stores - value is the resolved shape
+{
+  const Greeting: React.FC<{
+    label: string;
+    currency: string;
+  }> = () => null;
+  const $cart = createStore<{ count: number }>({ count: 0 });
+  const $name = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: { cart: $cart, name: $name },
+        // value inferred as { cart: { count: number }; name: string }
+        fn: (s, props) => `${s.name}: ${s.cart.count} ${props.currency}`,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting currency="₽" />;
+  expectType<React.FC>(App);
+}
+
+// mapProps: object `source` - accessing a missing field errors
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $cart = createStore<{ count: number }>({ count: 0 });
+
+  reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: { cart: $cart },
+        // @ts-expect-error - `nope` is not in the resolved source shape
+        fn: (s) => `${s.nope}`,
+      },
+    },
+  });
+}
+
+// mapProps: `source` can be an array of stores - value is the resolved tuple
+{
+  const Greeting: React.FC<{
+    label: string;
+  }> = () => null;
+  const $a = createStore<number>(0);
+  const $b = createStore<string>('');
+
+  const ReflectedGreeting = reflect({
+    view: Greeting,
+    bind: {},
+    mapProps: {
+      label: {
+        source: [$a, $b] as const,
+        // value inferred as [number, string]
+        fn: ([a, b]) => `${a} ${b}`,
+      },
+    },
+  });
+
+  const App: React.FC = () => <ReflectedGreeting />;
+  expectType<React.FC>(App);
+}
