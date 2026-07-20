@@ -37,7 +37,7 @@ await measure(`package.json → ./dist/package.json`, `created in`, async () => 
     maintainers: Existing.maintainers,
     license: Existing.license,
     publishConfig: Existing.publishConfig,
-    export: Existing.export,
+    exports: Existing.exports,
     main: Existing.main,
     module: Existing.module,
     typings: Existing.typings,
